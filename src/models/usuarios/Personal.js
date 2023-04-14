@@ -1,11 +1,23 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("Usuario",{
+    sequelize.define("Personal",{
         id:{
             type:DataTypes.INTEGER,
             primaryKey:true,
         },
-        password:{
+        nombres:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        email:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        telefonos:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        urlFoto:{
             type:DataTypes.STRING,
             allowNull: false,
         },

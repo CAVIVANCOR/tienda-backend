@@ -29,9 +29,18 @@ const PreciosCliProvModel = require("./models/clientesProveedores/PreciosCliProv
 const ProvinciaUbigeoModel = require("./models/clientesProveedores/ProvinciaUbigeo");
 const TipoDocIdentidadModel = require("./models/clientesProveedores/TipoDocIdentidad");
 const TransportistaCliProvModel = require("./models/clientesProveedores/TransportistaCliProv");
+const CuentasBancariasCliProvModel = require("./models/clientesProveedores/CuentasBancariasCliProv");
+const BancosProvModel = require("./models/clientesProveedores/Bancos");
 
+const AccesoModel = require("./models/usuarios/Acceso");
+const ModuloModel = require("./models/usuarios/Modulo");
+const PersonalModel = require("./models/usuarios/Personal");
+const RolModel = require("./models/usuarios/Rol");
+const SubModuloModel = require("./models/usuarios/SubModulo");
+const UsuarioModel = require("./models/usuarios/Usuario");
 
 /**Instancias que definen los modelos, crea el .models: */
+//**PRODUCTOS */
 ProductoModel(sequelize);
 FamiliaProductoModel(sequelize);
 SubFamiliaProductoModel(sequelize);
@@ -45,6 +54,7 @@ ProcedenciaProductoModel(sequelize);
 TipoExistenciaContModel(sequelize);
 UMProductoModel(sequelize);
 
+//**CLIENTES PROVEEDORES */
 ClienteProveedorModel(sequelize);
 ChoferTransportistaModel(sequelize);
 ContactosCliProvModel(sequelize);
@@ -56,13 +66,25 @@ PreciosCliProvModel(sequelize);
 ProvinciaUbigeoModel(sequelize);
 TipoDocIdentidadModel(sequelize);
 TransportistaCliProvModel(sequelize);
+CuentasBancariasCliProvModel(sequelize);
+BancosProvModel(sequelize);
+
+//**USUARIOS ACCESOS */
+UsuarioModel(sequelize);
+AccesoModel(sequelize);
+ModuloModel(sequelize);
+SubModuloModel(sequelize);
+RolModel(sequelize);
+PersonalModel(sequelize);
+
+
 
 //**Relacionar los Modelos */
 const  {Producto, FamiliaProducto, SubFamiliaProducto, AnoProducto, ColorProducto, LadoProducto, MarcaProducto, 
         MaterialProducto, ModeloMarcaProducto, ProcedenciaProducto, TipoExistenciaCont, UMProducto,
         ClienteProveedor, ChoferTransportista, ContactosCliProv, DepartamentoUbigeo, DireccionesCliProv, 
-        DistritoUbigeo, PaisUbigeo, PreciosCliProv, ProvinciaUbigeo, TipoDocIdentidad, TransportistaCliProv} = sequelize.models;
-
+        DistritoUbigeo, PaisUbigeo, PreciosCliProv, ProvinciaUbigeo, TipoDocIdentidad, TransportistaCliProv,
+        CuentasBancariasCliProv, Bancos, Usuario, Acceso, Modulo, SubModulo, Rol, Personal} = sequelize.models;
 //**PRODUCTOS */
 SubFamiliaProducto.hasMany(Producto);
 Producto.belongsTo(SubFamiliaProducto);
@@ -121,5 +143,30 @@ DepartamentoUbigeo.belongsTo(ProvinciaUbigeo);
 PaisUbigeo.hasMany(ProvinciaUbigeo);
 ProvinciaUbigeo.belongsTo(PaisUbigeo);
 
+ClienteProveedor.hasMany(CuentasBancariasCliProv);
+CuentasBancariasCliProv.belongsTo(ClienteProveedor);
+
+Bancos.hasMany(CuentasBancariasCliProv);
+CuentasBancariasCliProv.belongsTo(Bancos);
+
+Modulo, SubModulo, Rol
+
+//**USUARIOS ACCESOS */
+
+Usuario.hasMany(Personal);
+Personal.belongsTo(Usuario);
+
+Rol.hasMany(Usuario);
+Usuario.belongsTo(Rol);
+
+Usuario.hasMany(Acceso);
+Acceso.belongsTo(Usuario);
+
+SubModulo.hasMany(Acceso);
+Acceso.belongsTo(SubModulo);
+
+Modulo.hasMany(SubModulo);
+SubModulo.belongsTo(Modulo);
 
 module.exports = {sequelize, SERVER_PORT, ...sequelize.models}
+

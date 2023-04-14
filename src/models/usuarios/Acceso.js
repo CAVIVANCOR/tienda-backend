@@ -1,13 +1,33 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("Usuario",{
+    sequelize.define("Acceso",{
         id:{
             type:DataTypes.INTEGER,
             primaryKey:true,
         },
-        password:{
+        descripcion:{
             type:DataTypes.STRING,
             allowNull: false,
+        },
+        lectura:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        escritura:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        creacion:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        eliminacion:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        reportes:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         },
         created:{
             type:DataTypes.BOOLEAN,

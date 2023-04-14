@@ -1,13 +1,17 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("Usuario",{
+    sequelize.define("Rol",{
         id:{
             type:DataTypes.INTEGER,
             primaryKey:true,
         },
-        password:{
+        descripcion:{
             type:DataTypes.STRING,
             allowNull: false,
+        },
+        superUsuario:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         },
         created:{
             type:DataTypes.BOOLEAN,
@@ -25,3 +29,8 @@ module.exports = (sequelize)=>{
     {timestamps:false}
     )
 }
+
+// rol:{
+//     type:DataTypes.ENUM("SELLER","ADMIN","MANAGER","WAREHOUSE","ACCOUNTANT"),
+//     defaultValue:"SELLER",
+// },

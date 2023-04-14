@@ -51,18 +51,6 @@ module.exports = (sequelize)=>{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
-        nroCuentaBancariaMN:{
-            type:DataTypes.STRING,
-        },
-        nroCuentaInterBancariaMN:{
-            type:DataTypes.STRING,
-        },
-        nroCuentaBancariaME:{
-            type:DataTypes.STRING,
-        },
-        nroCuentaInterBancariaME:{
-            type:DataTypes.STRING,
-        },
         saldoAnticiposMN:{
             type:DataTypes.DECIMAL(12,2),
         },

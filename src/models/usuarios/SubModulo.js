@@ -1,11 +1,11 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("Usuario",{
+    sequelize.define("SubModulo",{
         id:{
             type:DataTypes.INTEGER,
             primaryKey:true,
         },
-        password:{
+        descripcion:{
             type:DataTypes.STRING,
             allowNull: false,
         },

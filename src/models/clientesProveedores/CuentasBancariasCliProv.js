@@ -1,13 +1,29 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("Usuario",{
+    sequelize.define("CuentasBancariasCliProv",{
         id:{
-            type:DataTypes.INTEGER,
+            type:DataTypes.BIGINT,
             primaryKey:true,
         },
-        password:{
+        descripcion:{
             type:DataTypes.STRING,
             allowNull: false,
+        },
+        moneda:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        nroCuentaBancaria:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        nroCuentaInterbancaria:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        principal:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         },
         created:{
             type:DataTypes.BOOLEAN,
