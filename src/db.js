@@ -5,6 +5,7 @@ const {DB_USER, DB_PASSWORD, DB_HOST, SERVER_PORT} = process.env;
 const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/tienda`,{logging:false});
 
 //**Definicion de modelos (con sequelize)*/
+//**PRODUCTOS */
 const ProductoModel = require("./models/productos/Producto");
 const FamiliaProductoModel = require("./models/productos/FamiliaProducto");
 const SubFamiliaProductoModel = require("./models/productos/SubFamiliaProducto");
@@ -18,6 +19,7 @@ const ProcedenciaProductoModel = require("./models/productos/ProcedenciaProducto
 const TipoExistenciaContModel = require("./models/productos/TipoExistenciaCont");
 const UMProductoModel = require("./models/productos/UMProducto");
 
+//**CLIENTES PROVEEDORES */
 const ClienteProveedorModel = require("./models/clientesProveedores/ClienteProveedor");
 const ChoferTransportistaModel = require("./models/clientesProveedores/ChoferTransportista");
 const ContactosCliProvModel = require("./models/clientesProveedores/ContactosCliProv");
@@ -32,12 +34,20 @@ const TransportistaCliProvModel = require("./models/clientesProveedores/Transpor
 const CuentasBancariasCliProvModel = require("./models/clientesProveedores/CuentasBancariasCliProv");
 const BancosProvModel = require("./models/clientesProveedores/Bancos");
 
+//**USUARIOS ACCESOS */
 const AccesoModel = require("./models/usuarios/Acceso");
 const ModuloModel = require("./models/usuarios/Modulo");
 const PersonalModel = require("./models/usuarios/Personal");
 const RolModel = require("./models/usuarios/Rol");
 const SubModuloModel = require("./models/usuarios/SubModulo");
 const UsuarioModel = require("./models/usuarios/Usuario");
+
+//**TABLAS GLOBALES */
+const CorrelativoDocModel = require("./models/tablas/CorrelativoDoc");
+const DatoGlobalModel = require("./models/tablas/DatoGlobal");
+const EstadoDocModel = require("./models/tablas/EstadoDoc");
+const TipoCambioModel = require("./models/tablas/TipoCambio");
+const TipoDocumentoModel = require("./models/tablas/TipoDocumento");
 
 /**Instancias que definen los modelos, crea el .models: */
 //**PRODUCTOS */
@@ -77,6 +87,12 @@ SubModuloModel(sequelize);
 RolModel(sequelize);
 PersonalModel(sequelize);
 
+//**TABLAS GLOBALES */
+CorrelativoDocModel(sequelize);
+DatoGlobalModel(sequelize);
+EstadoDocModel(sequelize);
+TipoCambioModel(sequelize);
+TipoDocumentoModel(sequelize);
 
 
 //**Relacionar los Modelos */
@@ -84,7 +100,9 @@ const  {Producto, FamiliaProducto, SubFamiliaProducto, AnoProducto, ColorProduct
         MaterialProducto, ModeloMarcaProducto, ProcedenciaProducto, TipoExistenciaCont, UMProducto,
         ClienteProveedor, ChoferTransportista, ContactosCliProv, DepartamentoUbigeo, DireccionesCliProv, 
         DistritoUbigeo, PaisUbigeo, PreciosCliProv, ProvinciaUbigeo, TipoDocIdentidad, TransportistaCliProv,
-        CuentasBancariasCliProv, Bancos, Usuario, Acceso, Modulo, SubModulo, Rol, Personal} = sequelize.models;
+        CuentasBancariasCliProv, Bancos, Usuario, Acceso, Modulo, SubModulo, Rol, Personal,
+        CorrelativoDoc, DatoGlobal, EstadoDoc, TipoCambio, TipoDocumento} = sequelize.models;
+
 //**PRODUCTOS */
 SubFamiliaProducto.hasMany(Producto);
 Producto.belongsTo(SubFamiliaProducto);
@@ -167,6 +185,11 @@ Acceso.belongsTo(SubModulo);
 
 Modulo.hasMany(SubModulo);
 SubModulo.belongsTo(Modulo);
+
+//**TABLAS GLOBALES */
+
+TipoDocumento.hasMany(CorrelativoDoc);
+CorrelativoDoc.belongsTo(TipoDocumento);
 
 module.exports = {sequelize, SERVER_PORT, ...sequelize.models}
 

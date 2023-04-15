@@ -1,0 +1,35 @@
+const {DataTypes} = require("sequelize");
+module.exports = (sequelize)=>{
+    sequelize.define("TipoCambio",{
+        id:{
+            type:DataTypes.INTEGER,
+            primaryKey:true,
+        },
+        fecha:{
+            type:DataTypes.DATEONLY,
+            defaultValue:DataTypes.NOW,
+        },
+        compra:{
+            type:DataTypes.DECIMAL(12,3),
+            allowNull:false,
+        },
+        venta:{
+            type:DataTypes.DECIMAL(12,3),
+            allowNull:false,
+        },
+        created:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:true
+        },
+        cesado:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        borradoLogico:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+    },
+    {timestamps:false}
+    )
+}
