@@ -72,6 +72,9 @@ module.exports = (sequelize)=>{
         costoUnitarioMN:{
             type:DataTypes.DECIMAL(12,2),
         },
+        nroMesesGarantia:{
+            type:DataTypes.INTEGER,
+        },
         costoUnitarioME:{
             type:DataTypes.DECIMAL(12,2),
         },

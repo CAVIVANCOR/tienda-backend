@@ -171,8 +171,11 @@ Modulo, SubModulo, Rol
 
 //**USUARIOS ACCESOS */
 
-Usuario.hasMany(Personal);
-Personal.belongsTo(Usuario);
+Personal.hasMany(Usuario);
+Usuario.belongsTo(Personal);
+
+TipoDocIdentidad.hasMany(Personal);
+Personal.belongsTo(TipoDocIdentidad);
 
 Rol.hasMany(Usuario);
 Usuario.belongsTo(Rol);

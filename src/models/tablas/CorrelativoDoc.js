@@ -7,9 +7,11 @@ module.exports = (sequelize)=>{
         },
         serie:{
             type:DataTypes.STRING,
+            allowNull: false,
         },
         correlativo:{
             type:DataTypes.BIGINT,
+            allowNull: false,
         },
         cesado:{
             type:DataTypes.BOOLEAN,

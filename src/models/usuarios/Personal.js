@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("Personal",{
         id:{
             type:DataTypes.INTEGER,
+            autoIncrement:true,
             primaryKey:true,
         },
         nombres:{
@@ -11,19 +12,23 @@ module.exports = (sequelize)=>{
         },
         email:{
             type:DataTypes.STRING,
-            allowNull: false,
         },
         telefonos:{
             type:DataTypes.STRING,
-            allowNull: false,
         },
         urlFoto:{
             type:DataTypes.STRING,
-            allowNull: false,
+        },
+        nroDocIdentidad:{
+            type:DataTypes.STRING,
+        },
+        vendedor:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,
@@ -32,6 +37,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

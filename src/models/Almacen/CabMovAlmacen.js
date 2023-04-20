@@ -1,0 +1,61 @@
+const {DataTypes} = require("sequelize");
+module.exports = (sequelize)=>{
+    sequelize.define("CabMovAlmacen",{
+        id:{
+            type:DataTypes.BIGINT,
+            primaryKey:true,
+        },
+        fecha:{
+            type:DataTypes.DATEONLY,
+            defaultValue:DataTypes.NOW,
+        },
+        serieDcmto:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        correlativoDcmto:{
+            type:DataTypes.BIGINT,
+            allowNull: false,
+        },
+        observaciones:{
+            type:DataTypes.STRING,
+        },
+        fechaCreacion:{
+            type:DataTypes.DATE,
+            defaultValue:DataTypes.NOW,
+        },
+        idVenta:{
+            type:DataTypes.BIGINT,
+        },
+        idCompra:{
+            type:DataTypes.BIGINT,
+        },
+        tc:{
+            type:DataTypes.DECIMAL(12,2),
+        },
+        emailDestino:{
+            type:DataTypes.STRING,
+        },
+        numGuiaSUNAT:{
+            type:DataTypes.STRING,
+        },
+        fechaGuiaSUNAT:{
+            type:DataTypes.DATEONLY,
+            defaultValue:DataTypes.NOW,
+        },
+        created:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:true
+        },
+        cesado:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        borradoLogico:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+    },
+    {timestamps:false}
+    )
+}
