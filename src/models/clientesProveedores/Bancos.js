@@ -3,15 +3,22 @@ module.exports = (sequelize)=>{
     sequelize.define("Bancos",{
         id:{
             type:DataTypes.INTEGER,
+            autoIncrement:true,
             primaryKey:true,
         },
         descripcion:{
             type:DataTypes.STRING,
             allowNull: false,
         },
+        abreviacion:{
+            type:DataTypes.STRING,
+        },
+        codSunat:{
+            type:DataTypes.STRING,
+        },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false,
         },
         cesado:{
             type:DataTypes.BOOLEAN,
@@ -20,6 +27,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

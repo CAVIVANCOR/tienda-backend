@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("DistritoUbigeo",{
         id:{
             type:DataTypes.INTEGER,
+            autoIncrement:true,
             primaryKey:true,
         },
         descripcion:{
@@ -22,7 +23,7 @@ module.exports = (sequelize)=>{
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,
@@ -31,6 +32,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

@@ -152,14 +152,14 @@ DistritoUbigeo.hasMany(DireccionesCliProv);
 DireccionesCliProv.belongsTo(DistritoUbigeo);
 
 
-DepartamentoUbigeo.hasMany(DistritoUbigeo);
-DistritoUbigeo.belongsTo(DepartamentoUbigeo);
+ProvinciaUbigeo.hasMany(DistritoUbigeo);
+DistritoUbigeo.belongsTo(ProvinciaUbigeo);
 
-ProvinciaUbigeo.hasMany(DepartamentoUbigeo);
-DepartamentoUbigeo.belongsTo(ProvinciaUbigeo);
+DepartamentoUbigeo.hasMany(ProvinciaUbigeo);
+ProvinciaUbigeo.belongsTo(DepartamentoUbigeo);
 
-PaisUbigeo.hasMany(ProvinciaUbigeo);
-ProvinciaUbigeo.belongsTo(PaisUbigeo);
+PaisUbigeo.hasMany(DepartamentoUbigeo);
+DepartamentoUbigeo.belongsTo(PaisUbigeo);
 
 ClienteProveedor.hasMany(CuentasBancariasCliProv);
 CuentasBancariasCliProv.belongsTo(ClienteProveedor);
