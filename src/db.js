@@ -48,6 +48,9 @@ const DatoGlobalModel = require("./models/tablas/DatoGlobal");
 const EstadoDocModel = require("./models/tablas/EstadoDoc");
 const TipoCambioModel = require("./models/tablas/TipoCambio");
 const TipoDocumentoModel = require("./models/tablas/TipoDocumento");
+const GrupoCentroCostosModel = require("./models/tablas/GrupoCentroCostos");
+const SubGrupoCentroCostoModel = require("./models/tablas/SubGrupoCentroCosto");
+const CentroCostoModel = require("./models/tablas/CentroCosto");
 
 /**Instancias que definen los modelos, crea el .models: */
 //**PRODUCTOS */
@@ -93,7 +96,9 @@ DatoGlobalModel(sequelize);
 EstadoDocModel(sequelize);
 TipoCambioModel(sequelize);
 TipoDocumentoModel(sequelize);
-
+CentroCostoModel(sequelize);
+GrupoCentroCostosModel(sequelize)
+SubGrupoCentroCostoModel(sequelize)
 
 //**Relacionar los Modelos */
 const  {Producto, FamiliaProducto, SubFamiliaProducto, AnoProducto, ColorProducto, LadoProducto, MarcaProducto, 
@@ -101,7 +106,7 @@ const  {Producto, FamiliaProducto, SubFamiliaProducto, AnoProducto, ColorProduct
         ClienteProveedor, ChoferTransportista, ContactosCliProv, DepartamentoUbigeo, DireccionesCliProv, 
         DistritoUbigeo, PaisUbigeo, PreciosCliProv, ProvinciaUbigeo, TipoDocIdentidad, TransportistaCliProv,
         CuentasBancariasCliProv, Bancos, Usuario, Acceso, Modulo, SubModulo, Rol, Personal,
-        CorrelativoDoc, DatoGlobal, EstadoDoc, TipoCambio, TipoDocumento} = sequelize.models;
+        CorrelativoDoc, DatoGlobal, EstadoDoc, TipoCambio, TipoDocumento, CentroCosto, GrupoCentroCostos, SubGrupoCentroCosto} = sequelize.models;
 
 //**PRODUCTOS */
 SubFamiliaProducto.hasMany(Producto);
@@ -193,6 +198,10 @@ SubModulo.belongsTo(Modulo);
 
 TipoDocumento.hasMany(CorrelativoDoc);
 CorrelativoDoc.belongsTo(TipoDocumento);
+GrupoCentroCostos.hasMany(SubGrupoCentroCosto);
+SubGrupoCentroCosto.belongsTo(GrupoCentroCostos);
+SubGrupoCentroCosto.hasMany(CentroCosto);
+CentroCosto.belongsTo(SubGrupoCentroCosto);
 
 module.exports = {sequelize, SERVER_PORT, ...sequelize.models}
 

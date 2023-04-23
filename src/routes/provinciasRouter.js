@@ -1,7 +1,7 @@
 const {Router}=require("express");
 const {getProvinciaHandler} = require("../handlers/provinciasHandlers");
-const provinciaRouter = Router();
+const provinciasRouter = Router();
 
-provinciaRouter.get("/",getProvinciaHandler);
+provinciasRouter.get("/",getProvinciaHandler);
 
-module.exports = provinciaRouter;
+module.exports = provinciasRouter;

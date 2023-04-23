@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("CorrelativoDoc",{
         id:{
             type:DataTypes.INTEGER,
+            autoIncrement:true,
             primaryKey:true,
         },
         serie:{
@@ -13,6 +14,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.BIGINT,
             allowNull: false,
         },
+        nroCeros:{
+            type:DataTypes.INTEGER,
+        },
         cesado:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -20,6 +24,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

@@ -1,6 +1,6 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("CentroCosto",{
+    sequelize.define("SubGrupoCentroCosto",{
         id:{
             type:DataTypes.INTEGER,
             autoIncrement:true,
@@ -10,17 +10,8 @@ module.exports = (sequelize)=>{
             type:DataTypes.STRING,
             allowNull: false,
         },
-        tipoIngEgr:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:false
-        },
-        calcUtilidades:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:false
-        },
-        created:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:true
+        codSunat:{
+            type:DataTypes.STRING,
         },
         cesado:{
             type:DataTypes.BOOLEAN,

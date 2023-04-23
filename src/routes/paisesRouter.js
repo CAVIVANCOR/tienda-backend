@@ -1,7 +1,7 @@
 const {Router}=require("express");
 const {getPaisHandler} = require("../handlers/paisesHandlers");
-const paisRouter = Router();
+const paisesRouter = Router();
 
-paisRouter.get("/",getPaisHandler);
+paisesRouter.get("/",getPaisHandler);
 
-module.exports = paisRouter;
+module.exports = paisesRouter;

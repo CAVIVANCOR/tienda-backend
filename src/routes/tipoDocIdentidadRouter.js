@@ -1,7 +1,7 @@
 const {Router}=require("express");
 const {getTDIHandler} = require("../handlers/tipoDocIdentidadHandlers");
-const TDIRouter = Router();
+const tipoDocIdentidadRouter = Router();
 
-TDIRouter.get("/",getTDIHandler);
+tipoDocIdentidadRouter.get("/",getTDIHandler);
 
-module.exports = TDIRouter;
+module.exports = tipoDocIdentidadRouter;

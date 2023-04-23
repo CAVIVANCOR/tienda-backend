@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("TipoCambio",{
         id:{
             type:DataTypes.INTEGER,
+            autoIncrement:true,
             primaryKey:true,
         },
         fecha:{
@@ -19,7 +20,7 @@ module.exports = (sequelize)=>{
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,
@@ -28,6 +29,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

@@ -1,7 +1,7 @@
 const {Router}=require("express");
 const {getDistritoHandler} = require("../handlers/DistritosHandlers");
-const distritoRouter = Router();
+const distritosRouter = Router();
 
-distritoRouter.get("/",getDistritoHandler);
+distritosRouter.get("/",getDistritoHandler);
 
-module.exports = distritoRouter;
+module.exports = distritosRouter;
