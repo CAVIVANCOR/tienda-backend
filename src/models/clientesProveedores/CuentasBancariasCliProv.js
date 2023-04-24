@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("CuentasBancariasCliProv",{
         id:{
             type:DataTypes.BIGINT,
+            autoIncrement:true,
             primaryKey:true,
         },
         descripcion:{
@@ -36,6 +37,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

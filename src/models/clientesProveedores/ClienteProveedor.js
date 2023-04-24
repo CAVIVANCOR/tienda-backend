@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("ClienteProveedor",{
         id:{
             type:DataTypes.BIGINT,
+            autoIncrement:true,
             primaryKey:true,
         },
         razonSocial:{
@@ -81,6 +82,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

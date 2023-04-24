@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("TransportistaCliProv",{
         id:{
             type:DataTypes.BIGINT,
+            autoIncrement:true,
             primaryKey:true,
         },
         marca_vehiculo:{
@@ -32,6 +33,9 @@ module.exports = (sequelize)=>{
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
         },
     },
     {timestamps:false}

@@ -1,28 +1,28 @@
 const {Router} = require("express");
 const mainRouter = Router();
 
-const personalRouter = require("./personalRouter");
-const tipoDocIdentidadRouter = require("./tipoDocIdentidadRouter");
-const bancosRouter = require("./bancosRouter");
-const paisesRouter = require("./paisesRouter");
-const departamentosRouter = require("./departamentosRouter");
-const provinciasRouter = require("./provinciasRouter");
-const distritosRouter = require("./distritosRouter");
+const bancosRouter = require("../routes/clientesProveedores/bancosRouter");
+const paisesRouter = require("../routes/clientesProveedores/paisesRouter");
+const departamentosRouter = require("../routes/clientesProveedores/departamentosRouter");
+const provinciasRouter = require("../routes/clientesProveedores/provinciasRouter");
+const distritosRouter = require("../routes/clientesProveedores/distritosRouter");
+const tipoDocIdentidadRouter = require("../routes/clientesProveedores/tipoDocIdentidadRouter");
 
-const tipoDocumentoRouter = require("./tipoDocumentoRouter");
-const tipoCambioRouter = require("./tipoCambioRouter");
-const correlativoDocRouter = require("./correlativoDocRouter");
-const estadoDocRouter = require("./estadoDocRouter");
-const centroCostosRouter = require("./centroCostosRouter");
-const grupoCentroCostosRouter = require("./grupoCentroCostosRouter");
-const subGrupoCentroCostosRouter = require("./subGrupoCentroCostosRouter");
+const tipoDocumentoRouter = require("../routes/tablas/tipoDocumentoRouter");
+const tipoCambioRouter = require("../routes/tablas/tipoCambioRouter");
+const correlativoDocRouter = require("../routes/tablas/correlativoDocRouter");
+const estadoDocRouter = require("../routes/tablas/estadoDocRouter");
+const centroCostosRouter = require("../routes/tablas/centroCostosRouter");
+const grupoCentroCostosRouter = require("../routes/tablas/grupoCentroCostosRouter");
+const subGrupoCentroCostosRouter = require("../routes/tablas/subGrupoCentroCostosRouter");
+const datosGlobalesRouter = require("../routes/tablas/datosGlobalesRouter");
 
-const accesosRouter = require("./accesosRouter");
-const modulosRouter = require("./modulosRouter");
-const rolesRouter = require("./rolesRouter");
-const subModulosRouter = require("./subModulosRouter");
-const usuariosRouter = require("./usuariosRouter");
-const datosGlobalesRouter = require("./datosGlobalesRouter");
+const personalRouter = require("../routes/usuarios/personalRouter");
+const accesosRouter = require("../routes/usuarios/accesosRouter");
+const modulosRouter = require("../routes/usuarios/modulosRouter");
+const rolesRouter = require("../routes/usuarios/rolesRouter");
+const subModulosRouter = require("../routes/usuarios/subModulosRouter");
+const usuariosRouter = require("../routes/usuarios/usuariosRouter");
 
 
 
