@@ -17,6 +17,12 @@ const centroCostosRouter = require("./centroCostosRouter");
 const grupoCentroCostosRouter = require("./grupoCentroCostosRouter");
 const subGrupoCentroCostosRouter = require("./subGrupoCentroCostosRouter");
 
+const accesosRouter = require("./accesosRouter");
+const modulosRouter = require("./modulosRouter");
+const rolesRouter = require("./rolesRouter");
+const subModulosRouter = require("./subModulosRouter");
+const usuariosRouter = require("./usuariosRouter");
+const datosGlobalesRouter = require("./datosGlobalesRouter");
 
 
 
@@ -35,5 +41,13 @@ mainRouter.use("/estadosDoc", estadoDocRouter);
 mainRouter.use("/centroCostos", centroCostosRouter);
 mainRouter.use("/grupoCentroCostos", grupoCentroCostosRouter);
 mainRouter.use("/subGrupoCentroCostos", subGrupoCentroCostosRouter);
+
+mainRouter.use("/accesos", accesosRouter);
+mainRouter.use("/modulos", modulosRouter);
+mainRouter.use("/roles", rolesRouter);
+mainRouter.use("/submodulos", subModulosRouter);
+mainRouter.use("/usuarios", usuariosRouter);
+mainRouter.use("/datosGlobales", datosGlobalesRouter);
+
 
 module.exports = mainRouter;

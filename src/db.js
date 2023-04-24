@@ -203,5 +203,8 @@ SubGrupoCentroCosto.belongsTo(GrupoCentroCostos);
 SubGrupoCentroCosto.hasMany(CentroCosto);
 CentroCosto.belongsTo(SubGrupoCentroCosto);
 
-module.exports = {sequelize, SERVER_PORT, ...sequelize.models}
+TipoDocIdentidad.hasMany(DatoGlobal);
+DatoGlobal.belongsTo(TipoDocIdentidad);
 
+
+module.exports = {sequelize, SERVER_PORT, ...sequelize.models}

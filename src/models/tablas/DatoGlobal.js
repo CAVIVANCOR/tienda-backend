@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("DatoGlobal",{
         id:{
             type:DataTypes.INTEGER,
+            autoIncrement:true,
             primaryKey:true,
         },
         razonSocial:{
@@ -20,22 +21,6 @@ module.exports = (sequelize)=>{
         numDocIdentidad:{
             type:DataTypes.STRING,
             unique:true,
-        },
-        dirFiscal:{
-            type:DataTypes.STRING,
-            allowNull:false,
-        },
-        codDirFiscal:{
-            type:DataTypes.BIGINT,
-            allowNull:false,
-        },
-        dirGuiaPrincipal:{
-            type:DataTypes.STRING,
-            allowNull:false,
-        },
-        codDirGuiaPrincipal:{
-            type:DataTypes.BIGINT,
-            allowNull:false,
         },
         monedaDefault:{
             type:DataTypes.BOOLEAN,
