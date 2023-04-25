@@ -6,25 +6,23 @@ module.exports = (sequelize)=>{
             autoIncrement:true,
             primaryKey:true,
         },
-        marca_vehiculo:{
+        marcaVehiculo:{
             type:DataTypes.STRING,
             allowNull: false,
         },
-        placa_vehiculo:{
+        placaVehiculo:{
             type:DataTypes.STRING,
             allowNull: false,
         },
-        certificado_vehiculo:{
+        certificadoVehiculo:{
             type:DataTypes.STRING,
-            allowNull: false,
         },
-        cod_cliprov:{
-            type:DataTypes.BIGINT,
-            allowNull: false,
+        nroDocIdentidad:{
+            type:DataTypes.STRING,
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,

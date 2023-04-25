@@ -6,13 +6,12 @@ module.exports = (sequelize)=>{
             autoIncrement:true,
             primaryKey:true,
         },
-        nro_licencia:{
+        nroLicencia:{
             type:DataTypes.STRING,
             allowNull: false,
         },
-        cod_cliprov:{
-            type:DataTypes.BIGINT,
-            allowNull: false,
+        nroDocIdentidad:{
+            type:DataTypes.STRING,
         },
         created:{
             type:DataTypes.BOOLEAN,

@@ -33,6 +33,7 @@ const TipoDocIdentidadModel = require("./models/clientesProveedores/TipoDocIdent
 const TransportistaCliProvModel = require("./models/clientesProveedores/TransportistaCliProv");
 const CuentasBancariasCliProvModel = require("./models/clientesProveedores/CuentasBancariasCliProv");
 const BancosProvModel = require("./models/clientesProveedores/Bancos");
+const TipoCliProvModel = require("./models/clientesProveedores/TipoCliProv");
 
 //**USUARIOS ACCESOS */
 const AccesoModel = require("./models/usuarios/Acceso");
@@ -81,6 +82,7 @@ TipoDocIdentidadModel(sequelize);
 TransportistaCliProvModel(sequelize);
 CuentasBancariasCliProvModel(sequelize);
 BancosProvModel(sequelize);
+TipoCliProvModel(sequelize);
 
 //**USUARIOS ACCESOS */
 UsuarioModel(sequelize);
@@ -106,7 +108,8 @@ const  {Producto, FamiliaProducto, SubFamiliaProducto, AnoProducto, ColorProduct
         ClienteProveedor, ChoferTransportista, ContactosCliProv, DepartamentoUbigeo, DireccionesCliProv, 
         DistritoUbigeo, PaisUbigeo, PreciosCliProv, ProvinciaUbigeo, TipoDocIdentidad, TransportistaCliProv,
         CuentasBancariasCliProv, Bancos, Usuario, Acceso, Modulo, SubModulo, Rol, Personal,
-        CorrelativoDoc, DatoGlobal, EstadoDoc, TipoCambio, TipoDocumento, CentroCosto, GrupoCentroCostos, SubGrupoCentroCosto} = sequelize.models;
+        CorrelativoDoc, DatoGlobal, EstadoDoc, TipoCambio, TipoDocumento, CentroCosto, 
+        GrupoCentroCostos, SubGrupoCentroCosto, TipoCliProv} = sequelize.models;
 
 //**PRODUCTOS */
 SubFamiliaProducto.hasMany(Producto);
@@ -138,8 +141,15 @@ ModeloMarcaProducto.belongsTo(MarcaProducto);
 TipoDocIdentidad.hasMany(ClienteProveedor);
 ClienteProveedor.belongsTo(TipoDocIdentidad);
 
+TipoCliProv.hasMany(ClienteProveedor);
+ClienteProveedor.belongsTo(TipoCliProv);
+
 ClienteProveedor.hasMany(ChoferTransportista);
 ChoferTransportista.belongsTo(ClienteProveedor);
+
+TipoDocIdentidad.hasMany(ChoferTransportista);
+ChoferTransportista.belongsTo(TipoDocIdentidad);
+
 
 ClienteProveedor.hasMany(ContactosCliProv);
 ContactosCliProv.belongsTo(ClienteProveedor);
@@ -152,6 +162,9 @@ PreciosCliProv.belongsTo(ClienteProveedor);
 
 ClienteProveedor.hasMany(TransportistaCliProv);
 TransportistaCliProv.belongsTo(ClienteProveedor);
+
+TipoDocIdentidad.hasMany(TransportistaCliProv);
+TransportistaCliProv.belongsTo(TipoDocIdentidad);
 
 DistritoUbigeo.hasMany(DireccionesCliProv);
 DireccionesCliProv.belongsTo(DistritoUbigeo);

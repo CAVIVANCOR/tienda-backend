@@ -18,21 +18,14 @@ module.exports = (sequelize)=>{
             type:DataTypes.STRING,
             unique:true,
         },
-        dirFiscal:{
+        telefonos:{
             type:DataTypes.STRING,
-            allowNull:false,
         },
-        codDirFiscal:{
-            type:DataTypes.BIGINT,
-            allowNull:false,
-        },
-        dirGuiaPrincipal:{
+        email:{
             type:DataTypes.STRING,
-            allowNull:false,
         },
-        codDirGuiaPrincipal:{
-            type:DataTypes.BIGINT,
-            allowNull:false,
+        emailFactSunat:{
+            type:DataTypes.STRING,
         },
         monedaLineaCredito:{
             type:DataTypes.BOOLEAN,
@@ -43,14 +36,6 @@ module.exports = (sequelize)=>{
         },
         lineaCreditoME:{
             type:DataTypes.DECIMAL(12,2),
-        },
-        cliente:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:false
-        },
-        proveedor:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:false
         },
         saldoAnticiposMN:{
             type:DataTypes.DECIMAL(12,2),
@@ -73,7 +58,7 @@ module.exports = (sequelize)=>{
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,
@@ -85,6 +70,18 @@ module.exports = (sequelize)=>{
         },
         idHistorico:{
             type:DataTypes.INTEGER,
+        },
+        codDirFiscal:{
+            type:DataTypes.STRING,
+        },
+        dirFiscal:{
+            type:DataTypes.STRING,
+        },
+        codDirGuia:{
+            type:DataTypes.STRING,
+        },
+        dirGuia:{
+            type:DataTypes.STRING,
         },
     },
     {timestamps:false}

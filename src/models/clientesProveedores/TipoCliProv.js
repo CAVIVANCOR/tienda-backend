@@ -1,26 +1,18 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("PreciosCliProv",{
+    sequelize.define("TipoCliProv",{
         id:{
-            type:DataTypes.BIGINT,
+            type:DataTypes.INTEGER,
             autoIncrement:true,
             primaryKey:true,
         },
-        fechaDesde:{
-            type:DataTypes.DATEONLY,
-            defaultValue:DataTypes.NOW,
+        descripcion:{
+            type:DataTypes.STRING,
+            allowNull: false,
         },
-        fechaHasta:{
-            type:DataTypes.DATEONLY,
-            defaultValue:DataTypes.NOW,
-        },
-        moneda:{
+        clienteProveedor:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
-        },
-        valorVentaUnit:{
-            type:DataTypes.DECIMAL(12,2),
-            allowNull: false,
         },
         created:{
             type:DataTypes.BOOLEAN,

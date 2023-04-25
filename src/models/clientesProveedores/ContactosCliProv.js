@@ -16,7 +16,6 @@ module.exports = (sequelize)=>{
         },
         telefonos:{
             type:DataTypes.STRING,
-            allowNull: false,
         },
         email:{
             type:DataTypes.STRING,
@@ -24,7 +23,7 @@ module.exports = (sequelize)=>{
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,

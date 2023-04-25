@@ -8,23 +8,15 @@ module.exports = (sequelize)=>{
         },
         direccion:{
             type:DataTypes.STRING,
-            allowNull: false,
         },
-        codUbigeo:{
+        direccionArmada:{
             type:DataTypes.STRING,
-            allowNull: false,
-        },
-        ubigeo:{
-            type:DataTypes.STRING,
-            allowNull: false,
         },
         telefonos:{
             type:DataTypes.STRING,
-            allowNull: false,
         },
         email:{
             type:DataTypes.STRING,
-            allowNull: false,
         },
         principal:{
             type:DataTypes.BOOLEAN,
@@ -36,7 +28,7 @@ module.exports = (sequelize)=>{
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,

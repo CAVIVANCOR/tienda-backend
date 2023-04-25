@@ -7,6 +7,15 @@ const departamentosRouter = require("../routes/clientesProveedores/departamentos
 const provinciasRouter = require("../routes/clientesProveedores/provinciasRouter");
 const distritosRouter = require("../routes/clientesProveedores/distritosRouter");
 const tipoDocIdentidadRouter = require("../routes/clientesProveedores/tipoDocIdentidadRouter");
+const tiposCliprovRouter = require("../routes/clientesProveedores/tiposCliprovRouter");
+
+const choferesTransportistasRouter = require("../routes/clientesProveedores/choferesTransportistasRouter");
+const clientesProveedoresRouter = require("../routes/clientesProveedores/clientesProveedoresRouter");
+const contactosCliprovRouter = require("../routes/clientesProveedores/contactosCliprovRouter");
+const cuentasBancariasCliProvRouter = require("../routes/clientesProveedores/cuentasBancariasCliProvRouter");
+const direccionesCliProvRouter = require("../routes/clientesProveedores/direccionesCliProvRouter");
+const preciosCliProvRouter = require("../routes/clientesProveedores/preciosCliProvRouter");
+const transportistasCliProvRouter = require("../routes/clientesProveedores/transportistasCliProvRouter");
 
 const tipoDocumentoRouter = require("../routes/tablas/tipoDocumentoRouter");
 const tipoCambioRouter = require("../routes/tablas/tipoCambioRouter");
@@ -33,6 +42,16 @@ mainRouter.use("/paises", paisesRouter);
 mainRouter.use("/departamentos", departamentosRouter);
 mainRouter.use("/provincias", provinciasRouter);
 mainRouter.use("/distritos", distritosRouter);
+mainRouter.use("/tiposCliProv", tiposCliprovRouter);
+
+mainRouter.use("/choferesTransportistas", choferesTransportistasRouter);
+mainRouter.use("/clientesProveedores", clientesProveedoresRouter);
+mainRouter.use("/contactosCliProv", contactosCliprovRouter);
+mainRouter.use("/cuentasBancariasCliProv", cuentasBancariasCliProvRouter);
+mainRouter.use("/direccionesCliProv", direccionesCliProvRouter);
+mainRouter.use("/preciosCliProv", preciosCliProvRouter);
+mainRouter.use("/transportistasCliProv", transportistasCliProvRouter);
+
 
 mainRouter.use("/tiposDocumento",tipoDocumentoRouter);
 mainRouter.use("/tiposCambio", tipoCambioRouter);

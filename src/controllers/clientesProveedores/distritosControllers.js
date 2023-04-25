@@ -49,7 +49,6 @@ const getAllDistrito= async ()=>{
     });
     if (databaseDistritos.length===0){
         apiDistritosRaw = (await axios.get('http://192.168.18.15:82/distritos')).data;
-        console.log("apiDistritosRaw",apiDistritosRaw)
         apiDistritos = await cleanArray(apiDistritosRaw);
         await cargaBDDistrito(apiDistritos);
         databaseDistritos = await DistritoUbigeo.findAll({
