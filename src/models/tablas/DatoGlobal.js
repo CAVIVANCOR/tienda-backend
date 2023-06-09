@@ -92,7 +92,10 @@ module.exports = (sequelize)=>{
             defaultValue:false
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "DatoGlobal"
+    }
     )
 }
 //**Formula Valor Venta Producto: ValorVenta=Costo*(100/(100-Rentabilidad) */

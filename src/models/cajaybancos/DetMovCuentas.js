@@ -1,0 +1,51 @@
+const {DataTypes} = require("sequelize");
+
+module.exports = (sequelize)=>{
+    sequelize.define("DetMovCuentas",{
+        id:{
+            type:DataTypes.BIGINT,
+            autoIncrement:true,
+            primaryKey:true,
+        },
+        fecha:{
+            type:DataTypes.DATE,
+            defaultValue:DataTypes.NOW,
+        },
+        tipoCambio:{
+            type:DataTypes.DECIMAL(12,2),
+        },
+        moneda:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        importe:{
+            type:DataTypes.DECIMAL(12,2),
+        },
+        nroTransaccion:{
+            type:DataTypes.STRING,
+        },
+        idDocOrigen:{
+            type:DataTypes.BIGINT,
+        },
+        fechaDocOrigen:{
+            type:DataTypes.DATE,
+            defaultValue:DataTypes.NOW,
+        },
+        created:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        borradoLogico:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.BIGINT,
+        },
+    },
+    {
+        timestamps:false,
+        tableName: "DetMovCuentas"
+    }
+    )
+}

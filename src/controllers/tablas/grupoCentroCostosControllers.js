@@ -40,4 +40,18 @@ const getAllGrupoCentroCostos= async ()=>{
     return databaseGrupoCentroCostos;
 };
 
-module.exports = {getAllGrupoCentroCostos};
+const createGrupoCentroCostos = async (regGrupoCentroCostos)=>{
+    const transactionCrearGrupoCentroCostos = await GrupoCentroCostos.sequelize.transaction();
+    try {
+       // await GrupoCentroCostos.sequelize.query('Lock Table GrupoCentroCostos',{transaction:transactionCrearGrupoCentroCostos});
+        let maxIdGrupoCentroCostos = await GrupoCentroCostos.max('id',{transaction:transactionCrearGrupoCentroCostos});
+        let newGrupoCentroCostos = await GrupoCentroCostos.create({id:maxIdGrupoCentroCostos+1, ...regGrupoCentroCostos},{transaction:transactionCrearGrupoCentroCostos});
+        await transactionCrearGrupoCentroCostos.commit();
+        console.log('Registro creado OK Tabla GrupoCentroCostos')
+        return newGrupoCentroCostos;
+    } catch (error) {
+        await transactionCrearGrupoCentroCostos.rollback();
+};
+};
+
+module.exports = {getAllGrupoCentroCostos,createGrupoCentroCostos};

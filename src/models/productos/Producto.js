@@ -3,27 +3,18 @@ module.exports = (sequelize)=>{
     sequelize.define("Producto",{
         id:{
             type:DataTypes.BIGINT,
+            autoIncrement:true,
             primaryKey:true,
         },
-        descripcionBase:{
-            type:DataTypes.STRING,
-            allowNull: false,
-        },
-        descripcionArmada:{
+        descripcion:{
             type:DataTypes.STRING,
             allowNull: false,
         },
         codigoProveedor:{
             type:DataTypes.STRING,
-            unique:true,
-        },
-        CodigoFabricante:{
-            type:DataTypes.STRING,
-            allowNull:false,
         },
         modeloFabricante:{
             type:DataTypes.STRING,
-            allowNull:false,
         },
         stockMinimo:{
             type:DataTypes.DECIMAL(12,2),
@@ -33,11 +24,9 @@ module.exports = (sequelize)=>{
         },
         urlFotoProducto:{
             type:DataTypes.STRING,
-            allowNull:false,
         },
         urlWebProductoFabricante:{
             type:DataTypes.STRING,
-            allowNull:false,
         },
         valorVentaUnitMN:{
             type:DataTypes.DECIMAL(12,2),
@@ -80,7 +69,7 @@ module.exports = (sequelize)=>{
         },
         mostrarFamiliaDescripcion:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         mostrarSubFamiliaDescripcion:{
             type:DataTypes.BOOLEAN,
@@ -112,7 +101,7 @@ module.exports = (sequelize)=>{
         },
         mostrarProcedenciaDescripcion:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         seriado:{
             type:DataTypes.BOOLEAN,
@@ -120,7 +109,7 @@ module.exports = (sequelize)=>{
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,
@@ -131,6 +120,9 @@ module.exports = (sequelize)=>{
             defaultValue:false
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "Producto"
+    }
     )
 }

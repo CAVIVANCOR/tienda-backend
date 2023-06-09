@@ -1,0 +1,77 @@
+const {DataTypes} = require("sequelize");
+module.exports = (sequelize)=>{
+    sequelize.define("CabCompras",{
+        id:{
+            type:DataTypes.BIGINT,
+            autoIncrement:true,
+            primaryKey:true,
+        },
+        fecha:{
+            type:DataTypes.DATEONLY,
+            defaultValue:DataTypes.NOW,
+        },
+        serieDcmto:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        correlativoDcmto:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
+        idContacto:{
+            type:DataTypes.BIGINT,
+        },
+        idDirOrigen:{
+            type:DataTypes.BIGINT,
+        },
+        idDirEntrega:{
+            type:DataTypes.BIGINT,
+        },
+        observaciones:{
+            type:DataTypes.STRING,
+        },
+        idDocAlmacen:{
+            type:DataTypes.BIGINT,
+        },
+        tipoCambio:{
+            type:DataTypes.DECIMAL(12,2),
+        },
+        porcentajeIGV:{
+            type:DataTypes.DECIMAL(12,2),
+        },
+        emailDestino:{
+            type:DataTypes.STRING,
+        },
+        rutaDcmtoPDF:{
+            type:DataTypes.STRING,
+        },
+        exonerado:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        moneda:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        anticipo:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        created:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        borradoLogico:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.BIGINT,
+        },
+    },
+    {
+        timestamps:false,
+        tableName: "CabCompras"
+    }
+    )
+}

@@ -1,4 +1,4 @@
-const {DistritoUbigeo,ProvinciaUbigeo,DepartamentoUbigeo,PaisUbigeo} = require("../../db");
+const {Distrito,Provincia,Departamento,Pais} = require("../../db");
 const axios = require("axios");
 
 const cleanArray=(arr)=>{
@@ -10,7 +10,7 @@ const cleanArray=(arr)=>{
             codSunat:elem.codSunat,
             codPostal:elem.codPostal,
             origen:elem.origen,
-            ProvinciaUbigeoId:elem.idProvincia,
+            ProvinciumId:elem.idProvincia,
         };
     });
     return clean;
@@ -20,7 +20,7 @@ const cargaBDDistrito = async (data)=>{
     try {
         await Promise.all(
             data.map(async(element)=>{
-                await DistritoUbigeo.create(element);
+                await Distrito.create(element);
             })
         )
         return 
@@ -33,15 +33,15 @@ const getAllDistrito= async ()=>{
     let databaseDistritos = null;
     let apiDistritosRaw = null;
     let apiDistritos = null;
-    databaseDistritos = await DistritoUbigeo.findAll({
+    databaseDistritos = await Distrito.findAll({
         include:[{
-            model:ProvinciaUbigeo,
+            model:Provincia,
             attributes:["descripcion","codSunat"],
             include:[{
-                model:DepartamentoUbigeo,
+                model:Departamento,
                 attributes:["descripcion","codSunat"],
                 include:[{
-                    model:PaisUbigeo,
+                    model:Pais,
                     attributes:["descripcion","codSunat"],
                 }]
             }]
@@ -51,15 +51,15 @@ const getAllDistrito= async ()=>{
         apiDistritosRaw = (await axios.get('http://192.168.18.15:82/distritos')).data;
         apiDistritos = await cleanArray(apiDistritosRaw);
         await cargaBDDistrito(apiDistritos);
-        databaseDistritos = await DistritoUbigeo.findAll({
+        databaseDistritos = await Distrito.findAll({
             include:[{
-                model:ProvinciaUbigeo,
+                model:Provincia,
                 attributes:["descripcion","codSunat"],
                 include:[{
-                    model:DepartamentoUbigeo,
+                    model:Departamento,
                     attributes:["descripcion","codSunat"],
                     include:[{
-                        model:PaisUbigeo,
+                        model:Pais,
                         attributes:["descripcion","codSunat"],
                     }]
                 }]
@@ -69,4 +69,19 @@ const getAllDistrito= async ()=>{
     return databaseDistritos;
 };
 
-module.exports = {getAllDistrito};
+const createDistrito = async (regDistrito)=>{
+    const transactionCrearDistrito = await Distrito.sequelize.transaction();
+    try {
+       // await Distrito.sequelize.query('Lock Table Distrito',{transaction:transactionCrearDistrito});
+        let maxIdDistrito = await Distrito.max('id',{transaction:transactionCrearDistrito});
+        let newDistrito = await Distrito.create({id:maxIdDistrito+1, ...regDistrito},{transaction:transactionCrearDistrito});
+        await transactionCrearDistrito.commit();
+        console.log('Registro creado OK Tabla Distrito')
+        return newDistrito;
+    } catch (error) {
+        await transactionCrearDistrito.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllDistrito,createDistrito};

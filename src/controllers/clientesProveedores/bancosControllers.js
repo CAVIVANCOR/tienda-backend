@@ -40,4 +40,19 @@ const getAllBancos= async ()=>{
     return databaseBancos;
 };
 
-module.exports = {getAllBancos};
+const createBancos = async (regBancos)=>{
+    const transactionCrearBancos = await Bancos.sequelize.transaction();
+    try {
+       // await Bancos.sequelize.query('Lock Table Bancos',{transaction:transactionCrearBancos});
+        let maxIdBancos = await Bancos.max("id", {transaction:transactionCrearBancos});
+        let newBancos = await Bancos.create({id:maxIdBancos+1, ...regBancos},{transaction:transactionCrearBancos});
+        await transactionCrearBancos.commit();
+        console.log('Registro creado OK Tabla Bancos')
+        return newBancos;
+    } catch (error) {
+        await transactionCrearBancos.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllBancos,createBancos};

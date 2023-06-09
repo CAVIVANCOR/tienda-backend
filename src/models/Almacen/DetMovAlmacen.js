@@ -1,13 +1,11 @@
 const {DataTypes} = require("sequelize");
+
 module.exports = (sequelize)=>{
     sequelize.define("DetMovAlmacen",{
         id:{
             type:DataTypes.BIGINT,
+            autoIncrement:true,
             primaryKey:true,
-        },
-        fecha:{
-            type:DataTypes.DATEONLY,
-            defaultValue:DataTypes.NOW,
         },
         nroLote:{
             type:DataTypes.STRING,
@@ -28,30 +26,18 @@ module.exports = (sequelize)=>{
             type:DataTypes.DECIMAL(12,2),
             allowNull: false,
         },
-        pesoKG:{
-            type:DataTypes.DECIMAL(12,2),
-            allowNull: false,
-        },
         valorUnitMN:{
             type:DataTypes.DECIMAL(12,2),
         },
         codUbicacionOrigen:{
             type:DataTypes.BIGINT,
+            allowNull: false,
         },
         codUbicacionDestino:{
             type:DataTypes.BIGINT,
-        },
-        idDetCompra:{
-            type:DataTypes.BIGINT,
-        },
-        idDetVenta:{
-            type:DataTypes.BIGINT,
+            allowNull: false,
         },
         created:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:true
-        },
-        cesado:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
@@ -59,7 +45,13 @@ module.exports = (sequelize)=>{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
+        idHistorico:{
+            type:DataTypes.BIGINT,
+        },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "DetMovAlmacen"
+    }
     )
 }

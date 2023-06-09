@@ -6,6 +6,10 @@ module.exports = (sequelize)=>{
             autoIncrement:true,
             primaryKey:true,
         },
+        usuario:{
+            type:DataTypes.STRING,
+            allowNull: false,
+        },
         password:{
             type:DataTypes.STRING,
             allowNull: false,
@@ -26,6 +30,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.INTEGER,
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "Usuario"
+    }
     )
 }

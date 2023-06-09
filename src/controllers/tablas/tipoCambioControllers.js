@@ -4,10 +4,11 @@ const axios = require("axios");
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
-            idHistorico:elem.id,
+            id:elem.id,
             fecha:elem.fecha,
             compra:elem.compra,
             venta:elem.venta,
+            idHistorico:elem.id,
         };
     });
     return clean;
@@ -40,4 +41,19 @@ const getAllTiposCambio= async ()=>{
     return databaseTiposCambio;
 };
 
-module.exports = {getAllTiposCambio};
+const createTiposCambio = async (regTiposCambio)=>{
+    const transactionCrearTiposCambio = await TipoCambio.sequelize.transaction();
+    try {
+        //await TipoCambio.sequelize.query('Lock Table TipoCambio',{transaction:transactionCrearTiposCambio});
+        let maxIdTiposCambio = await TipoCambio.max('id',{transaction:transactionCrearTiposCambio});
+        let newTiposCambio = await TipoCambio.create({id:maxIdTiposCambio+1, ...regTiposCambio},{transaction:transactionCrearTiposCambio});
+        await transactionCrearTiposCambio.commit();
+        console.log('Registro creado OK Tabla TipoCambio')
+        return newTiposCambio;
+    } catch (error) {
+        await transactionCrearTiposCambio.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllTiposCambio,createTiposCambio};

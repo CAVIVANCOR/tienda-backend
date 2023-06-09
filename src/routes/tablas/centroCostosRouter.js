@@ -1,7 +1,8 @@
 const {Router} = require("express");
-const {getCentroCostosHandler}=require("../../handlers/tablas/centroCostosHandlers");
+const {getCentroCostosHandler, createCentroCostosHandler}=require("../../handlers/tablas/centroCostosHandlers");
 const centroCostosRouter = Router();
 
 centroCostosRouter.get("/",getCentroCostosHandler);
+centroCostosRouter.post("/",createCentroCostosHandler);
 
 module.exports = centroCostosRouter;

@@ -1,7 +1,10 @@
 const server = require("./src/app");
 const {sequelize, SERVER_PORT}=require("./src/db.js");
 
-sequelize.sync({force:true})
+//sequelize.drop();
+//console.log("All tables dropped!");
+//{force:true}
+sequelize.sync()
 .then(()=>{
     server.listen(Number(SERVER_PORT),()=>{
         console.log("Listening on http://localhost:"+SERVER_PORT);

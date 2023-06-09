@@ -26,6 +26,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.INTEGER,
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "Modulo"
+    }
     )
 }

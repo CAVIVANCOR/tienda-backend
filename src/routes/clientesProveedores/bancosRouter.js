@@ -1,7 +1,8 @@
 const {Router}=require("express");
-const {getBancosHandler} = require("../../handlers/clientesProveedores/bancosHandlers");
+const {getBancosHandler,createBancosHandler} = require("../../handlers/clientesProveedores/bancosHandlers");
 const bancosRouter = Router();
 
 bancosRouter.get("/",getBancosHandler);
+bancosRouter.post("/",createBancosHandler);
 
 module.exports = bancosRouter;

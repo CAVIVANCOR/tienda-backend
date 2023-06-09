@@ -40,4 +40,19 @@ const getAllTipoCliProv= async ()=>{
     return databaseTipoCliProv;
 };
 
-module.exports = {getAllTipoCliProv};
+const createTipoCliProv = async (regTipoCliProv)=>{
+    const transactionCrearTipoCliProv = await TipoCliProv.sequelize.transaction();
+    try {
+        //await TipoCliProv.sequelize.query('Lock Table TipoCliProv',{transaction:transactionCrearTipoCliProv});
+        let maxIdTipoCliProv = await TipoCliProv.max("id", {transaction:transactionCrearTipoCliProv});
+        let newTipoCliProv = await TipoCliProv.create({id:maxIdTipoCliProv+1, ...regTipoCliProv},{transaction:transactionCrearTipoCliProv});
+        await transactionCrearTipoCliProv.commit();
+        console.log('Registro creado OK Tabla TipoCliProv')
+        return newTipoCliProv;
+    } catch (error) {
+        await transactionCrearTipoCliProv.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllTipoCliProv,createTipoCliProv};

@@ -1,10 +1,9 @@
-const {Personal,TipoDocIdentidad} = require("../../db");
+const {Personal,TipoDocIdentidad,sequelize} = require("../../db");
 const axios = require("axios");
-
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
-            idHistorico:elem.id,
+            id:elem.id,
             nombres:elem.nombres,
             email:elem.email,
             telefonos:elem.telefonos,
@@ -15,6 +14,7 @@ const cleanArray=(arr)=>{
             borradoLogico:false,
             TipoDocIdentidadId: elem.codTipoDI,
             nroDocIdentidad: elem.nroDocDI,
+            idHistorico:elem.id,
         };
     });
     return clean;
@@ -57,4 +57,19 @@ const getAllPersonal= async ()=>{
     return databasePersonal;
 };
 
-module.exports = {getAllPersonal};
+const createPersona = async (regPersona)=>{
+    const transactionCrearPersona = await Personal.sequelize.transaction();
+    try {
+        let maxIdPersonal = await Personal.max('id',{transaction:transactionCrearPersona});
+        let newPersona = await Personal.create({id:maxIdPersonal+1, ...regPersona},{transaction:transactionCrearPersona});
+        await transactionCrearPersona.commit();
+        console.log('Registro creado OK Tabla Personal')
+        return newPersona;
+    } catch (error) {
+        await transactionCrearPersona.rollback();
+        console.log(error.message);
+    }
+}
+
+
+module.exports = {getAllPersonal,createPersona};

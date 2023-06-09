@@ -1,0 +1,50 @@
+const {DataTypes} = require("sequelize");
+module.exports = (sequelize)=>{
+    sequelize.define("DirCliProv",{
+        id:{
+            type:DataTypes.BIGINT,
+            autoIncrement:true,
+            primaryKey:true,
+        },
+        direccion:{
+            type:DataTypes.STRING,
+        },
+        direccionArmada:{
+            type:DataTypes.STRING,
+        },
+        telefonos:{
+            type:DataTypes.STRING,
+        },
+        email:{
+            type:DataTypes.STRING,
+        },
+        principal:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        fiscal:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        created:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        cesado:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        borradoLogico:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        idHistorico:{
+            type:DataTypes.INTEGER,
+        },
+    },
+    {
+        timestamps:false,
+        tableName: "DirCliProv"
+    }
+    )
+}

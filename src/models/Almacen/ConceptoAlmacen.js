@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("ConceptoAlmacen",{
         id:{
             type:DataTypes.INTEGER,
+            autoIncrement:true,
             primaryKey:true,
         },
         descripcion:{
@@ -11,15 +12,19 @@ module.exports = (sequelize)=>{
         },
         codAlmacenOrigen:{
             type:DataTypes.INTEGER,
-            defaultValue:false
+            allowNull: false,
         },
         codAlmacenDestino:{
             type:DataTypes.INTEGER,
-            defaultValue:false
+            allowNull: false,
+        },
+        prioridad:{
+            type:DataTypes.INTEGER,
+            defaultValue:1,
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:true
+            defaultValue:false
         },
         cesado:{
             type:DataTypes.BOOLEAN,
@@ -29,7 +34,13 @@ module.exports = (sequelize)=>{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
+        idHistorico:{
+            type:DataTypes.INTEGER,
+        },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "ConceptoAlmacen"
+    }
     )
 }

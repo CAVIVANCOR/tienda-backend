@@ -6,10 +6,6 @@ module.exports = (sequelize)=>{
             autoIncrement:true,
             primaryKey:true,
         },
-        descripcion:{
-            type:DataTypes.STRING,
-            allowNull: false,
-        },
         lectura:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -46,6 +42,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.INTEGER,
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "Acceso"
+    }
     )
 }

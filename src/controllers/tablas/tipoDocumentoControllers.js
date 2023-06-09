@@ -42,4 +42,19 @@ const getAllTiposDoc= async ()=>{
     return databaseTiposDoc;
 };
 
-module.exports = {getAllTiposDoc};
+const createTipoDoc = async (regTipoDoc)=>{
+    const transactionCrearTipoDoc = await TipoDocumento.sequelize.transaction();
+    try {
+        //await TipoDocumento.sequelize.query('Lock Table TipoDocumento',{transaction:transactionCrearTipoDoc});
+        let maxIdTipoDoc = await TipoDocumento.max('id',{transaction:transactionCrearTipoDoc});
+        let newTipoDoc = await TipoDocumento.create({id:maxIdTipoDoc+1, ...regTipoDoc},{transaction:transactionCrearTipoDoc});
+        await transactionCrearTipoDoc.commit();
+        console.log('Registro creado OK Tabla TipoDocumento')
+        return newTipoDoc;
+    } catch (error) {
+        await transactionCrearTipoDoc.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllTiposDoc,createTipoDoc};

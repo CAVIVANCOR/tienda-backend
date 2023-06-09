@@ -40,4 +40,19 @@ const getAllTDI= async ()=>{
     return databaseTDI;
 };
 
-module.exports = {getAllTDI};
+const createTDI = async (regTDI)=>{
+    const transactionCrearTDI = await TipoDocIdentidad.sequelize.transaction();
+    try {
+        //await TipoDocIdentidad.sequelize.query('Lock Table TipoDocIdentidad',{transaction:transactionCrearTDI});
+        let maxIdTDI = await TipoDocIdentidad.max('id',{transaction:transactionCrearTDI});
+        let newTDI = await TipoDocIdentidad.create({id:maxIdTDI+1, ...regTDI},{transaction:transactionCrearTDI});
+        await transactionCrearTDI.commit();
+        console.log('Registro creado OK Tabla TipoDocIdentidad')
+        return newTDI;
+    } catch (error) {
+        await transactionCrearTDI.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllTDI,createTDI};

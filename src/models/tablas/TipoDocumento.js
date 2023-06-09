@@ -20,10 +20,6 @@ module.exports = (sequelize)=>{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
-        cesado:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:false
-        },
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -32,6 +28,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.INTEGER,
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "TipoDocumento"
+    }
     )
 }

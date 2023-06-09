@@ -1,4 +1,4 @@
-const {ProvinciaUbigeo} = require("../../db");
+const {Provincia, Departamento, Pais} = require("../../db");
 const axios = require("axios");
 
 const cleanArray=(arr)=>{
@@ -9,7 +9,7 @@ const cleanArray=(arr)=>{
             descripcion:elem.descripcion,
             codSunat:elem.codSunat,
             origen:elem.origen,
-            DepartamentoUbigeoId:elem.idDepartamento,
+            DepartamentoId:elem.idDepartamento,
         };
     });
     return clean;
@@ -19,7 +19,7 @@ const cargaBDProvincia = async (data)=>{
     try {
         await Promise.all(
             data.map(async(element)=>{
-                await ProvinciaUbigeo.create(element);
+                await Provincia.create(element);
             })
         )
         return 
@@ -32,14 +32,47 @@ const getAllProvincia= async ()=>{
     let databaseProvincias = null;
     let apiProvinciasRaw = null;
     let apiProvincias = null;
-    databaseProvincias = await ProvinciaUbigeo.findAll();
+    databaseProvincias = await Provincia.findAll({
+        include:[{
+            model:Departamento,
+            attributes:["descripcion","codSunat"],
+            include:[{
+                model:Pais,
+                attributes:["descripcion","codSunat"]
+            }]
+        }]
+    });
     if (databaseProvincias.length===0){
         apiProvinciasRaw = (await axios.get('http://192.168.18.15:82/provincias')).data;
         apiProvincias = await cleanArray(apiProvinciasRaw);
         await cargaBDProvincia(apiProvincias);
-        databaseProvincias = await ProvinciaUbigeo.findAll();
+        databaseProvincias = await Provincia.findAll({
+            include:[{
+                model:Departamento,
+                attributes:["descripcion","codSunat"],
+                include:[{
+                    model:Pais,
+                    attributes:["descripcion","codSunat"]
+                }]
+            }]
+        });
     }
     return databaseProvincias;
 };
 
-module.exports = {getAllProvincia};
+const createProvicias = async (regProvincias)=>{
+    const transactionCrearProvincias = await Provincia.sequelize.transaction();
+    try {
+        //await Provincia.sequelize.query('Lock Table Provincia',{transaction:transactionCrearProvincias});
+        let maxIdProvincia = await Provincia.max('id',{transaction:transactionCrearProvincias});
+        let newProvincia = await Provincia.create({id:maxIdProvincia+1, ...regProvincias},{transaction:transactionCrearProvincias});
+        await transactionCrearProvincias.commit();
+        console.log('Registro creado OK Tabla Provincia')
+        return newProvincia;
+    } catch (error) {
+        await transactionCrearProvincias.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllProvincia, createProvicias};

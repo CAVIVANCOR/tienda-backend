@@ -17,9 +17,6 @@ module.exports = (sequelize)=>{
         certificadoVehiculo:{
             type:DataTypes.STRING,
         },
-        nroDocIdentidad:{
-            type:DataTypes.STRING,
-        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -36,6 +33,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.INTEGER,
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "TransportistaCliProv"
+    }
     )
 }

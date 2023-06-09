@@ -1,4 +1,4 @@
-const {PaisUbigeo} = require("../../db");
+const {Pais} = require("../../db");
 const axios = require("axios");
 
 const cleanArray=(arr)=>{
@@ -18,7 +18,7 @@ const cargaBDPais = async (data)=>{
     try {
         await Promise.all(
             data.map(async(element)=>{
-                await PaisUbigeo.create(element);
+                await Pais.create(element);
             })
         )
         return 
@@ -31,14 +31,29 @@ const getAllPais= async ()=>{
     let databasePais = null;
     let apiPaisRaw = null;
     let apiPais = null;
-    databasePais = await PaisUbigeo.findAll();
+    databasePais = await Pais.findAll();
     if (databasePais.length===0){
         apiPaisRaw = (await axios.get('http://192.168.18.15:82/paises')).data;
         apiPais = await cleanArray(apiPaisRaw);
         await cargaBDPais(apiPais);
-        databasePais = await PaisUbigeo.findAll();
+        databasePais = await Pais.findAll();
     }
     return databasePais;
 };
 
-module.exports = {getAllPais};
+const createPais = async (regPais)=>{
+    const transactionCrearPais = await Pais.sequelize.transaction();
+    try {
+        //await Pais.sequelize.query('Lock Table Pais',{transaction:transactionCrearPais});
+        let maxIdPais = await Pais.max('id',{transaction:transactionCrearPais});
+        let newPais = await Pais.create({id:maxIdPais+1, ...regPais},{transaction:transactionCrearPais});
+        await transactionCrearPais.commit();
+        console.log('Registro creado OK Tabla Pais')
+        return newPais;
+    } catch (error) {
+        await transactionCrearPais.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllPais,createPais};

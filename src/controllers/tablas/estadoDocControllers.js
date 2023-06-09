@@ -39,4 +39,19 @@ const getAllEstadoDoc= async ()=>{
     return databaseEstadoDoc;
 };
 
-module.exports = {getAllEstadoDoc};
+const createEstadoDoc = async (regEstadoDoc)=>{
+    const transactionCrearEstadoDoc = await EstadoDoc.sequelize.transaction();
+    try {
+        //await EstadoDoc.sequelize.query('Lock Table EstadoDoc',{transaction:transactionCrearEstadoDoc});
+        let maxIdEstadoDoc = await EstadoDoc.max('id',{transaction:transactionCrearEstadoDoc});
+        let newEstadoDoc = await EstadoDoc.create({id:maxIdEstadoDoc+1, ...regEstadoDoc},{transaction:transactionCrearEstadoDoc});
+        await transactionCrearEstadoDoc.commit();
+        console.log('Registro creado OK Tabla EstadoDoc')
+        return newEstadoDoc;
+    } catch (error) {
+        await transactionCrearEstadoDoc.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllEstadoDoc,createEstadoDoc};

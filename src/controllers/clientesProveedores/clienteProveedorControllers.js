@@ -1,4 +1,4 @@
-const {ClienteProveedor,DireccionesCliProv,DistritoUbigeo} = require("../../db");
+const {ClienteProveedor,DirCliProv,Distrito} = require("../../db");
 const axios = require("axios");
 const {Op}=require("sequelize");
 
@@ -45,58 +45,58 @@ const cargaBDClienteProveedor = async (data)=>{
                 if (element.codDirFiscal === element.codDirGuia){
                     if (element.codDirFiscal !== "")
                     {
-                        distritosEncontrado = await DistritoUbigeo.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
+                        distritosEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
                         if (distritosEncontrado){
                             distritosEncontradosConvertidos = JSON.stringify(distritosEncontrado);
                             distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
                             codDistritoEncontrado = distritosEncontradosConvertidos2.id;
                         }
-                        await DireccionesCliProv.create({
+                        await DirCliProv.create({
                             direccion:element.dirFiscal,
                             telefonos:element.telefonos,
                             email:element.email,
                             principal:true,
                             fiscal:true,
                             ClienteProveedorId:element.id,
-                            DistritoUbigeoId:Number(codDistritoEncontrado),
+                            DistritoId:Number(codDistritoEncontrado),
                             idHistorico:0
                             }
                         );
                     }
                 }else{
                     if (element.codDirGuia !== ""){
-                        distritosEncontrado = await DistritoUbigeo.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
+                        distritosEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
                         if (distritosEncontrado){
                             distritosEncontradosConvertidos = JSON.stringify(distritosEncontrado);
                             distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
                             codDistritoEncontrado = distritosEncontradosConvertidos2.id;
                         }
-                        await DireccionesCliProv.create({
+                        await DirCliProv.create({
                             direccion:element.dirFiscal,
                             telefonos:element.telefonos,
                             email:element.email,
                             principal:true,
                             fiscal:true,
                             ClienteProveedorId:element.id,
-                            DistritoUbigeoId:Number(codDistritoEncontrado),
+                            DistritoId:Number(codDistritoEncontrado),
                             idHistorico:0
                             }
                         );
                         codDistritoEncontrado = 0;
-                        distritosEncontrado = await DistritoUbigeo.findOne({where:{codSunat:{[Op.iLike]:element.codDirGuia}}});
+                        distritosEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirGuia}}});
                         if (distritosEncontrado){
                             distritosEncontradosConvertidos = JSON.stringify(distritosEncontrado);
                             distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
                             codDistritoEncontrado = distritosEncontradosConvertidos2.id;
                         }
-                        await DireccionesCliProv.create({
+                        await DirCliProv.create({
                             direccion:element.dirGuia,
                             telefonos:element.telefonos,
                             email:element.email,
                             principal:true,
                             fiscal:false,
                             ClienteProveedorId:element.id,
-                            DistritoUbigeoId:Number(codDistritoEncontrado),
+                            DistritoId:Number(codDistritoEncontrado),
                             idHistorico:0
                             }
                         );
@@ -124,4 +124,18 @@ const getAllClienteProveedor= async ()=>{
     return databaseClienteProveedor;
 };
 
-module.exports = {getAllClienteProveedor};
+const createClienteProveedor = async (regClienteProveedor)=>{
+    const transactionCrearClienteProveedor = await ClienteProveedor.sequelize.transaction();
+    try {
+        let maxIdClienteProveedor = await ClienteProveedor.max('id', { transaction: transactionCrearClienteProveedor });
+        let newClienteProveedor = await ClienteProveedor.create({id:maxIdClienteProveedor+1, ...regClienteProveedor}, { transaction: transactionCrearClienteProveedor });
+        await transactionCrearClienteProveedor.commit();
+        console.log('registro creado OK Tabla ClienteProveedor');
+        return newClienteProveedor;
+    } catch (error) {
+        await transactionCrearClienteProveedor.rollback();
+        console.log(error.message);
+    };
+};
+
+module.exports = {getAllClienteProveedor,createClienteProveedor};

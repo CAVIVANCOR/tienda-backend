@@ -9,6 +9,7 @@ module.exports = (sequelize)=>{
         fecha:{
             type:DataTypes.DATEONLY,
             defaultValue:DataTypes.NOW,
+            unique:true,
         },
         compra:{
             type:DataTypes.DECIMAL(12,3),
@@ -22,10 +23,6 @@ module.exports = (sequelize)=>{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
-        cesado:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:false
-        },
         borradoLogico:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -34,6 +31,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.INTEGER,
         },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "TipoCambio"
+    }
     )
 }

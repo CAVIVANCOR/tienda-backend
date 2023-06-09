@@ -3,6 +3,7 @@ module.exports = (sequelize)=>{
     sequelize.define("CabMovAlmacen",{
         id:{
             type:DataTypes.BIGINT,
+            autoIncrement:true,
             primaryKey:true,
         },
         fecha:{
@@ -14,40 +15,47 @@ module.exports = (sequelize)=>{
             allowNull: false,
         },
         correlativoDcmto:{
-            type:DataTypes.BIGINT,
+            type:DataTypes.STRING,
             allowNull: false,
+        },
+        idContacto:{
+            type:DataTypes.BIGINT,
+        },
+        idDirOrigen:{
+            type:DataTypes.BIGINT,
+        },
+        idDirEntrega:{
+            type:DataTypes.BIGINT,
+        },
+        idTransportista:{
+            type:DataTypes.BIGINT,
+        },
+        idChofer:{
+            type:DataTypes.BIGINT,
         },
         observaciones:{
             type:DataTypes.STRING,
         },
-        fechaCreacion:{
-            type:DataTypes.DATE,
-            defaultValue:DataTypes.NOW,
-        },
-        idVenta:{
+        idDocOrigenVenta:{
             type:DataTypes.BIGINT,
         },
-        idCompra:{
+        idDocOrigenCompra:{
             type:DataTypes.BIGINT,
         },
-        tc:{
+        tipoCambio:{
             type:DataTypes.DECIMAL(12,2),
         },
         emailDestino:{
             type:DataTypes.STRING,
         },
-        numGuiaSUNAT:{
+        numGuiaSunat:{
             type:DataTypes.STRING,
         },
-        fechaGuiaSUNAT:{
+        fechaGuiaSunat:{
             type:DataTypes.DATEONLY,
             defaultValue:DataTypes.NOW,
         },
         created:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:true
-        },
-        cesado:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
@@ -55,7 +63,13 @@ module.exports = (sequelize)=>{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
+        idHistorico:{
+            type:DataTypes.BIGINT,
+        },
     },
-    {timestamps:false}
+    {
+        timestamps:false,
+        tableName: "CabMovAlmacen"
+    }
     )
 }

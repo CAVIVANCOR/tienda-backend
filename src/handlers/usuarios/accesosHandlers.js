@@ -1,8 +1,18 @@
-const { getAllAccesos } = require("../../controllers/usuarios/accesoControllers");
+const { getAllAccesos, createAccesos } = require("../../controllers/usuarios/accesoControllers");
 
 const getAccesosHandler = async (req,res)=>{
     const results = await getAllAccesos();
     res.status(201).json(results);
 };
 
-module.exports ={getAccesosHandler}
+const createAccesosHandler = async (req,res)=>{
+    let registroAcceso = req.body;
+    try {
+        let newAcceso = await createAccesos(registroAcceso);
+        res.status(201).json(newAcceso);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
+}
+
+module.exports ={getAccesosHandler,createAccesosHandler }

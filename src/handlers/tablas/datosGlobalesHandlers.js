@@ -1,8 +1,18 @@
-const { getAllDatosGlobales } = require("../../controllers/tablas/datosGlobalesControllers");
+const { getAllDatosGlobales, createDatosGlobales } = require("../../controllers/tablas/datosGlobalesControllers");
 
 const getDatosGlobalesHandler = async (req,res)=>{
     const results = await getAllDatosGlobales();
     res.status(201).json(results);
 };
 
-module.exports ={getDatosGlobalesHandler}
+const createDatosGlobalesHandler = async (req,res)=>{
+    let registroDatosGlobales = req.body;
+    try {
+        const results = await createDatosGlobales(registroDatosGlobales);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getDatosGlobalesHandler,createDatosGlobalesHandler};
