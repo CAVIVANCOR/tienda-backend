@@ -83,7 +83,7 @@ const getAllKardexAlmacen= async (isAdministrator=false)=>{
 const createKardexAlmacen = async (regKardexAlmacen)=>{
     const transactionCrearKardexAlmacen = await KardexAlmacen.sequelize.transaction();
     try {
-        let maxIdKardexAlmacen = await KardexAlmacen.max('id',{transaction:transactionCrearKardexAlmacen});
+        let maxIdKardexAlmacen = await KardexAlmacen.max('id');
         let newKardexAlmacen = await KardexAlmacen.create({id:maxIdKardexAlmacen+1,...regKardexAlmacen},{transaction:transactionCrearKardexAlmacen});
         await transactionCrearKardexAlmacen.commit();
         console.log('Registro creado OK Tabla Kardex Almacen');
@@ -91,6 +91,7 @@ const createKardexAlmacen = async (regKardexAlmacen)=>{
     } catch (error) {
         await transactionCrearKardexAlmacen.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 

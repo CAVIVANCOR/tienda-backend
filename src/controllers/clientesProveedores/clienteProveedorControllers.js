@@ -1,7 +1,17 @@
-const {ClienteProveedor,DirCliProv,Distrito} = require("../../db");
+const {ClienteProveedor,DirCliProv,Distrito,TipoDocIdentidad,TipoCliProv,CabMovAlmacen,CabCompras,CabVentas} = require("../../db");
 const axios = require("axios");
 const {Op}=require("sequelize");
-
+const regClienteProveedorUsuario ={
+    where: { borradoLogico: false },
+    include:[{
+        Model:TipoDocIdentidad,
+        attributes:["descripcion","codSunat"]
+    },{
+        Model:TipoCliProv,
+        attributes:["descripcion","clienteProveedor"]
+    }]
+};
+const {where,...regClienteProveedorAdmin}=regClienteProveedorUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -33,6 +43,7 @@ const cleanArray=(arr)=>{
 };
 
 const cargaBDClienteProveedor = async (data)=>{
+    let transactionCargaBDClienteProveedor = await ClienteProveedor.sequelize.transaction();
     try {
         let distritosEncontrado = null;
         let distritosEncontradosConvertidos = null;
@@ -60,7 +71,7 @@ const cargaBDClienteProveedor = async (data)=>{
                             ClienteProveedorId:element.id,
                             DistritoId:Number(codDistritoEncontrado),
                             idHistorico:0
-                            }
+                            }, { transaction: transactionCargaBDClienteProveedor }
                         );
                     }
                 }else{
@@ -80,7 +91,7 @@ const cargaBDClienteProveedor = async (data)=>{
                             ClienteProveedorId:element.id,
                             DistritoId:Number(codDistritoEncontrado),
                             idHistorico:0
-                            }
+                            }, { transaction: transactionCargaBDClienteProveedor }
                         );
                         codDistritoEncontrado = 0;
                         distritosEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirGuia}}});
@@ -98,36 +109,46 @@ const cargaBDClienteProveedor = async (data)=>{
                             ClienteProveedorId:element.id,
                             DistritoId:Number(codDistritoEncontrado),
                             idHistorico:0
-                            }
+                            }, { transaction: transactionCargaBDClienteProveedor }
                         );
                     }
                 };
             })
         )
+        await transactionCargaBDClienteProveedor.commit();
         return 
     } catch (error) {
+        await transactionCargaBDClienteProveedor.rollback();
         console.log(error.message)
+        throw new Error(error.message);
     }
 };
 
-const getAllClienteProveedor= async ()=>{
-    let databaseClienteProveedor = null;
-    let apiClienteProveedorRaw = null;
-    let apiClienteProveedor = null;
-    databaseClienteProveedor = await ClienteProveedor.findAll();
-    if (databaseClienteProveedor.length===0){
-        apiClienteProveedorRaw = (await axios.get('http://192.168.18.15:82/clientesProveedores')).data;
-        apiClienteProveedor = await cleanArray(apiClienteProveedorRaw);
-        await cargaBDClienteProveedor(apiClienteProveedor);
-        databaseClienteProveedor = await ClienteProveedor.findAll();
+const getAllClienteProveedor= async (isAdministrator=false)=>{
+    try {
+        let databaseClienteProveedor = null;
+        let apiClienteProveedorRaw = null;
+        let apiClienteProveedor = null;
+        let regClienteProveedor = regClienteProveedorUsuario;
+        if (isAdministrator) regClienteProveedor = regClienteProveedorAdmin;
+        databaseClienteProveedor = await ClienteProveedor.findAll(regClienteProveedor);
+        if (databaseClienteProveedor.length===0){
+            apiClienteProveedorRaw = (await axios.get('http://192.168.18.15:82/clientesProveedores')).data;
+            apiClienteProveedor = await cleanArray(apiClienteProveedorRaw);
+            await cargaBDClienteProveedor(apiClienteProveedor);
+            databaseClienteProveedor = await ClienteProveedor.findAll(regClienteProveedor);
+        }
+        return databaseClienteProveedor;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
     }
-    return databaseClienteProveedor;
 };
 
 const createClienteProveedor = async (regClienteProveedor)=>{
     const transactionCrearClienteProveedor = await ClienteProveedor.sequelize.transaction();
     try {
-        let maxIdClienteProveedor = await ClienteProveedor.max('id', { transaction: transactionCrearClienteProveedor });
+        let maxIdClienteProveedor = await ClienteProveedor.max('id');
         let newClienteProveedor = await ClienteProveedor.create({id:maxIdClienteProveedor+1, ...regClienteProveedor}, { transaction: transactionCrearClienteProveedor });
         await transactionCrearClienteProveedor.commit();
         console.log('registro creado OK Tabla ClienteProveedor');
@@ -135,7 +156,30 @@ const createClienteProveedor = async (regClienteProveedor)=>{
     } catch (error) {
         await transactionCrearClienteProveedor.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllClienteProveedor,createClienteProveedor};
+const deleteClienteProveedor = async (id)=>{
+    let transactionEliminarClienteProveedor = await ClienteProveedor.sequelize.transaction();
+    try {
+        let foundClienteProveedor = await ClienteProveedor.findByPk(id);
+        if (!foundClienteProveedor) throw new Error('ID ClienteProveedor no encontrado');
+        let foundCabMovalmacen = await CabMovAlmacen.findAll({where:{ClienteProveedorId:id,borradoLogico:false}});
+        let foundCabCompras = await CabCompras.findAll({where:{ClienteProveedorId:id,borradoLogico:false}});
+        let foundCabVentas = await CabVentas.findAll({where:{ClienteProveedorId:id,borradoLogico:false}});
+        if (foundCabMovalmacen.length>0) throw new Error('ClienteProveedor tiene movimientos de Almacen pendientes');
+        if (foundCabCompras.length>0) throw new Error('ClienteProveedor tiene movimientos de Compras pendientes');
+        if (foundCabVentas.length>0) throw new Error('ClienteProveedor tiene movimientos de Ventas pendientes');
+        let deletedClienteProveedor = await foundClienteProveedor.update({borradoLogico:!foundClienteProveedor.borradoLogico},{transaction:transactionEliminarClienteProveedor});
+        await transactionEliminarClienteProveedor.commit();
+        console.log('registro eliminado OK Tabla ClienteProveedor');
+        return deletedClienteProveedor;
+    } catch (error) {
+        await transactionEliminarClienteProveedor.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    }
+}
+
+module.exports = {getAllClienteProveedor,createClienteProveedor,deleteClienteProveedor};

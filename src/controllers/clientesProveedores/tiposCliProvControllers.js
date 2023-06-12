@@ -1,6 +1,10 @@
 const {TipoCliProv} = require("../../db");
 const axios = require("axios");
-
+const ClienteProveedor = require("../../models/clientesProveedores/ClienteProveedor");
+const regTipoCliProvUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regTipoCliProvAdmin}=regTipoCliProvUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -22,20 +26,23 @@ const cargaBDTipoCliProv = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllTipoCliProv= async ()=>{
+const getAllTipoCliProv= async (isAdministrator=false)=>{
     let databaseTipoCliProv = null;
     let apiTipoCliProvRaw = null;
     let apiTipoCliProv = null;
-    databaseTipoCliProv = await TipoCliProv.findAll();
+    let regTipoCliProv = regTipoCliProvUsuario;
+    if (isAdministrator) regTipoCliProv = regTipoCliProvAdmin;
+    databaseTipoCliProv = await TipoCliProv.findAll(regTipoCliProv);
     if (databaseTipoCliProv.length===0){
         apiTipoCliProvRaw = (await axios.get('http://192.168.18.15:82/tiposCliProv')).data;
         apiTipoCliProv = await cleanArray(apiTipoCliProvRaw);
         await cargaBDTipoCliProv(apiTipoCliProv);
-        databaseTipoCliProv = await TipoCliProv.findAll();
+        databaseTipoCliProv = await TipoCliProv.findAll(regTipoCliProv);
     }
     return databaseTipoCliProv;
 };
@@ -44,7 +51,7 @@ const createTipoCliProv = async (regTipoCliProv)=>{
     const transactionCrearTipoCliProv = await TipoCliProv.sequelize.transaction();
     try {
         //await TipoCliProv.sequelize.query('Lock Table TipoCliProv',{transaction:transactionCrearTipoCliProv});
-        let maxIdTipoCliProv = await TipoCliProv.max("id", {transaction:transactionCrearTipoCliProv});
+        let maxIdTipoCliProv = await TipoCliProv.max("id");
         let newTipoCliProv = await TipoCliProv.create({id:maxIdTipoCliProv+1, ...regTipoCliProv},{transaction:transactionCrearTipoCliProv});
         await transactionCrearTipoCliProv.commit();
         console.log('Registro creado OK Tabla TipoCliProv')
@@ -52,7 +59,26 @@ const createTipoCliProv = async (regTipoCliProv)=>{
     } catch (error) {
         await transactionCrearTipoCliProv.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllTipoCliProv,createTipoCliProv};
+const deleteTipoCliProv = async (id)=>{
+    const transactionEliminarTipoCliProv = await TipoCliProv.sequelize.transaction();
+    try {
+        let foundTipoCliProv = await TipoCliProv.findByPk(id);
+        if (!foundTipoCliProv) throw new Error('ID de TipoCliProv no encontrada');
+        let foundClienteProveedor = await ClienteProveedor.findAll({where:{TipoCliProvId:id,borradoLogico:false}});
+        if (foundClienteProveedor.length>0) throw new Error('El TipoCliProv tiene clientes asociados');
+        let deletedTipoCliProv = await foundTipoCliProv.update({borradoLogico:!foundTipoCliProv.borradoLogico},{transaction:transactionEliminarTipoCliProv});
+        await transactionEliminarTipoCliProv.commit();
+        console.log('Registro eliminado OK Tabla TipoCliProv');
+        return deletedTipoCliProv;
+    } catch (error) {
+        await transactionEliminarTipoCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllTipoCliProv,createTipoCliProv,deleteTipoCliProv};

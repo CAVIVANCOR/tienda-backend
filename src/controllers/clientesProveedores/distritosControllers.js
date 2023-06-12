@@ -1,6 +1,21 @@
-const {Distrito,Provincia,Departamento,Pais} = require("../../db");
+const {Distrito,Provincia,Departamento,Pais,DirCliProv} = require("../../db");
 const axios = require("axios");
-
+const regDistritoUsuario ={
+    where: { borradoLogico: false },
+    include:[{
+        model:Provincia,
+        attributes:["descripcion","codSunat"],
+        include:[{
+            model:Departamento,
+            attributes:["descripcion","codSunat"],
+            include:[{
+                model:Pais,
+                attributes:["descripcion","codSunat"],
+            }]
+        }]
+    }]
+};
+const {where,...regDistritoAdmin}=regDistritoUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -26,45 +41,22 @@ const cargaBDDistrito = async (data)=>{
         return 
     } catch (error) {
         console.log(error.message)
+        throw new Error(error.message);
     }
 };
 
-const getAllDistrito= async ()=>{
+const getAllDistrito= async (isAdministrator=false)=>{
     let databaseDistritos = null;
     let apiDistritosRaw = null;
     let apiDistritos = null;
-    databaseDistritos = await Distrito.findAll({
-        include:[{
-            model:Provincia,
-            attributes:["descripcion","codSunat"],
-            include:[{
-                model:Departamento,
-                attributes:["descripcion","codSunat"],
-                include:[{
-                    model:Pais,
-                    attributes:["descripcion","codSunat"],
-                }]
-            }]
-        }]
-    });
+    let regDistrito = regDistritoUsuario;
+    if (isAdministrator) regDistrito = regDistritoAdmin;
+    databaseDistritos = await Distrito.findAll(regDistrito);
     if (databaseDistritos.length===0){
         apiDistritosRaw = (await axios.get('http://192.168.18.15:82/distritos')).data;
         apiDistritos = await cleanArray(apiDistritosRaw);
         await cargaBDDistrito(apiDistritos);
-        databaseDistritos = await Distrito.findAll({
-            include:[{
-                model:Provincia,
-                attributes:["descripcion","codSunat"],
-                include:[{
-                    model:Departamento,
-                    attributes:["descripcion","codSunat"],
-                    include:[{
-                        model:Pais,
-                        attributes:["descripcion","codSunat"],
-                    }]
-                }]
-            }]
-        });
+        databaseDistritos = await Distrito.findAll(regDistrito);
     }
     return databaseDistritos;
 };
@@ -73,7 +65,7 @@ const createDistrito = async (regDistrito)=>{
     const transactionCrearDistrito = await Distrito.sequelize.transaction();
     try {
        // await Distrito.sequelize.query('Lock Table Distrito',{transaction:transactionCrearDistrito});
-        let maxIdDistrito = await Distrito.max('id',{transaction:transactionCrearDistrito});
+        let maxIdDistrito = await Distrito.max('id');
         let newDistrito = await Distrito.create({id:maxIdDistrito+1, ...regDistrito},{transaction:transactionCrearDistrito});
         await transactionCrearDistrito.commit();
         console.log('Registro creado OK Tabla Distrito')
@@ -81,7 +73,25 @@ const createDistrito = async (regDistrito)=>{
     } catch (error) {
         await transactionCrearDistrito.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllDistrito,createDistrito};
+const deleteDistrito = async (id)=>{
+    const transactionBorrarDistrito = await Distrito.sequelize.transaction();
+    try {
+        let foundDistrito = await Distrito.findByPk(id);
+        if (!foundDistrito) throw new Error("ID Distrito no encontrado");
+        let foundDirCliProv = await DirCliProv.findAll({where:{DistritoId:id,borradoLogico:false}});
+        if (foundDirCliProv.length>0) throw new Error("Distrito tiene clientes asociados");
+        let deletedDistrito = await foundDistrito.update({borradoLogico:!foundDistrito.borradoLogico},{transaction:transactionBorrarDistrito});
+        await transactionBorrarDistrito.commit();
+        console.log("Registro borrado OK Tabla Distrito");
+        return deletedDistrito;
+    } catch (error) {
+        await transactionBorrarDistrito.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+module.exports = {getAllDistrito,createDistrito,deleteDistrito};

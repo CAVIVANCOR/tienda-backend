@@ -1,6 +1,13 @@
-const {SubFamilia,Familia} = require("../../db");
+const {SubFamilia,Familia,Producto} = require("../../db");
 const axios = require("axios");
-
+const regSubFamiliaProductoUsuario ={
+    where: { borradoLogico: false },
+    include:[{
+        model:Familia,
+        attributes:["descripcion","noKardex"]
+    }]
+};
+const {where,...regSubFamiliaProductoAdmin}=regSubFamiliaProductoUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -23,30 +30,23 @@ const cargaBDSubFamiliaProducto = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllSubFamiliaProducto= async ()=>{
+const getAllSubFamiliaProducto= async (isAdministrator=false)=>{
     let databaseSubFamiliaProducto = null;
     let apiSubFamiliaProductoRaw = null;
     let apiSubFamiliaProducto = null;
-    databaseSubFamiliaProducto = await SubFamilia.findAll({
-        include:[{
-            model:Familia,
-            attributes:["descripcion","noKardex"]
-        }]
-    });
+    let regSubFamiliaProducto = regSubFamiliaProductoUsuario;
+    if (isAdministrator) regSubFamiliaProducto = regSubFamiliaProductoAdmin;
+    databaseSubFamiliaProducto = await SubFamilia.findAll(regSubFamiliaProducto);
     if (databaseSubFamiliaProducto.length===0){
         apiSubFamiliaProductoRaw = (await axios.get('http://192.168.18.15:82/subFamiliasProductos')).data;
         apiSubFamiliaProducto = await cleanArray(apiSubFamiliaProductoRaw);
         await cargaBDSubFamiliaProducto(apiSubFamiliaProducto);
-        databaseSubFamiliaProducto = await SubFamilia.findAll({
-            include:[{
-                model:Familia,
-                attributes:["descripcion","noKardex"]
-            }]
-        });
+        databaseSubFamiliaProducto = await SubFamilia.findAll(regSubFamiliaProducto);
     }
     return databaseSubFamiliaProducto;
 };
@@ -54,7 +54,7 @@ const getAllSubFamiliaProducto= async ()=>{
 const createSubFamiliaProducto = async (regSubFamiliaProducto)=>{
     const transactionCrearSubFamiliaProducto = await SubFamilia.sequelize.transaction();
     try {
-        let maxIdSubFamiliaProducto = await SubFamilia.max("id", {transaction:transactionCrearSubFamiliaProducto});
+        let maxIdSubFamiliaProducto = await SubFamilia.max("id");
         let newSubFamiliaProducto = await SubFamilia.create({id:maxIdSubFamiliaProducto+1, ...regSubFamiliaProducto},{transaction:transactionCrearSubFamiliaProducto});
         await transactionCrearSubFamiliaProducto.commit();
         console.log('Registro creado OK Tabla SubFamilia');
@@ -62,7 +62,26 @@ const createSubFamiliaProducto = async (regSubFamiliaProducto)=>{
     } catch (error) {
         await transactionCrearSubFamiliaProducto.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllSubFamiliaProducto,createSubFamiliaProducto};
+const deleteSubFamiliaProducto = async (id)=>{
+    const transactionEliminarSubFamiliaProducto = await SubFamilia.sequelize.transaction();
+    try {
+        let foundSubFamiliaProducto = await SubFamilia.findByPk(id);
+        if (!foundSubFamiliaProducto) throw new Error('ID de Registro SubFamilia de producto no encontrado');
+        let foundProductos = await Producto.findAll({where:{SubFamiliumId:id,borradoLogico:false}});
+        if (foundProductos.length>0) throw new Error('No se puede eliminar el registro ya que tiene productos asociados');
+        let deletedSubFamiliaProducto = await foundSubFamiliaProducto.update({borradoLogico:!foundSubFamiliaProducto.borradoLogico},{transaction:transactionEliminarSubFamiliaProducto});
+        await transactionEliminarSubFamiliaProducto.commit();
+        console.log('Registro SubFamiliaProducto eliminado OK');
+        return deletedSubFamiliaProducto;
+    } catch (error) {
+        await transactionEliminarSubFamiliaProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllSubFamiliaProducto,createSubFamiliaProducto,deleteSubFamiliaProducto};

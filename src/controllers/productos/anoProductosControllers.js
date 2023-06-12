@@ -1,6 +1,9 @@
-const {Ano} = require("../../db");
+const {Ano,Producto} = require("../../db");
 const axios = require("axios");
-
+const regAnoUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regAnoAdmin}=regAnoUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -21,20 +24,23 @@ const cargaBDAnoProducto = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllAnoProducto= async ()=>{
+const getAllAnoProducto= async (isAdministrator=false)=>{
     let databaseAnoProducto = null;
     let apiAnoProductoRaw = null;
     let apiAnoProducto = null;
-    databaseAnoProducto = await Ano.findAll();
+    let regAno = regAnoUsuario;
+    if (isAdministrator) regAno = regAnoAdmin;
+    databaseAnoProducto = await Ano.findAll(regAno);
     if (databaseAnoProducto.length===0){
         apiAnoProductoRaw = (await axios.get('http://192.168.18.15:82/anosProductos')).data;
         apiAnoProducto = await cleanArray(apiAnoProductoRaw);
         await cargaBDAnoProducto(apiAnoProducto);
-        databaseAnoProducto = await Ano.findAll();
+        databaseAnoProducto = await Ano.findAll(regAno);
     }
     return databaseAnoProducto;
 };
@@ -42,7 +48,7 @@ const getAllAnoProducto= async ()=>{
 const createAnoProducto = async (regAno)=>{
     const transactionCrearAnoProducto = await Ano.sequelize.transaction();
     try {
-        let maxIdAno = await Ano.max("id", {transaction:transactionCrearAnoProducto});
+        let maxIdAno = await Ano.max("id");
         let newAno = await Ano.create({id:maxIdAno+1, ...regAno},{transaction:transactionCrearAnoProducto});
         await transactionCrearAnoProducto.commit();
         console.log('Registro creado OK Tabla Ano')
@@ -50,7 +56,26 @@ const createAnoProducto = async (regAno)=>{
     } catch (error) {
         await transactionCrearAnoProducto.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllAnoProducto,createAnoProducto};
+const deleteAno = async (id)=>{
+    const transactionEliminarAno = await Ano.sequelize.transaction();
+    try {
+        let foundAno = await Ano.findByPk(id);
+        if (!foundAno) throw new Error('ID Ano de producto No encontrado');
+        let foundProductos = await Producto.findAll({where:{AnoId:id, borradoLogico:false}});
+        if (foundProductos.length>0) throw new Error('Ano de producto tiene productos asociados');
+        let deletedAno = await foundAno.update({borradoLogico:!foundAno.borradoLogico},{transaction:transactionEliminarAno});
+        await transactionEliminarAno.commit();
+        console.log('Registro eliminado OK Tabla Ano');
+        return deletedAno;
+    } catch (error) {
+        await transactionEliminarAno.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllAnoProducto,createAnoProducto,deleteAno};

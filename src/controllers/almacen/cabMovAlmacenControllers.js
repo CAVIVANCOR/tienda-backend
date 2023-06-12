@@ -83,6 +83,7 @@ const cargaBDCabMovAlmacen = async (data)=>{
         return 
     } catch (error) {
         console.log(error.message)
+        throw new Error(error.message);
     }
 };
 
@@ -104,10 +105,10 @@ const getAllCabMovAlmacen= async (isAdministrator=false)=>{
 
 
 const createCabMovAlmacen = async (regCabMovAlmacen) => {
-    const transactionCrearCabMovAlmacen = await CabMovAlmacen.sequelize.transaction();
+    let transactionCrearCabMovAlmacen = await CabMovAlmacen.sequelize.transaction();
     let detMovAlmacenRecords = null; // Inicializa la variable con un valor predeterminado
     try {
-        let maxIdCabMovAlmacen = await CabMovAlmacen.max('id', { transaction: transactionCrearCabMovAlmacen });
+        let maxIdCabMovAlmacen = await CabMovAlmacen.max('id');
         let newCabMovAlmacen = await CabMovAlmacen.create({ id: maxIdCabMovAlmacen + 1, ...regCabMovAlmacen }, { transaction: transactionCrearCabMovAlmacen });
         if (regCabMovAlmacen.DetMovAlmacen) { // Verifica que regCabMovAlmacen.DetMovAlmacen esté definido
             detMovAlmacenRecords = await DetMovAlmacen.bulkCreate(regCabMovAlmacen.DetMovAlmacen, { transaction: transactionCrearCabMovAlmacen });
@@ -126,7 +127,7 @@ const deleteCabMovAlmacen = async (id) => {
         let foundCabMovAlmacen = await CabMovAlmacen.findByPk(id);
         if (!foundCabMovAlmacen) throw new Error("No se encontró el ID del registro a eliminar en la tabla CabMovAlmacen");
         let foundDetMovAlmacen = await DetMovAlmacen.findAll({
-            where: { CabMovAlmacenId: id }
+            where: { CabMovAlmacenId: id, borradoLogico: false },
         })
         if (foundDetMovAlmacen.length > 0){
             await Promise.all(
@@ -135,11 +136,7 @@ const deleteCabMovAlmacen = async (id) => {
                 })
             )
         };
-        let deletedCabMovAlmacen = await CabMovAlmacen.update(
-            { borradoLogico: !foundAlmacen.borradoLogico },
-            { where:{id} },
-            { transaction: transactionEliminarCabMovAlmacen },
-        )
+        let deletedCabMovAlmacen = await foundCabMovAlmacen.update({borradoLogico:!foundCabMovAlmacen.borradoLogico},{transaction:transactionEliminarCabMovAlmacen});
         await transactionEliminarCabMovAlmacen.commit();
         return deletedCabMovAlmacen;
     } catch (error) {

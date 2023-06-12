@@ -67,7 +67,7 @@ const getAllDetMovAlmacen= async (isAdministrator=false)=>{
 const createDetMovAlmacen = async (regDetMovAlmacen)=>{
     let transactionCrearDetMovAlmacen = await DetMovAlmacen.sequelize.transaction();
     try {
-        let maxIdDetMovAlmacen = await DetMovAlmacen.max("id", {transaction:transactionCrearDetMovAlmacen});
+        let maxIdDetMovAlmacen = await DetMovAlmacen.max("id");
         let newDetMovAlmacen = await DetMovAlmacen.create({id:maxIdDetMovAlmacen+1, ...regDetMovAlmacen},{transaction:transactionCrearDetMovAlmacen});
         await transactionCrearDetMovAlmacen.commit();
         console.log('Registro creado OK Tabla DetMovAlmacen')
@@ -75,6 +75,7 @@ const createDetMovAlmacen = async (regDetMovAlmacen)=>{
     } catch (error) {
         await transactionCrearDetMovAlmacen.rollback();
         console.log(error.message)
+        throw new Error(error.message);
     };
 };
 
@@ -89,11 +90,7 @@ const deleteDetMovAlmacen = async (id)=>{
             }
         })
         if (foundKardexAlmacen) throw new Error("El registro se encuentra en Kardex de Almacen, debe eliminar primero el Kardex");
-        let deletedDetMovAlmacen = await DetMovAlmacen.update(
-            { borradoLogico: !foundAlmacen.borradoLogico },
-            { where:{id} },
-            { transaction: transactionEliminarDetMovAlmacen },
-            )
+        let deletedDetMovAlmacen = await foundDetMovAlmacen.update({borradoLogico:!foundDetMovAlmacen.borradoLogico},{transaction:transactionEliminarDetMovAlmacen});
         await transactionEliminarDetMovAlmacen.commit();
         console.log('Registro eliminado OK Tabla DetMovAlmacen')
         return deletedDetMovAlmacen;

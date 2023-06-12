@@ -1,6 +1,9 @@
-const {Pais} = require("../../db");
+const {Pais,Departamento} = require("../../db");
 const axios = require("axios");
-
+const regPaisUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regPaisAdmin}=regPaisUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -24,19 +27,22 @@ const cargaBDPais = async (data)=>{
         return 
     } catch (error) {
         console.log(error.message)
+        throw new Error(error.message);
     }
 };
 
-const getAllPais= async ()=>{
+const getAllPais= async (isAdministrator=false)=>{
     let databasePais = null;
     let apiPaisRaw = null;
     let apiPais = null;
-    databasePais = await Pais.findAll();
+    let regPais = regPaisUsuario;
+    if (isAdministrator) regPais = regPaisAdmin;
+    databasePais = await Pais.findAll(regPais);
     if (databasePais.length===0){
         apiPaisRaw = (await axios.get('http://192.168.18.15:82/paises')).data;
         apiPais = await cleanArray(apiPaisRaw);
         await cargaBDPais(apiPais);
-        databasePais = await Pais.findAll();
+        databasePais = await Pais.findAll(regPais);
     }
     return databasePais;
 };
@@ -45,7 +51,7 @@ const createPais = async (regPais)=>{
     const transactionCrearPais = await Pais.sequelize.transaction();
     try {
         //await Pais.sequelize.query('Lock Table Pais',{transaction:transactionCrearPais});
-        let maxIdPais = await Pais.max('id',{transaction:transactionCrearPais});
+        let maxIdPais = await Pais.max('id');
         let newPais = await Pais.create({id:maxIdPais+1, ...regPais},{transaction:transactionCrearPais});
         await transactionCrearPais.commit();
         console.log('Registro creado OK Tabla Pais')
@@ -53,7 +59,26 @@ const createPais = async (regPais)=>{
     } catch (error) {
         await transactionCrearPais.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllPais,createPais};
+const deletePais = async (id)=>{
+    const transactionEliminarPais = await Pais.sequelize.transaction();
+    try {
+        let foundPais = await Pais.findByPk(id);
+        if (!foundPais) throw new Error('ID Pais no encontrado');
+        let foundDepartamento = await Departamento.findAll({where:{PaiId:id,borradoLogico:false}});
+        if (foundDepartamento.length>0) throw new Error('El pais tiene departamentos asociados');
+        let deletedPais = await foundPais.update({borradoLogico:!foundPais.borradoLogico},{transaction:transactionEliminarPais});
+        await transactionEliminarPais.commit();
+        console.log('Registro borrado OK Tabla Pais')
+        return deletedPais;
+    } catch (error) {
+        await transactionEliminarPais.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllPais,createPais,deletePais};

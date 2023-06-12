@@ -1,6 +1,10 @@
 const {UMProd} = require("../../db");
 const axios = require("axios");
-
+const Producto = require("../../models/productos/Producto");
+const regUMProdProductoUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regUMProdProductoAdmin}=regUMProdProductoUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -24,14 +28,17 @@ const cargaBDUMProducto = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllUMProducto= async ()=>{
+const getAllUMProducto= async (isAdministrator=false)=>{
     let databaseUMProducto = null;
     let apiUMProductoRaw = null;
     let apiUMProducto = null;
+    let regUMProdProducto = regUMProdProductoUsuario;
+    if (isAdministrator) regUMProdProducto = regUMProdProductoAdmin;
     databaseUMProducto = await UMProd.findAll();
     if (databaseUMProducto.length===0){
         apiUMProductoRaw = (await axios.get('http://192.168.18.15:82/umProductos')).data;
@@ -45,7 +52,7 @@ const getAllUMProducto= async ()=>{
 const createUMProducto = async (regUMProducto)=>{
     const transactionCrearUMProducto = await UMProd.sequelize.transaction();
     try {
-        let maxIdUMProducto = await UMProd.max("id", {transaction:transactionCrearUMProducto});
+        let maxIdUMProducto = await UMProd.max("id");
         let newUMProducto = await UMProd.create({id:maxIdUMProducto+1, ...regUMProducto},{transaction:transactionCrearUMProducto});
         await transactionCrearUMProducto.commit();
         console.log('Registro creado OK Tabla UMProd')
@@ -53,7 +60,26 @@ const createUMProducto = async (regUMProducto)=>{
     } catch (error) {
         await transactionCrearUMProducto.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllUMProducto,createUMProducto};
+const deleteUMProducto = async (id)=>{
+    const transactionEliminarUMProducto = await UMProd.sequelize.transaction();
+    try {
+        let foundUMProducto = await UMProd.findByPk(id);
+        if (!foundUMProducto) throw new Error('No existe el ID registro de UMProducto');
+        let foundProductos = await Producto.findAll({where:{UMProdId:id,borradoLogico:false}});
+        if (foundProductos.length>0) throw new Error('El registro de UMProducto tiene productos asociados');
+        let deletedUMProducto = await foundUMProducto.update({borradoLogico:!foundUMProducto.borradoLogico},{transaction:transactionEliminarUMProducto});
+        await transactionEliminarUMProducto.commit();
+        console.log('Registro eliminado OK Tabla UMProd');
+        return deletedUMProducto;
+    } catch (error) {
+        await transactionEliminarUMProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllUMProducto,createUMProducto,deleteUMProducto};

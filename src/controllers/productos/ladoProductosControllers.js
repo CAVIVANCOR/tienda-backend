@@ -1,6 +1,9 @@
-const {Lado} = require("../../db");
+const {Lado, Producto} = require("../../db");
 const axios = require("axios");
-
+const regLadoProductoUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regLadoProductoAdmin}=regLadoProductoUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -21,20 +24,23 @@ const cargaBDLadoProducto = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllLadoProducto= async ()=>{
+const getAllLadoProducto= async (isAdministrator=false)=>{
     let databaseLadoProducto = null;
     let apiLadoProductoRaw = null;
     let apiLadoProducto = null;
-    databaseLadoProducto = await Lado.findAll();
+    let regLadoProducto = regLadoProductoUsuario;
+    if (isAdministrator) regLadoProducto = regLadoProductoAdmin;
+    databaseLadoProducto = await Lado.findAll(regLadoProducto);
     if (databaseLadoProducto.length===0){
         apiLadoProductoRaw = (await axios.get('http://192.168.18.15:82/ladosProductos')).data;
         apiLadoProducto = await cleanArray(apiLadoProductoRaw);
         await cargaBDLadoProducto(apiLadoProducto);
-        databaseLadoProducto = await Lado.findAll();
+        databaseLadoProducto = await Lado.findAll(regLadoProducto);
     }
     return databaseLadoProducto;
 };
@@ -42,7 +48,7 @@ const getAllLadoProducto= async ()=>{
 const createLadoProducto = async (regLadoProducto)=>{
     const transactionCrearLadoProducto = await Lado.sequelize.transaction();
     try {
-        let maxIdLadoProducto = await Lado.max("id", {transaction:transactionCrearLadoProducto});
+        let maxIdLadoProducto = await Lado.max("id");
         let newLadoProducto = await Lado.create({id:maxIdLadoProducto+1, ...regLadoProducto},{transaction:transactionCrearLadoProducto});
         await transactionCrearLadoProducto.commit();
         console.log('Registro creado OK Tabla Lado')
@@ -50,7 +56,26 @@ const createLadoProducto = async (regLadoProducto)=>{
     } catch (error) {
         await transactionCrearLadoProducto.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllLadoProducto,createLadoProducto};
+const deleteLadoProducto = async (id)=>{
+    const transactionEliminarLadoProducto = await Lado.sequelize.transaction();
+    try {
+        let foundLadoProducto = await Lado.findByPk(id);
+        if (!foundLadoProducto) throw new Error("ID de Lado del producto no encontrado");
+        let foundProductos = await Producto.findAll({where:{LadoId:id, borradoLogico:false}});
+        if (foundProductos.length>0) throw new Error("El Lado tiene productos asociados");
+        let deletedLadoProducto = await foundLadoProducto.update({borradoLogico:!foundLadoProducto.borradoLogico},{transaction:transactionEliminarLadoProducto});
+        await transactionEliminarLadoProducto.commit();
+        console.log('Registro eliminado OK Tabla Lado');
+        return deletedLadoProducto;
+    } catch (error) {
+        await transactionEliminarLadoProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllLadoProducto,createLadoProducto,deleteLadoProducto};

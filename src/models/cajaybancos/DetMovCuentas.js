@@ -31,6 +31,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.DATE,
             defaultValue:DataTypes.NOW,
         },
+        idCuentaBancaria:{
+            type:DataTypes.BIGINT,
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false

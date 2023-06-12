@@ -1,6 +1,9 @@
-const {Bancos} = require("../../db");
+const {Bancos,DetMovCuentas} = require("../../db");
 const axios = require("axios");
-
+const regBancosUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regBancosAdmin}=regBancosUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -23,13 +26,16 @@ const cargaBDBancos = async (data)=>{
         return 
     } catch (error) {
         console.log(error.message)
+        throw new Error(error.message);
     }
 };
 
-const getAllBancos= async ()=>{
+const getAllBancos= async (isAdministrator=false)=>{
     let databaseBancos = null;
     let apiBancosRaw = null;
     let apiBancos = null;
+    let regBancos = regBancosUsuario;
+    if (isAdministrator) regBancos = regBancosAdmin;
     databaseBancos = await Bancos.findAll();
     if (databaseBancos.length===0){
         apiBancosRaw = (await axios.get('http://192.168.18.15:82/bancos')).data;
@@ -44,7 +50,7 @@ const createBancos = async (regBancos)=>{
     const transactionCrearBancos = await Bancos.sequelize.transaction();
     try {
        // await Bancos.sequelize.query('Lock Table Bancos',{transaction:transactionCrearBancos});
-        let maxIdBancos = await Bancos.max("id", {transaction:transactionCrearBancos});
+        let maxIdBancos = await Bancos.max("id");
         let newBancos = await Bancos.create({id:maxIdBancos+1, ...regBancos},{transaction:transactionCrearBancos});
         await transactionCrearBancos.commit();
         console.log('Registro creado OK Tabla Bancos')
@@ -52,7 +58,26 @@ const createBancos = async (regBancos)=>{
     } catch (error) {
         await transactionCrearBancos.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllBancos,createBancos};
+const deleteBanco = async (id)=>{
+    const transactionEliminarBanco = await Bancos.sequelize.transaction();
+    try {
+        let foundbanco = await Bancos.findByPk(id);
+        if (!foundbanco) throw new Error('ID de Registro en Bancos No encontrado');
+        let foundDetMovCuentas = await DetMovCuentas.findAll({where:{BancoId:id, borradoLogico:false}});
+        if (foundDetMovCuentas.length>0) throw new Error('El Banco tiene Cuentas Asociadas');
+        let deletedBanco = await foundbanco.update({borradoLogico:!foundbanco.borradoLogico},{transaction:transactionEliminarBanco});
+        await transactionEliminarBanco.commit();
+        console.log('Registro eliminado OK Tabla Bancos')
+        return deletedBanco;
+    } catch (error) {
+        await transactionEliminarBanco.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllBancos,createBancos,deleteBanco};

@@ -1,5 +1,41 @@
-const {Producto, SubFamilia,Familia, Ano, Colore, Lado, Materiale, Procedencia, TipoExisCont, UMProd, ModeloMarca, Marca} = require("../../db");
+const {Producto, SubFamilia,Familia, Ano, Colore, Lado, Materiale, Procedencia, TipoExisCont, UMProd, ModeloMarca,DetCompras,DetVentas,DetMovAlmacen} = require("../../db");
 const axios = require("axios");
+const regProductoUsuario ={
+    where: { borradoLogico: false },
+    include:[{
+                model:SubFamilia,
+                attributes:["descripcion"],
+                include:[{
+                            model:Familia,
+                            attributes:["descripcion"],
+                        }],
+            },{
+                model:Ano,
+                attributes:["descripcion"],
+            },{
+                model:Materiale,
+                attributes:["descripcion"],
+            },{
+                model:Colore,
+                attributes:["descripcion"],
+            },{
+                model:Lado,
+                attributes:["descripcion"],
+            },{
+                model:Procedencia,
+                attributes:["descripcion"],
+            },{
+                model:TipoExisCont,
+                attributes:["descripcion","codSunat"],
+            },{
+                model:UMProd,
+                attributes:["descripcion","conversion","abreviacion"],
+            },{
+                model:ModeloMarca,
+                attributes:["descripcion"],
+            }]
+};
+const {where,...regProductoAdmin}=regProductoUsuario;
 
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
@@ -49,104 +85,23 @@ const cargaBDProducto = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllProducto= async ()=>{
+const getAllProducto= async (isAdministrator=false)=>{
     let databaseProducto = null;
     let apiProductoRaw = null;
     let apiProducto = null;
-    databaseProducto = await Producto.findAll({
-        include:[{
-                    model:SubFamilia,
-                    attributes:["descripcion"],
-                        include:[{
-                                    model:Familia,
-                                    attributes:["descripcion"],
-                                }],
-                },
-                {
-                    model:Ano,
-                    attributes:["descripcion"],
-                },
-                {
-                    model:Materiale,
-                    attributes:["descripcion"],
-                },
-                {
-                    model:Colore,
-                    attributes:["descripcion"],
-                },
-                {
-                    model:Lado,
-                    attributes:["descripcion"],
-                },
-                {
-                    model:Procedencia,
-                    attributes:["descripcion"],
-                },
-                {
-                    model:TipoExisCont,
-                    attributes:["descripcion","codSunat"],
-                },
-                {
-                    model:UMProd,
-                    attributes:["descripcion","conversion","abreviacion"],
-                },
-                {
-                    model:ModeloMarca,
-                    attributes:["descripcion"],
-                }
-            ]
-    });
+    let regProducto = regProductoUsuario;
+    if (isAdministrator) regProducto = regProductoAdmin;
+    databaseProducto = await Producto.findAll(regProducto);
     if (databaseProducto.length===0){
         apiProductoRaw = (await axios.get('http://192.168.18.15:82/productos')).data;
         apiProducto = await cleanArray(apiProductoRaw);
         await cargaBDProducto(apiProducto);
-        databaseProducto = await Producto.findAll({
-            include:[{
-                        model:SubFamilia,
-                        attributes:["descripcion"],
-                            include:[{
-                                        model:Familia,
-                                        attributes:["descripcion"],
-                                    }],
-                    },
-                    {
-                        model:Ano,
-                        attributes:["descripcion"],
-                    },
-                    {
-                        model:Materiale,
-                        attributes:["descripcion"],
-                    },
-                    {
-                        model:Colore,
-                        attributes:["descripcion"],
-                    },
-                    {
-                        model:Lado,
-                        attributes:["descripcion"],
-                    },
-                    {
-                        model:Procedencia,
-                        attributes:["descripcion"],
-                    },
-                    {
-                        model:TipoExisCont,
-                        attributes:["descripcion","codSunat"],
-                    },
-                    {
-                        model:UMProd,
-                        attributes:["descripcion","conversion","abreviacion"],
-                    },
-                    {
-                        model:ModeloMarca,
-                        attributes:["descripcion"],
-                    }
-                ]
-        });
+        databaseProducto = await Producto.findAll(regProducto);
     }
     return databaseProducto;
 };
@@ -154,7 +109,7 @@ const getAllProducto= async ()=>{
 const createProducto = async (regProducto)=>{
     const transactionCrearProducto = await Producto.sequelize.transaction();
     try {
-        let maxIdProducto = await Producto.max('id',{transaction:transactionCrearProducto});
+        let maxIdProducto = await Producto.max('id');
         let newProducto = await Producto.create({id:maxIdProducto+1, ...regProducto},{transaction:transactionCrearProducto});
         await transactionCrearProducto.commit();
         console.log('Registro Creado OK Tabla Producto');
@@ -162,7 +117,30 @@ const createProducto = async (regProducto)=>{
     } catch (error) {
         await transactionCrearProducto.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllProducto, createProducto};
+const deleteProducto = async (id)=>{
+    const transactionEliminarProducto = await Producto.sequelize.transaction();
+    try {
+        let foundProducto = await Producto.findByPk(id);
+        if (!foundProducto) throw new Error('ID de Producto no encontrado');
+        let foundDetCompras = await DetCompras.findAll({where:{ProductoId: id, borradoLogico: false}});
+        let foundDetVentas = await DetVentas.findAll({where:{ProductoId: id, borradoLogico: false}});
+        let foundDetMovAlmacen = await DetMovAlmacen.findAll({where:{ProductoId: id, borradoLogico: false}});
+        if (foundDetCompras.length>0) throw new Error('Existen compras asociadas a este producto');
+        if (foundDetVentas.length>0) throw new Error('Existen ventas asociadas a este producto');
+        if (foundDetMovAlmacen.length>0) throw new Error('Existen movimientos de almacen asociados a este producto');
+        let deletedProducto = await foundProducto.update({borradoLogico:!foundProducto.borradoLogico},{transaction:transactionEliminarProducto});
+        await transactionEliminarProducto.commit();
+        console.log('Registro Eliminado OK Tabla Producto');
+        return deletedProducto;
+    } catch (error) {
+        await transactionEliminarProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllProducto, createProducto, deleteProducto};

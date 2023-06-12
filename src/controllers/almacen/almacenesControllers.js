@@ -34,6 +34,7 @@ const cargaBDAlmacen = async (data)=>{
         return 
     } catch (error) {
         console.log(error.message)
+        throw new Error(error.message);
     }
 };
 
@@ -56,7 +57,7 @@ const getAllAlmacen= async (isAdministrator=false)=>{
 const createAlmacen = async (regAlmacen)=>{
     const transactionCrearAlmacen = await Almacen.sequelize.transaction();
     try {
-        let maxIdAlmacen = await Almacen.max("id", {transaction:transactionCrearAlmacen});
+        let maxIdAlmacen = await Almacen.max("id");
         let newAlmacen = await Almacen.create({id:maxIdAlmacen+1, ...regAlmacen},{transaction:transactionCrearAlmacen});
         await transactionCrearAlmacen.commit();
         console.log('Registro creado OK Tabla Almacen')
@@ -64,7 +65,7 @@ const createAlmacen = async (regAlmacen)=>{
     } catch (error) {
         await transactionCrearAlmacen.rollback();
         console.log(error.message);
-        throw error;
+        throw new Error(error.message);
     };
 };
 
@@ -75,22 +76,17 @@ const deleteAlmacen = async (id) => {
             if (!foundAlmacen) {
                 throw new Error('No se ha encontrado la entrada de Almacen');
             }
-            let foundConceptoAlmacen = await ConceptoAlmacen.findOne({
+            let foundConceptoAlmacen = await ConceptoAlmacen.findAll({
                 where: {
                     [Op.or]: [
                         { codAlmacenOrigen: id },
                         { codAlmacenDestino: id }
-                    ]}
+                    ],
+                    borradoLogico: false}
                 }
             );
-            if (foundConceptoAlmacen) {
-                throw new Error('No se puede marcar como borrado el Almacen porque hay ConceptoAlmacen que lo referencian');
-            }
-            const deletedAlmacen = await Almacen.update(
-                { borradoLogico: !foundAlmacen.borradoLogico },
-                { where:{id} },
-                { transaction: transactionEliminarAlmacen },
-                );
+            if (foundConceptoAlmacen.length>0) throw new Error('No se puede marcar como borrado el Almacen porque hay ConceptoAlmacen que lo referencian');
+            let deletedAlmacen = await foundAlmacen.update({borradoLogico:!foundAlmacen.borradoLogico},{transaction:transactionEliminarAlmacen});
             await transactionEliminarAlmacen.commit();
             console.log("Registro eliminado OK Tabla Almacen");
             return deletedAlmacen;

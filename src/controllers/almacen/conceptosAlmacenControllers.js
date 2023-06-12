@@ -33,6 +33,7 @@ const cargaBDConceptoAlmacen = async (data)=>{
         return 
     } catch (error) {
         console.log(error.message)
+        throw new Error(error.message);
     }
 };
 
@@ -55,7 +56,7 @@ const getAllConceptoAlmacen= async (isAdministrator=false)=>{
 const createConceptoAlmacen = async (regConceptoAlmacen)=>{
     const transactionCrearConceptoAlmacen = await ConceptoAlmacen.sequelize.transaction();
     try {
-        let maxIdConceptoAlmacen = await ConceptoAlmacen.max('id',{transaction:transactionCrearConceptoAlmacen});
+        let maxIdConceptoAlmacen = await ConceptoAlmacen.max('id');
         let newConceptoAlmacen = await ConceptoAlmacen.create({id:maxIdConceptoAlmacen+1, ...regConceptoAlmacen},{transaction:transactionCrearConceptoAlmacen});
         await transactionCrearConceptoAlmacen.commit();
         console.log('Registro creado OK Tabla ConceptoAlmacen')
@@ -72,17 +73,13 @@ const deleteConceptoAlmacen = async (id) => {
     try {
         const foundConceptoAlmacen = await ConceptoAlmacen.findByPk(id);
         if (!foundConceptoAlmacen) throw new Error("No se a encontrado el ID en la tabla ConceptoAlmacen");
-        const foundDetMovAlmacen = await CabMovAlmacen.findOne({
+        const foundCabMovAlmacen = await CabMovAlmacen.findOne({
             where:{
-                ConceptoAlmacenId:id
+                ConceptoAlmacenId:id, borradoLogico:false
             }
         })
-        if (foundDetMovAlmacen) throw new Error("No se puede eliminar el registro ya que tiene movimientos asociados");
-        const deletedTipoMovAlmacen = await ConceptoAlmacen.update(
-            { borradoLogico: !foundAlmacen.borradoLogico },
-            { where:{id} },
-            { transaction: transactionEliminarConceptoAlmacen },
-            )
+        if (foundCabMovAlmacen) throw new Error("No se puede eliminar el registro ya que tiene movimientos asociados");
+        let deletedTipoMovAlmacen = await foundConceptoAlmacen.update({borradoLogico:!foundConceptoAlmacen.borradoLogico},{transaction:transactionEliminarConceptoAlmacen});
         await transactionEliminarConceptoAlmacen.commit();
         console.log('Registro eliminado OK Tabla ConceptoAlmacen')
         return deletedTipoMovAlmacen;

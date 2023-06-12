@@ -1,6 +1,9 @@
-const {Familia} = require("../../db");
+const {Familia, SubFamilia} = require("../../db");
 const axios = require("axios");
-
+const regFamiliaProductoUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regFamiliaProductoAdmin}=regFamiliaProductoUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -21,20 +24,23 @@ const cargaBDFamiliaProducto = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllFamiliaProducto= async ()=>{
+const getAllFamiliaProducto= async (isAdministrator=false)=>{
     let databaseFamiliaProducto = null;
     let apiFamiliaProductoRaw = null;
     let apiFamiliaProducto = null;
-    databaseFamiliaProducto = await Familia.findAll();
+    let regFamiliaProducto = regFamiliaProductoUsuario;
+    if (isAdministrator) regFamiliaProducto = regFamiliaProductoAdmin;
+    databaseFamiliaProducto = await Familia.findAll(regFamiliaProducto);
     if (databaseFamiliaProducto.length===0){
         apiFamiliaProductoRaw = (await axios.get('http://192.168.18.15:82/familiasProductos')).data;
         apiFamiliaProducto = await cleanArray(apiFamiliaProductoRaw);
         await cargaBDFamiliaProducto(apiFamiliaProducto);
-        databaseFamiliaProducto = await Familia.findAll();
+        databaseFamiliaProducto = await Familia.findAll(regFamiliaProducto);
     }
     return databaseFamiliaProducto;
 };
@@ -42,7 +48,7 @@ const getAllFamiliaProducto= async ()=>{
 const createFamiliaProducto = async (regFamiliaProducto)=>{
     const transactionCrearFamiliaProducto = await Familia.sequelize.transaction();
     try {
-        let maxIdFamiliaProducto = await Familia.max("id", {transaction:transactionCrearFamiliaProducto});
+        let maxIdFamiliaProducto = await Familia.max("id");
         let newFamiliaProducto = await Familia.create({id:maxIdFamiliaProducto+1, ...regFamiliaProducto},{transaction:transactionCrearFamiliaProducto});
         await transactionCrearFamiliaProducto.commit();
         console.log('Registro creado OK Tabla Familia')
@@ -50,7 +56,26 @@ const createFamiliaProducto = async (regFamiliaProducto)=>{
     } catch (error) {
         await transactionCrearFamiliaProducto.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllFamiliaProducto,createFamiliaProducto};
+const deleteFamiliaProducto = async (id)=>{
+    const transactionEliminarFamiliaProducto = await Familia.sequelize.transaction();
+    try {
+        let foundFamiliaProducto = await Familia.findByPk(id);
+        if (!foundFamiliaProducto) throw new Error('El ID de Familia Producto No existe');
+        let foundSubFamilias = await SubFamilia.findAll({where:{FamiliumId:id, borradoLogico:false}});
+        if (foundSubFamilias.length>0) throw new Error('El ID de Familia Producto Tiene SubFamilias Asociadas');
+        let deletedFamiliaProducto = await foundFamiliaProducto.update({borradoLogico:!foundFamiliaProducto.borradoLogico},{transaction:transactionEliminarFamiliaProducto});
+        await transactionEliminarFamiliaProducto.commit();
+        console.log('Registro eliminado OK Tabla Familia')
+        return deletedFamiliaProducto;
+    } catch (error) {
+        await transactionEliminarFamiliaProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllFamiliaProducto,createFamiliaProducto, deleteFamiliaProducto};

@@ -1,6 +1,7 @@
 const {UbicaAlmacen, Almacen,DetMovAlmacen} = require("../../db");
 const axios = require("axios");
 const regUbicacionFisicaAlmacenUsuario ={
+    where: { borradoLogico: false },
     include:[{
         model:Almacen,
         attributes:["descripcion","kardex","direccion"]
@@ -33,7 +34,8 @@ const cargaBDUbicacionFisicaAlmacen = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
@@ -56,7 +58,7 @@ const getAllUbicacionFisicaAlmacen= async (isAdministrator=false)=>{
 const createUbicacionFisicaAlmacen = async (regUbicacionFisicaAlmacen)=>{
     const transactionCrearUbicacionFisicaAlmacen = await UbicaAlmacen.sequelize.transaction();
     try {
-        let maxIdUbicacionFisicaAlmacen = await UbicaAlmacen.max("id", {transaction:transactionCrearUbicacionFisicaAlmacen});
+        let maxIdUbicacionFisicaAlmacen = await UbicaAlmacen.max("id");
         let newUbicacionFisicaAlmacen = await UbicaAlmacen.create({id:maxIdUbicacionFisicaAlmacen+1, ...regUbicacionFisicaAlmacen},{transaction:transactionCrearUbicacionFisicaAlmacen});
         await transactionCrearUbicacionFisicaAlmacen.commit();
         console.log('Registro creado OK Tabla UbicacionFisicaAlmacen')
@@ -80,17 +82,12 @@ const deleteUbicacionFisicaAlmacen = async (id)=>{
                 [Op.or]: [
                     { codUbicacionOrigen: id },
                     { codUbicacionDestino: id }
-                ]}
+                ],
+                borradoLogico: false}
             }
         );
-        if (foundDetMovAlmacen) {
-            throw new Error('No se puede marcar como borrado La Ubicacion Fisica Almacen porque hay Detalles de Movimientos que lo referencian');
-        }
-        let deletedUbicacionFisicaAlmacen = await UbicaAlmacen.update(
-            { borradoLogico: !foundAlmacen.borradoLogico },
-            { where:{id} },
-            { transaction: transactionEliminarUbicacionFisicaAlmacen },
-            );
+        if (foundDetMovAlmacen) throw new Error('No se puede marcar como borrado La Ubicacion Fisica Almacen porque hay Detalles de Movimientos que lo referencian');
+        let deletedUbicacionFisicaAlmacen = await foundUbicacionFisicaAlmacen.update({borradoLogico:!foundUbicacionFisicaAlmacen.borradoLogico},{transaction:transactionEliminarUbicacionFisicaAlmacen});
         await transactionEliminarUbicacionFisicaAlmacen.commit();
         console.log('Registro Eliminado OK Tabla UbicacionFisicaAlmacen')
         return deletedUbicacionFisicaAlmacen;
