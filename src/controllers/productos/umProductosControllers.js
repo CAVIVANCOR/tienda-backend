@@ -1,6 +1,5 @@
-const {UMProd} = require("../../db");
+const {UMProd,Producto} = require("../../db");
 const axios = require("axios");
-const Producto = require("../../models/productos/Producto");
 const regUMProdProductoUsuario ={
     where: { borradoLogico: false },
 };

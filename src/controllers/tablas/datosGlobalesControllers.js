@@ -1,28 +1,20 @@
 const {DatoGlobal,sequelize} = require("../../db");
-
-const getAllDatosGlobales= async ()=>{
-    let databaseDatosGlobales = await DatoGlobal.findAll();
+const regDatoGlobalUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regDatoGlobalAdmin}=regDatoGlobalUsuario;
+const getAllDatosGlobales= async (isAdministrator=false)=>{
+    let regDatoGlobal = regDatoGlobalUsuario;
+    if (isAdministrator) regDatoGlobal = regDatoGlobalAdmin;
+    let databaseDatosGlobales = await DatoGlobal.findAll(regDatoGlobal);
     return databaseDatosGlobales;
 };
-
-// const createDatosGlobales = async (regDatosGlobales)=>{
-//     const transactionCrearDatosGlobales = await sequelize.transaction();
-//     try {
-//         let newDatosGlobales = await DatoGlobal.create(regDatosGlobales,{transaction:transactionCrearDatosGlobales});
-//         await transactionCrearDatosGlobales.commit();
-//         console.log('Registro creado OK Tabla DatoGlobal')
-//         return newDatosGlobales;
-//     } catch (error) {
-//         await transactionCrearDatosGlobales.rollback();
-//         console.log(error.message);
-//     };
-// };
 
 const createDatosGlobales = async (regDatosGlobales)=>{
     const transactionCrearDatosGlobales = await sequelize.transaction();
     try {
         let countDatosGlobales = await DatoGlobal.count({transaction:transactionCrearDatosGlobales});
-        let maxIdDatosGlobales = countDatosGlobales > 0 ? await DatoGlobal.max('id',{transaction:transactionCrearDatosGlobales}) : 0;
+        let maxIdDatosGlobales = countDatosGlobales > 0 ? await DatoGlobal.max('id') : 0;
         let newDatosGlobales = await DatoGlobal.create({id:maxIdDatosGlobales+1, ...regDatosGlobales},{transaction:transactionCrearDatosGlobales});
         await transactionCrearDatosGlobales.commit();
         console.log('Registro creado OK Tabla DatoGlobal')
@@ -30,7 +22,24 @@ const createDatosGlobales = async (regDatosGlobales)=>{
     } catch (error) {
         await transactionCrearDatosGlobales.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllDatosGlobales,createDatosGlobales};
+const deleteDatosGlobales = async (id)=>{
+    let transactionEliminarDatosGlobales = await DatoGlobal.sequelize.transaction();
+    try {
+        let foundDatosGlobales = await DatoGlobal.findByPk(id);
+        if (!foundDatosGlobales) throw new Error('ID DatoGlobal no encontrado');
+        let deletedDatosGlobales = await foundDatosGlobales.destroy({transaction:transactionEliminarDatosGlobales});
+        await transactionEliminarDatosGlobales.commit();
+        console.log('Registro eliminado OK Tabla DatoGlobal')
+        return deletedDatosGlobales;
+    } catch (error) {
+        await transactionEliminarDatosGlobales.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllDatosGlobales,createDatosGlobales, deleteDatosGlobales};

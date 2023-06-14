@@ -1,6 +1,9 @@
-const {EstadoDoc} = require("../../db");
+const {EstadoDoc,CabCompras,CabMovAlmacen,CabVentas} = require("../../db");
 const axios = require("axios");
-
+const regEstadoDocUsuario ={
+    where: { borradoLogico: false },
+};
+const {where,...regEstadoDocAdmin}=regEstadoDocUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
@@ -21,20 +24,23 @@ const cargaBDEstadoDoc = async (data)=>{
         )
         return 
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        throw new Error(error.message);
     }
 };
 
-const getAllEstadoDoc= async ()=>{
+const getAllEstadoDoc= async (isAdministrator=false)=>{
     let databaseEstadoDoc = null;
     let apiEstadoDocRaw = null;
     let apiEstadoDoc = null;
-    databaseEstadoDoc = await EstadoDoc.findAll();
+    let regEstadoDoc = regEstadoDocUsuario;
+    if (isAdministrator) regEstadoDoc = regEstadoDocAdmin;
+    databaseEstadoDoc = await EstadoDoc.findAll(regEstadoDoc);
     if (databaseEstadoDoc.length===0){
         apiEstadoDocRaw = (await axios.get('http://192.168.18.15:82/estadosDoc')).data;
         apiEstadoDoc = await cleanArray(apiEstadoDocRaw);
         await cargaBDEstadoDoc(apiEstadoDoc);
-        databaseEstadoDoc = await EstadoDoc.findAll();
+        databaseEstadoDoc = await EstadoDoc.findAll(regEstadoDoc);
     }
     return databaseEstadoDoc;
 };
@@ -43,7 +49,7 @@ const createEstadoDoc = async (regEstadoDoc)=>{
     const transactionCrearEstadoDoc = await EstadoDoc.sequelize.transaction();
     try {
         //await EstadoDoc.sequelize.query('Lock Table EstadoDoc',{transaction:transactionCrearEstadoDoc});
-        let maxIdEstadoDoc = await EstadoDoc.max('id',{transaction:transactionCrearEstadoDoc});
+        let maxIdEstadoDoc = await EstadoDoc.max('id');
         let newEstadoDoc = await EstadoDoc.create({id:maxIdEstadoDoc+1, ...regEstadoDoc},{transaction:transactionCrearEstadoDoc});
         await transactionCrearEstadoDoc.commit();
         console.log('Registro creado OK Tabla EstadoDoc')
@@ -51,7 +57,30 @@ const createEstadoDoc = async (regEstadoDoc)=>{
     } catch (error) {
         await transactionCrearEstadoDoc.rollback();
         console.log(error.message);
+        throw new Error(error.message);
     };
 };
 
-module.exports = {getAllEstadoDoc,createEstadoDoc};
+const deleteEstadoDoc = async (id)=>{
+    let transactionEliminarEstadoDoc = await EstadoDoc.sequelize.transaction();
+    try {
+        let foundEstadoDoc = await EstadoDoc.findByPk(id);
+        if (!foundEstadoDoc) throw new Error('ID EstadoDoc no encontrado');
+        let foundCabCompras = await CabCompras.findAll({where:{EstadoDocId:id,borradoLogico:false}});
+        let foundCabVentas = await CabVentas.findAll({where:{EstadoDocId:id,borradoLogico:false}});
+        let foundCabMovAlmacen = await CabMovAlmacen.findAll({where:{EstadoDocId:id,borradoLogico:false}});
+        if (foundCabCompras.length>0) throw new Error('EstadoDoc tiene compras asociadas');
+        if (foundCabVentas.length>0) throw new Error('EstadoDoc tiene ventas asociadas');
+        if (foundCabMovAlmacen.length>0) throw new Error('EstadoDoc tiene movimientos de almacen asociados');
+        let deletedEstadoDoc = await foundEstadoDoc.update({borradoLogico:!foundEstadoDoc.borradoLogico},{transaction:transactionEliminarEstadoDoc});
+        await transactionEliminarEstadoDoc.commit();
+        console.log('Registro eliminado OK Tabla EstadoDoc')
+        return deletedEstadoDoc;
+    } catch (error) {
+        await transactionEliminarEstadoDoc.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllEstadoDoc,createEstadoDoc,deleteEstadoDoc};
