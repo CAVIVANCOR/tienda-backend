@@ -80,4 +80,20 @@ const deleteBanco = async (id)=>{
     };
 }
 
-module.exports = {getAllBancos,createBancos,deleteBanco};
+const updateBanco = async (id,regBancos)=>{
+    const transactionActualizarBanco = await Bancos.sequelize.transaction();
+    try {
+        let foundbanco = await Bancos.findByPk(id);
+        if (!foundbanco) throw new Error('ID de Registro en Bancos No encontrado');
+        let updatedBanco = await foundbanco.update(regBancos,{transaction:transactionActualizarBanco});
+        await transactionActualizarBanco.commit();
+        console.log('Registro actualizado OK Tabla Bancos')
+        return updatedBanco;
+    } catch (error) {
+        await transactionActualizarBanco.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllBancos,createBancos,deleteBanco, updateBanco};

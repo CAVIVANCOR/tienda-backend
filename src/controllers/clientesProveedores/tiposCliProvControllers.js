@@ -81,4 +81,20 @@ const deleteTipoCliProv = async (id)=>{
     };
 }
 
-module.exports = {getAllTipoCliProv,createTipoCliProv,deleteTipoCliProv};
+const updateTipoCliProv = async (id,regTipoCliProv)=>{
+    const transactionActualizarTipoCliProv = await TipoCliProv.sequelize.transaction();
+    try {
+        let foundTipoCliProv = await TipoCliProv.findByPk(id);
+        if (!foundTipoCliProv) throw new Error('ID de TipoCliProv no encontrada');
+        let updatedTipoCliProv = await foundTipoCliProv.update(regTipoCliProv,{transaction:transactionActualizarTipoCliProv});
+        await transactionActualizarTipoCliProv.commit();
+        console.log('Registro actualizado OK Tabla TipoCliProv');
+        return updatedTipoCliProv;
+    } catch (error) {
+        await transactionActualizarTipoCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllTipoCliProv,createTipoCliProv,deleteTipoCliProv, updateTipoCliProv};

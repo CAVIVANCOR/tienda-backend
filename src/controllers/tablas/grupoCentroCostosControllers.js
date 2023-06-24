@@ -77,6 +77,22 @@ const deleteGrupoCentroCostos = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateGrupoCentroCostos = async (id,regGrupoCentroCostos)=>{
+    let transactionActualizarGrupoCentroCostos = await GrupoCentroCostos.sequelize.transaction();
+    try {
+        let foundGrupoCentroCostos = await GrupoCentroCostos.findByPk(id);
+        if (!foundGrupoCentroCostos) throw new Error('ID GrupoCentroCostos no encontrado');
+        let updatedGrupoCentroCostos = await foundGrupoCentroCostos.update(regGrupoCentroCostos,{transaction:transactionActualizarGrupoCentroCostos});
+        await transactionActualizarGrupoCentroCostos.commit();
+        console.log('Registro actualizado OK Tabla GrupoCentroCostos')
+        return updatedGrupoCentroCostos;
+    } catch (error) {
+        await transactionActualizarGrupoCentroCostos.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllGrupoCentroCostos,createGrupoCentroCostos,deleteGrupoCentroCostos};
+module.exports = {getAllGrupoCentroCostos,createGrupoCentroCostos,deleteGrupoCentroCostos, updateGrupoCentroCostos};

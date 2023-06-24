@@ -1,4 +1,4 @@
-const { getAllCabCompras, createCabCompras, deleteCabCompras} = require("../../controllers/compras/cabComprasControllers");
+const { getAllCabCompras, createCabCompras, deleteCabCompras, updateCabCompras} = require("../../controllers/compras/cabComprasControllers");
 
 const getCabComprasHandler = async (req,res)=>{
     const results = await getAllCabCompras();
@@ -23,5 +23,17 @@ const deleteCabComprasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateCabComprasHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroCabCompras = req.body;
+    try {
+        const results = await updateCabCompras(id,registroCabCompras);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
-module.exports ={getCabComprasHandler, createCabComprasHandler, deleteCabComprasHandler};
+
+module.exports ={getCabComprasHandler, createCabComprasHandler, deleteCabComprasHandler, updateCabComprasHandler};

@@ -1,4 +1,4 @@
-const { getAllMaterialProducto, createMaterialProducto, deleteMaterialProducto } = require("../../controllers/productos/materialProductosControllers");
+const { getAllMaterialProducto, createMaterialProducto, deleteMaterialProducto, updateMaterialProducto } = require("../../controllers/productos/materialProductosControllers");
 
 const getMaterialProductoHandler = async (req,res)=>{
     const results = await getAllMaterialProducto();
@@ -23,6 +23,17 @@ const deleteMaterialProductoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateMaterialProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroMaterialProducto = req.body;
+    try {
+        const results = await updateMaterialProducto(id,registroMaterialProducto);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getMaterialProductoHandler, createMaterialProductoHandler, deleteMaterialProductoHandler};
+module.exports ={getMaterialProductoHandler, createMaterialProductoHandler, deleteMaterialProductoHandler, updateMaterialProductoHandler};

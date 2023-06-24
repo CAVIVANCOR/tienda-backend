@@ -1,4 +1,4 @@
-const { getAllSubModulos,createSubModulo, deleteSubModulo } = require("../../controllers/usuarios/submoduloControllers");
+const { getAllSubModulos,createSubModulo, deleteSubModulo, updateSubModulo } = require("../../controllers/usuarios/submoduloControllers");
 
 const getSubModulosHandler = async (req,res)=>{
     const results = await getAllSubModulos();
@@ -23,6 +23,17 @@ const deleteSubModuloHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     }
+};
+
+const updateSubModuloHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroSubModulo = req.body;
+    try {
+        const results = await updateSubModulo(id,registroSubModulo);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
 }
 
-module.exports ={getSubModulosHandler, createSubModuloHandler, deleteSubModuloHandler}
+module.exports ={getSubModulosHandler, createSubModuloHandler, deleteSubModuloHandler, updateSubModuloHandler}

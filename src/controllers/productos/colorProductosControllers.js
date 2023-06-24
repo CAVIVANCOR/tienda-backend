@@ -76,6 +76,22 @@ const deleteColorProducto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateColorProducto = async (id,regColorProducto)=>{
+    const transactionActualizarColorProducto = await Colore.sequelize.transaction();
+    try {
+        let foundColorProducto = await Colore.findByPk(id);
+        if (!foundColorProducto) throw new Error("ID de Color de Producto No existe");
+        let updatedColorProducto = await foundColorProducto.update(regColorProducto,{transaction:transactionActualizarColorProducto});
+        await transactionActualizarColorProducto.commit();
+        console.log('Registro actualizado OK Tabla Colore');
+        return updatedColorProducto;
+    } catch (error) {
+        await transactionActualizarColorProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllColorProducto,createColorProducto,deleteColorProducto};
+module.exports = {getAllColorProducto,createColorProducto,deleteColorProducto, updateColorProducto};

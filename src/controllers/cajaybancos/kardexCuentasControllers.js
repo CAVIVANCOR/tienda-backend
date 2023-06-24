@@ -1,5 +1,7 @@
 const {KardexCuentas,DetMovCuentas,Cuentas,Usuario,Personal,EstadoDoc,ConceptoMovC,Bancos, ClienteProveedor, TipoDocIdentidad, TipoCliProv} = require("../../db");
 const axios = require("axios");
+const { Op } = require("sequelize");
+
 let regKardexCuentasUsuario ={
     include:[{
                 model:DetMovCuentas,
@@ -43,11 +45,11 @@ const cleanArray=(arr)=>{
             tipoCambio:elem.tipoCambio,
             moneda:elem.moneda,
             ingEgr:elem.ingEgr,
-            saldoIniMN: 0.00,
-            saldoIniME:0.00,
+            saldoIniMN:0,
+            saldoIniME:0,
             importe:elem.importe,
-            saldoFinMN:0.00,
-            saldoFinME:0.00,
+            saldoFinMN:0,
+            saldoFinME:0,
             DetMovCuentaId:elem.DetMovCuentaId,
             CuentaId:elem.CuentaId,
         };
@@ -78,6 +80,10 @@ const getAllKardexCuentas= async ()=>{
         apiKardexCuentasRaw = (await axios.get('http://192.168.18.15:82/kardexCuentas')).data;
         apiKardexCuentas = await cleanArray(apiKardexCuentasRaw);
         await cargaBDKardexCuentas(apiKardexCuentas);
+        let result = await regeneraKardexCuentas(3112);
+        // await regeneraKardexAlmacen(723240, 4, 7718);
+        // await regeneraKardexAlmacen(811195, 8, 5233);
+        //console.log("result regeneraKardexCuentas",result.kardexGeneradoOrigen,result.kardexGeneradoDestino);
         databaseKardexCuentas = await KardexCuentas.findAll(regKardexCuentasUsuario);
     }
     return databaseKardexCuentas;
@@ -98,14 +104,41 @@ const createKardexCuentas = async (regKardexCuentas)=>{
         };
 };
 
+// const deleteKardexCuentas = async (idDetMovCuenta)=>{
+//     const transactionEliminarKardexCuentas = await KardexCuentas.sequelize.transaction();
+//     try {
+//         const destroyedRows = await KardexCuentas.destroy({where: {DetMovCuentaId: idDetMovCuenta}}, {transaction: transactionEliminarKardexCuentas});
+//         if (destroyedRows === 0) {
+//           throw new Error('No existe el ID de Detalle Movimiento Cuenta a eliminar en KardexCuentas');
+//         } else {
+//           await transactionEliminarKardexCuentas.commit();
+//           console.log('Registros eliminados OK en Tabla KardexCuentas');
+//           return destroyedRows;
+//         }
+//     } catch (error) {
+//         await transactionEliminarKardexCuentas.rollback();
+//         console.log(error.message);
+//         throw new Error(error.message);
+//     };
+// };
+
+
 const deleteKardexCuentas = async (idDetMovCuenta)=>{
-    const transactionEliminarKardexCuentas = await KardexCuentas.sequelize.transaction();
+    let transactionEliminarKardexCuentas = await KardexCuentas.sequelize.transaction();
     try {
-        const foundKardexCuentas = await KardexCuentas.findAll({where:{DetMovCuentaId:idDetMovCuenta}});
-        if (foundKardexCuentas.length===0) throw new Error('No existe el ID de Detalle Movimiento Cuenta a eliminar en KardexCuentas');
-        let deletedKardexCuentas = await foundKardexCuentas.destroy({transaction:transactionEliminarKardexCuentas});
+        let foundKardexaCuentas = await KardexCuentas.findAll({
+            where:{
+                DetMovCuentaId:idDetMovCuenta
+            }
+        });
+        if (foundKardexaCuentas.length===0) throw new Error("ID Detalle Movimiento no se encuentra en la Tabla Kardex Cuentas");
+        let deletedKardexCuentas = await Promise.all(
+            foundKardexaCuentas.map(async(element)=>{
+                return await element.destroy({transaction:transactionEliminarKardexCuentas});
+            })
+        )
         await transactionEliminarKardexCuentas.commit();
-        console.log('Registro eliminado OK Tabla KardexCuentas');
+        console.log('Registros eliminados OK en Tabla KardexCuentas');
         return deletedKardexCuentas;
     } catch (error) {
         await transactionEliminarKardexCuentas.rollback();
@@ -113,6 +146,7 @@ const deleteKardexCuentas = async (idDetMovCuenta)=>{
         throw new Error(error.message);
     };
 };
+
 
 const busquedaKardexCuentas = async (CuentaId, fechaInicio, fechaFin) => {
     try {
@@ -169,7 +203,7 @@ const generaSaldosKardexCuentas = async (regKardexgenerado)=>{
             if (kardex.ingEgr) {
                 saldoImporte = (+saldoImporte) + (+kardex.importe);
             } else {
-              saldoImporte = (+saldoImporte) - (+kardex.cantidad);
+              saldoImporte = (+saldoImporte) - (+kardex.importe);
             }
             kardex.saldoFin = (+saldoImporte).toFixed(2);
             await kardex.save({ transaction: transactionGeneraSaldosKardexCuentas });
@@ -199,7 +233,7 @@ const regeneraKardexCuentas = async (idDetMovCuenta)=>{
         if (deletedKardex){
             regDetMovCuentas = await DetMovCuentas.findByPk(idDetMovCuenta);
             if (!regDetMovCuentas) throw new Error("ID no se encuentra en la Tabla Detalle Movimiento Cuentas");
-            foundConceptoMovCuentas = await ConceptoMovC.findByPk(idDetMovCuenta.ConceptoMovCId);
+            foundConceptoMovCuentas = await ConceptoMovC.findByPk(regDetMovCuentas.ConceptoMovCId);
             if (!foundConceptoMovCuentas) throw new Error("ID no se encuentra en la Tabla Concepto Movimientos Cuentas");
             foundCuentaOrigen = await Cuentas.findByPk(foundConceptoMovCuentas.idCuentaOrigen);
             if (!foundCuentaOrigen) throw new Error("ID Origen no se encuentra en la Tabla Cuentas");
@@ -234,7 +268,7 @@ const regeneraKardexCuentas = async (idDetMovCuenta)=>{
         } else throw new Error("No se completo la eliminación de los Registros del kardex");
         await transactionRegeneraKardexCuentas.commit();
         if (foundCuentaOrigen.kardex){
-          kardexGeneradoOrigen = await generaSaldosKardexCuentas(createdKardexCuentasOrigen)
+            kardexGeneradoOrigen = await generaSaldosKardexCuentas(createdKardexCuentasOrigen)
         };
         if (foundCuentaDestino.kardex){
             kardexGeneradoDestino = await generaSaldosKardexCuentas(createdKardexCuentasDestino)
@@ -247,6 +281,5 @@ const regeneraKardexCuentas = async (idDetMovCuenta)=>{
         throw new Error(error.message);
     };
 };
-
 
 module.exports = {getAllKardexCuentas,createKardexCuentas, deleteKardexCuentas, regeneraKardexCuentas};

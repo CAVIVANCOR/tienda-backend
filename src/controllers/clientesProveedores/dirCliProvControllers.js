@@ -86,6 +86,21 @@ const deleteDirCliProv = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateDirCliProv = async (id,regDirCliProv)=>{
+    const transactionActualizarDirCliProv = await DirCliProv.sequelize.transaction();
+    try {
+        let foundDirCliProv = await DirCliProv.findByPk(id);
+        if (!foundDirCliProv) throw new Error("ID DirCliProv no encontrado");
+        let updatedDirCliProv = await foundDirCliProv.update(regDirCliProv,{transaction:transactionActualizarDirCliProv});
+        await transactionActualizarDirCliProv.commit();
+        return updatedDirCliProv;
+    } catch (error) {
+        await transactionActualizarDirCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllDirCliProv,createDirCliProv,deleteDirCliProv};
+module.exports = {getAllDirCliProv,createDirCliProv,deleteDirCliProv, updateDirCliProv};

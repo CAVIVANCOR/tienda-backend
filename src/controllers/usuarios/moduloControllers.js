@@ -42,6 +42,22 @@ const deleteModulo = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllModulos,createModulo,deleteModulo};
+const updateModulo = async (id,regModulo)=>{
+    let transactionActualizarModulo = await Modulo.sequelize.transaction();
+    try {
+        let foundModulo = await Modulo.findByPk(id);
+        if (!foundModulo) throw new Error('ID de Modulo no encontrado');
+        let updatedModulo = await foundModulo.update(regModulo,{transaction:transactionActualizarModulo});
+        await transactionActualizarModulo.commit();
+        console.log('Registro actualizado OK Tabla Modulo');
+        return updatedModulo;
+    } catch (error) {
+        await transactionActualizarModulo.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllModulos,createModulo,deleteModulo, updateModulo};

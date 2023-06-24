@@ -88,6 +88,22 @@ const deleteProvincias = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateProvincias = async (regProvincias)=>{
+    const transactionActualizarProvincias = await Provincia.sequelize.transaction();
+    try {
+        let foundProvincia = await Provincia.findByPk(regProvincias.id);
+        if (!foundProvincia) throw new Error('ID de Provincia no encontrada');
+        let updatedProvincia = await foundProvincia.update(regProvincias,{transaction:transactionActualizarProvincias});
+        await transactionActualizarProvincias.commit();
+        console.log('Registro actualizado OK Tabla Provincia');
+        return updatedProvincia;
+    } catch (error) {
+        await transactionActualizarProvincias.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllProvincia, createProvicias, deleteProvincias};
+module.exports = {getAllProvincia, createProvicias, deleteProvincias, updateProvincias};

@@ -1,4 +1,4 @@
-const { getAllPreciosCliProv, createPreciosCliProv, deletePreciosCliProv } = require("../../controllers/clientesProveedores/preciosCliProvControllers");
+const { getAllPreciosCliProv, createPreciosCliProv, deletePreciosCliProv, updatePreciosCliProv } = require("../../controllers/clientesProveedores/preciosCliProvControllers");
 
 const getPreciosCliProvHandler = async (req,res)=>{
     const results = await getAllPreciosCliProv();
@@ -23,6 +23,17 @@ const deletePreciosCliProvHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updatePreciosCliProvHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroPreciosCliProv = req.body;
+    try {
+        const results = await updatePreciosCliProv(id,registroPreciosCliProv);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getPreciosCliProvHandler, createPreciosCliProvHandler, deletePreciosCliProvHandler};
+module.exports ={getPreciosCliProvHandler, createPreciosCliProvHandler, deletePreciosCliProvHandler, updatePreciosCliProvHandler};

@@ -78,4 +78,20 @@ const deleteAnoProducto = async (id)=>{
     };
 };
 
-module.exports = {getAllAnoProducto,createAnoProducto,deleteAnoProducto};
+const updateAnoProducto = async (id,regAno)=>{
+    const transactionActualizarAno = await Ano.sequelize.transaction();
+    try {
+        let foundAno = await Ano.findByPk(id);
+        if (!foundAno) throw new Error('ID Ano de producto No encontrado');
+        let updatedAno = await foundAno.update(regAno,{transaction:transactionActualizarAno});
+        await transactionActualizarAno.commit();
+        console.log('Registro actualizado OK Tabla Ano');
+        return updatedAno;
+    } catch (error) {
+        await transactionActualizarAno.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllAnoProducto,createAnoProducto,deleteAnoProducto, updateAnoProducto};

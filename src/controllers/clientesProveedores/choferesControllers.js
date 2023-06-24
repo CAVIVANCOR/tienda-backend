@@ -42,6 +42,22 @@ const deleteChofer = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateChofer = async (id,regChofer)=>{
+    const transactionActualizarChofer = await Chofer.sequelize.transaction();
+    try {
+        let foundChofer = await Chofer.findByPk(id);
+        if (!foundChofer) throw new Error("El ID del Registro de la Tabla Choferes No encontrado");
+        let updatedChofer = await foundChofer.update(regChofer,{transaction:transactionActualizarChofer});
+        await transactionActualizarChofer.commit();
+        console.log('Registro actualizado OK Tabla Chofer')
+        return updatedChofer;
+    } catch (error) {
+        await transactionActualizarChofer.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllChofer, createChofer, deleteChofer};
+module.exports = {getAllChofer, createChofer, deleteChofer, updateChofer};

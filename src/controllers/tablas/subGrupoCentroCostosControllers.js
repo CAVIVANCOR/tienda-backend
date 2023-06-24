@@ -83,6 +83,22 @@ const deleteSubGrupoCentroCosto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateSubGrupoCentroCosto = async (id,regSubGrupoCentroCosto)=>{
+    let transactionActualizarSubGrupoCentroCosto = await SubGrupoCentroCosto.sequelize.transaction();
+    try {
+        let foundSubGrupoCentroCosto = await SubGrupoCentroCosto.findByPk(id);
+        if (!foundSubGrupoCentroCosto) throw new Error('ID SubGrupoCentroCosto no encontrado');
+        let updatedSubGrupoCentroCosto = await foundSubGrupoCentroCosto.update(regSubGrupoCentroCosto,{transaction:transactionActualizarSubGrupoCentroCosto});
+        await transactionActualizarSubGrupoCentroCosto.commit();
+        console.log('Registro actualizado OK Tabla SubGrupoCentroCosto')
+        return updatedSubGrupoCentroCosto;
+    } catch (error) {
+        await transactionActualizarSubGrupoCentroCosto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllSubGrupoCentroCosto,createSubGrupoCentroCosto,deleteSubGrupoCentroCosto};
+module.exports = {getAllSubGrupoCentroCosto,createSubGrupoCentroCosto,deleteSubGrupoCentroCosto, updateSubGrupoCentroCosto};

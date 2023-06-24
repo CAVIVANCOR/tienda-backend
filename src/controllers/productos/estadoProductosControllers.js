@@ -76,6 +76,22 @@ const deleteEstadoProducto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateEstadoProducto = async (id,regEstadoProducto)=>{
+    const transactionActualizarEstadoProducto = await EstadoProd.sequelize.transaction();
+    try {
+        let foundEstadoProducto = await EstadoProd.findByPk(id);
+        if (!foundEstadoProducto) throw new Error('ID de Estado producto No existe');
+        let updatedEstadoProducto = await foundEstadoProducto.update(regEstadoProducto,{transaction:transactionActualizarEstadoProducto});
+        await transactionActualizarEstadoProducto.commit();
+        console.log('Estado de producto actualizado OK');
+        return updatedEstadoProducto;
+    } catch (error) {
+        await transactionActualizarEstadoProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllEstadoProducto,createEstadoProducto, deleteEstadoProducto};
+module.exports = {getAllEstadoProducto,createEstadoProducto, deleteEstadoProducto, updateEstadoProducto};

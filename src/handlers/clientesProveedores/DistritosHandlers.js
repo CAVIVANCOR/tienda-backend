@@ -1,4 +1,4 @@
-const { getAllDistrito, createDistrito, deleteDistrito } = require("../../controllers/clientesProveedores/distritosControllers");
+const { getAllDistrito, createDistrito, deleteDistrito, updateDistrito } = require("../../controllers/clientesProveedores/distritosControllers");
 
 const getDistritoHandler = async (req,res)=>{
     const results = await getAllDistrito();
@@ -23,6 +23,17 @@ const deleteDistritoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateDistritoHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroDistrito = req.body;
+    try {
+        const results = await updateDistrito(id,registroDistrito);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getDistritoHandler, createDistritoHandler, deleteDistritoHandler};
+module.exports ={getDistritoHandler, createDistritoHandler, deleteDistritoHandler, updateDistritoHandler};

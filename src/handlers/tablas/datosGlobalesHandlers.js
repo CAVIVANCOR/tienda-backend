@@ -1,4 +1,4 @@
-const { getAllDatosGlobales, createDatosGlobales, deleteDatosGlobales} = require("../../controllers/tablas/datosGlobalesControllers");
+const { getAllDatosGlobales, createDatosGlobales, deleteDatosGlobales, updateDatosGlobales} = require("../../controllers/tablas/datosGlobalesControllers");
 
 const getDatosGlobalesHandler = async (req,res)=>{
     const results = await getAllDatosGlobales();
@@ -23,6 +23,17 @@ const deleteDatosGlobalesHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateDatosGlobalesHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroDatosGlobales = req.body;
+    try {
+        const results = await updateDatosGlobales(id,registroDatosGlobales);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getDatosGlobalesHandler,createDatosGlobalesHandler, deleteDatosGlobalesHandler};
+module.exports ={getDatosGlobalesHandler,createDatosGlobalesHandler, deleteDatosGlobalesHandler, updateDatosGlobalesHandler};

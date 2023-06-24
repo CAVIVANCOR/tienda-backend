@@ -147,5 +147,19 @@ const deleteCabVentas = async (id)=>{
     };
 };
 
+const updateCabVentas = async (id,regCabVentas)=>{
+    let transactionActualizarCabVentas = await CabVentas.sequelize.transaction();
+    try {
+        let foundCabVentas = await CabVentas.findByPk(id);
+        if (!foundCabVentas) throw new Error('ID de CabVentas no encontrado');
+        let updatedCabVentas = await foundCabVentas.update(regCabVentas, {transaction:transactionActualizarCabVentas});
+        console.log('Registro actualizado OK Tabla CabVentas');
+        return updatedCabVentas;
+    } catch (error) {
+        await transactionActualizarCabVentas.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
 
-module.exports = {getAllCabVentas,createCabVentas,deleteCabVentas};
+module.exports = {getAllCabVentas,createCabVentas,deleteCabVentas, updateCabVentas};

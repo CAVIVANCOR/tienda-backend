@@ -76,7 +76,23 @@ const deleteTipoExistenciaCont = async (id)=>{
         await transactionEliminarTipoExistenciaCont.rollback();
         console.log(error.message);
         throw new Error(error.message);
-    }
-}
+    };
+};
 
-module.exports = {getAllTipoExistenciaCont,createTipoExistenciaCont, deleteTipoExistenciaCont};
+const updateTipoExistenciaCont = async (id,regTipoExistenciaCont)=>{
+    const transactionActualizarTipoExistenciaCont = await TipoExisCont.sequelize.transaction();
+    try {
+        let foundTipoExistenciaCont = await TipoExisCont.findByPk(id);
+        if (!foundTipoExistenciaCont) throw new Error("ID de Registro TipoExisCont de Producto no existe");
+        let updatedTipoExistenciaCont = await foundTipoExistenciaCont.update(regTipoExistenciaCont,{transaction:transactionActualizarTipoExistenciaCont});
+        await transactionActualizarTipoExistenciaCont.commit();
+        console.log('Registro actualizado OK Tabla TipoExisCont')
+        return updatedTipoExistenciaCont;
+    } catch (error) {
+        await transactionActualizarTipoExistenciaCont.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTipoExistenciaCont,createTipoExistenciaCont, deleteTipoExistenciaCont, updateTipoExistenciaCont};

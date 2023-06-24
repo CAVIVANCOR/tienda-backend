@@ -1,4 +1,4 @@
-const {getAllTiposDoc, createTipoDoc, deleteTipoDocumento} = require("../../controllers/tablas/tipoDocumentoControllers");
+const {getAllTiposDoc, createTipoDoc, deleteTipoDocumento, updateTipoDocumento} = require("../../controllers/tablas/tipoDocumentoControllers");
 
 
 const getTiposDocHandler = async (req,res)=>{
@@ -24,6 +24,17 @@ const deleteTipoDocumentoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateTipoDocumentoHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroTipoDoc = req.body;
+    try {
+        const results = await updateTipoDocumento(id,registroTipoDoc);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports = {getTiposDocHandler, createTipoDocHandler, deleteTipoDocumentoHandler};
+module.exports = {getTiposDocHandler, createTipoDocHandler, deleteTipoDocumentoHandler, updateTipoDocumentoHandler};

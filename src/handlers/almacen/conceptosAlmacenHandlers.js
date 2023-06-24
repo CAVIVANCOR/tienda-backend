@@ -1,4 +1,4 @@
-const { getAllConceptoAlmacen, createConceptoAlmacen, deleteConceptoAlmacen } = require("../../controllers/almacen/conceptosAlmacenControllers");
+const { getAllConceptoAlmacen, createConceptoAlmacen, deleteConceptoAlmacen, updateConceptoAlmacen } = require("../../controllers/almacen/conceptosAlmacenControllers");
 
 const getConceptoAlmacenHandler = async (req,res)=>{
     const results = await getAllConceptoAlmacen();
@@ -23,6 +23,17 @@ const deleteConceptoAlmacenHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateConceptoAlmacenHandler = async (req,res)=>{
+    const {id} = req.params;
+    let registroConceptoAlmacen = req.body;
+    try {
+        const results = await updateConceptoAlmacen(id,registroConceptoAlmacen);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getConceptoAlmacenHandler, createConceptoAlmacenHandler, deleteConceptoAlmacenHandler};
+module.exports ={getConceptoAlmacenHandler, createConceptoAlmacenHandler, deleteConceptoAlmacenHandler, updateConceptoAlmacenHandler};

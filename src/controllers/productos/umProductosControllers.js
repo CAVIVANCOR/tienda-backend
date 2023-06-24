@@ -81,4 +81,20 @@ const deleteUMProducto = async (id)=>{
     };
 };
 
-module.exports = {getAllUMProducto,createUMProducto,deleteUMProducto};
+const updateUMProducto = async (id,regUMProducto)=>{
+    const transactionActualizarUMProducto = await UMProd.sequelize.transaction();
+    try {
+        let foundUMProducto = await UMProd.findByPk(id);
+        if (!foundUMProducto) throw new Error('No existe el ID registro de UMProducto');
+        let updatedUMProducto = await foundUMProducto.update(regUMProducto,{transaction:transactionActualizarUMProducto});
+        await transactionActualizarUMProducto.commit();
+        console.log('Registro actualizado OK Tabla UMProd');
+        return updatedUMProducto;
+    } catch (error) {
+        await transactionActualizarUMProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllUMProducto,createUMProducto,deleteUMProducto, updateUMProducto};

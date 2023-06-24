@@ -140,4 +140,20 @@ const deleteDetCompras = async (id)=>{
     };
 };
 
-module.exports = {getAllDetCompras,createDetCompras,deleteDetCompras};
+const updateDetCompras = async (id,regDetCompras)=>{
+    let transactionActualizarDetCompras = await DetCompras.sequelize.transaction();
+    try {
+        let foundDetCompras = await DetCompras.findByPk(id);
+        if (!foundDetCompras) throw new Error("No se encontro el ID del registro en Detalle Compras");
+        let updatedDetCompras = await foundDetCompras.update(regDetCompras,{transaction:transactionActualizarDetCompras});
+        await transactionActualizarDetCompras.commit();
+        console.log('Registro actualizado OK Tabla DetCompras');
+        return updatedDetCompras;
+    } catch (error) {
+        await transactionActualizarDetCompras.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllDetCompras,createDetCompras,deleteDetCompras, updateDetCompras};

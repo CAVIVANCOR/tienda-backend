@@ -75,7 +75,23 @@ const deleteMarcaProducto = async (id)=>{
         await transactionEliminarMarcaProducto.rollback();
         console.log(error.message);
         throw new Error(error.message);
-    }
-}
+    };
+};
 
-module.exports = {getAllMarcaProducto,createMarcaProducto, deleteMarcaProducto};
+const updateMarcaProducto = async (id,regMarcaProducto)=>{
+    const transactionActualizarMarcaProducto = await Marca.sequelize.transaction();
+    try {
+        let foundMarcaProducto = await Marca.findByPk(id);
+        if (!foundMarcaProducto) throw new Error("MarcaProducto no encontrado");
+        let updatedMarcaProducto = await foundMarcaProducto.update(regMarcaProducto,{transaction:transactionActualizarMarcaProducto});
+        await transactionActualizarMarcaProducto.commit();
+        console.log('Registro actualizado OK Tabla Marca de Producto')
+        return updatedMarcaProducto;
+    } catch (error) {
+        await transactionActualizarMarcaProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllMarcaProducto,createMarcaProducto, deleteMarcaProducto, updateMarcaProducto};

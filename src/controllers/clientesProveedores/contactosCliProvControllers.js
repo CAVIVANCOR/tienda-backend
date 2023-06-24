@@ -47,4 +47,20 @@ const deleteContactosCliProv = async (id)=>{
     }
 }
 
-module.exports = {getAllContactosCliProv,createContactosCliProv,deleteContactosCliProv};
+const updateContactosCliProv = async (id,regContactosCliProv)=>{
+    let transactionActualizarContactosCliProv = await ContactosCliProv.sequelize.transaction();
+    try {
+        let foundContactosCliProv = await ContactosCliProv.findByPk(id);
+        if (!foundContactosCliProv) throw new Error('ID ContactosCliProv no encontrado');
+        let updatedContactosCliProv = await foundContactosCliProv.update(regContactosCliProv,{transaction:transactionActualizarContactosCliProv});
+        await transactionActualizarContactosCliProv.commit();
+        console.log('Registro actualizado OK Tabla ContactosCliProv');
+        return updatedContactosCliProv;
+    } catch (error) {
+        await transactionActualizarContactosCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllContactosCliProv,createContactosCliProv,deleteContactosCliProv, updateContactosCliProv};

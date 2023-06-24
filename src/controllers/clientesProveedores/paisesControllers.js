@@ -79,6 +79,21 @@ const deletePais = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllPais,createPais,deletePais};
+const updatePais = async (id,regPais)=>{
+    const transactionActualizarPais = await Pais.sequelize.transaction();
+    try {
+        let foundPais = await Pais.findByPk(id);
+        if (!foundPais) throw new Error('ID Pais no encontrado');
+        let updatedPais = await foundPais.update(regPais,{transaction:transactionActualizarPais});
+        await transactionActualizarPais.commit();
+        return updatedPais;
+    } catch (error) {
+        await transactionActualizarPais.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllPais,createPais,deletePais, updatePais};

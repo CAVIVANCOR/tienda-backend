@@ -76,6 +76,22 @@ const deleteLadoProducto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateLadoProducto = async (id,regLadoProducto)=>{
+    const transactionActualizarLadoProducto = await Lado.sequelize.transaction();
+    try {
+        let foundLadoProducto = await Lado.findByPk(id);
+        if (!foundLadoProducto) throw new Error("ID de Lado del producto no encontrado");
+        let updatedLadoProducto = await foundLadoProducto.update(regLadoProducto,{transaction:transactionActualizarLadoProducto});
+        await transactionActualizarLadoProducto.commit();
+        console.log('Registro actualizado OK Tabla Lado');
+        return updatedLadoProducto;
+    } catch (error) {
+        await transactionActualizarLadoProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllLadoProducto,createLadoProducto,deleteLadoProducto};
+module.exports = {getAllLadoProducto,createLadoProducto,deleteLadoProducto, updateLadoProducto};

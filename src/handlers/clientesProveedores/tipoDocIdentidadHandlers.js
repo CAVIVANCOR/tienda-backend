@@ -1,4 +1,4 @@
-const { getAllTDI, createTDI, deleteTDI } = require("../../controllers/clientesProveedores/tipoDocIdentidadControllers");
+const { getAllTDI, createTDI, deleteTDI, updateTDI } = require("../../controllers/clientesProveedores/tipoDocIdentidadControllers");
 
 const getTDIHandler = async (req,res)=>{
     const results = await getAllTDI();
@@ -23,6 +23,17 @@ const deleteTDIHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateTDIHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroTDI = req.body;
+    try {
+        const results = await updateTDI(id,registroTDI);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getTDIHandler, createTDIHandler, deleteTDIHandler};
+module.exports ={getTDIHandler, createTDIHandler, deleteTDIHandler, updateTDIHandler};

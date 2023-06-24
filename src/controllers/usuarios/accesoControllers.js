@@ -50,4 +50,20 @@ const deleteAcceso = async (id)=>{
     };
 };
 
-module.exports = {getAllAccesos,createAccesos,deleteAcceso};
+const updateAcceso = async (id,regAcceso)=>{
+    let transactionActualizarAcceso = await Acceso.sequelize.transaction();
+    try {
+        let foundAcceso = await Acceso.findByPk(id);
+        if (!foundAcceso) throw new Error('ID de Acceso no encontrado');
+        let updatedAcceso = await foundAcceso.update(regAcceso,{transaction:transactionActualizarAcceso});
+        await transactionActualizarAcceso.commit();
+        console.log('Registro actualizado OK Tabla Acceso');
+        return updatedAcceso;
+    } catch (error) {
+        await transactionActualizarAcceso.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllAccesos,createAccesos,deleteAcceso, updateAcceso};

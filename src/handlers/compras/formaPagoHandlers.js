@@ -1,4 +1,4 @@
-const { getAllFormaPago, createFormaPago, deleteFormaPago } = require("../../controllers/compras/formaPagoControllers");
+const { getAllFormaPago, createFormaPago, deleteFormaPago, updateFormaPago } = require("../../controllers/compras/formaPagoControllers");
 
 const getFormaPagoHandler = async (req,res)=>{
     const results = await getAllFormaPago();
@@ -23,6 +23,17 @@ const deleteFormaPagoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateFormaPagoHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroFormaPago = req.body;
+    try {
+        const results = await updateFormaPago(id,registroFormaPago);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getFormaPagoHandler, createFormaPagoHandler, deleteFormaPagoHandler};
+module.exports ={getFormaPagoHandler, createFormaPagoHandler, deleteFormaPagoHandler, updateFormaPagoHandler};

@@ -94,4 +94,20 @@ const deleteCentroCosto = async (id)=>{
     };
 };
 
-module.exports = {getAllCentroCosto,createCentroCosto, deleteCentroCosto};
+const updateCentroCosto = async (id, regCentroCosto)=>{
+    const transactionActualizarCentroCosto = await CentroCosto.sequelize.transaction();
+    try {
+        let foundCentroCosto = await CentroCosto.findByPk(id);
+        if (!foundCentroCosto) throw new Error('ID CentroCosto no encontrado');
+        let updatedCentroCosto = await foundCentroCosto.update(regCentroCosto,{transaction:transactionActualizarCentroCosto});
+        await transactionActualizarCentroCosto.commit();
+        console.log('Registro actualizado OK Tabla CentroCosto');
+        return updatedCentroCosto;
+    } catch (error) {
+        await transactionActualizarCentroCosto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllCentroCosto,createCentroCosto, deleteCentroCosto, updateCentroCosto};

@@ -81,6 +81,22 @@ const deleteEstadoDoc = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllEstadoDoc,createEstadoDoc,deleteEstadoDoc};
+const updateEstadoDoc = async (id,regEstadoDoc)=>{
+    let transactionActualizarEstadoDoc = await EstadoDoc.sequelize.transaction();
+    try {
+        let foundEstadoDoc = await EstadoDoc.findByPk(id);
+        if (!foundEstadoDoc) throw new Error('ID EstadoDoc no encontrado');
+        let updatedEstadoDoc = await foundEstadoDoc.update(regEstadoDoc,{transaction:transactionActualizarEstadoDoc});
+        await transactionActualizarEstadoDoc.commit();
+        console.log('Registro actualizado OK Tabla EstadoDoc')
+        return updatedEstadoDoc;
+    } catch (error) {
+        await transactionActualizarEstadoDoc.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllEstadoDoc,createEstadoDoc,deleteEstadoDoc, updateEstadoDoc};

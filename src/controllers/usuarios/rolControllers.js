@@ -42,6 +42,22 @@ const deleteRol = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllRoles,createRol,deleteRol};
+const updateRol = async (id,regRol)=>{
+    let transactionActualizarRol = await Rol.sequelize.transaction();
+    try {
+        let foundRol = await Rol.findByPk(id);
+        if (!foundRol) throw new Error('ID de Rol no encontrado');
+        let updatedRol = await foundRol.update(regRol,{transaction:transactionActualizarRol});
+        await transactionActualizarRol.commit();
+        console.log('Registro actualizado OK Tabla Rol');
+        return updatedRol;
+    } catch (error) {
+        await transactionActualizarRol.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllRoles,createRol,deleteRol, updateRol};

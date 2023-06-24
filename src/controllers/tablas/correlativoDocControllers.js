@@ -87,7 +87,25 @@ const deleteCorrelativoDoc = async (id)=>{
         await transactionEliminarCorrelativoDoc.rollback();
         console.log(error.message);
         throw new Error(error.message);
-    }
-}
+    };
+};
 
-module.exports = {getAllCorrelativoDoc,createCorrelativoDoc,deleteCorrelativoDoc};
+const updateCorrelativoDoc = async (id,regCorrelativoDoc)=>{
+    const transactionActualizarCorrelativoDoc = await CorrelativoDoc.sequelize.transaction();
+    try {
+        let foundCorrelativoDoc = await CorrelativoDoc.findByPk(id);
+        if (!foundCorrelativoDoc) throw new Error('ID CorrelativoDoc No encontrado');
+        let updatedCorrelativoDoc = await foundCorrelativoDoc.update(regCorrelativoDoc,{transaction:transactionActualizarCorrelativoDoc});
+        await transactionActualizarCorrelativoDoc.commit();
+        console.log('Registro actualizado OK Tabla CorrelativoDoc');
+        return updatedCorrelativoDoc;
+    } catch (error) {
+        await transactionActualizarCorrelativoDoc.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+
+module.exports = {getAllCorrelativoDoc,createCorrelativoDoc,deleteCorrelativoDoc, updateCorrelativoDoc};

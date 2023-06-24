@@ -78,4 +78,20 @@ const deleteProcedenciaProducto = async (id)=>{
     };
 };
 
-module.exports = {getAllProcedenciaProducto,createProcedenciaProducto, deleteProcedenciaProducto};
+const updateProcedenciaProducto = async (id,regProcedenciaProducto)=>{
+    const transactionActualizarProcedenciaProducto = await Procedencia.sequelize.transaction();
+    try {
+        let foundProcedenciaProducto = await Procedencia.findByPk(id);
+        if (!foundProcedenciaProducto) throw new Error("No se encontró el registro a actualizar en la Tabla Procedencia");
+        let updatedProcedenciaProducto = await foundProcedenciaProducto.update(regProcedenciaProducto,{transaction:transactionActualizarProcedenciaProducto});
+        await transactionActualizarProcedenciaProducto.commit();
+        console.log('Registro actualizado OK Tabla Procedencia de Producto')
+        return updatedProcedenciaProducto;
+    } catch (error) {
+        await transactionActualizarProcedenciaProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllProcedenciaProducto,createProcedenciaProducto, deleteProcedenciaProducto, updateProcedenciaProducto};

@@ -1,4 +1,4 @@
-const { getAllTipoExistenciaCont, createTipoExistenciaCont, deleteTipoExistenciaCont } = require("../../controllers/productos/tipoExistenciasContControllers");
+const { getAllTipoExistenciaCont, createTipoExistenciaCont, deleteTipoExistenciaCont, updateTipoExistenciaCont } = require("../../controllers/productos/tipoExistenciasContControllers");
 
 const getTipoExistenciaContHandler = async (req,res)=>{
     const results = await getAllTipoExistenciaCont();
@@ -23,6 +23,17 @@ const deleteTipoExistenciaContHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateTipoExistenciaContHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroTipoExistenciaCont = req.body;
+    try {
+        const results = await updateTipoExistenciaCont(id,registroTipoExistenciaCont);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getTipoExistenciaContHandler, createTipoExistenciaContHandler, deleteTipoExistenciaContHandler};
+module.exports ={getTipoExistenciaContHandler, createTipoExistenciaContHandler, deleteTipoExistenciaContHandler, updateTipoExistenciaContHandler};

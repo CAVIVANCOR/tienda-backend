@@ -1,4 +1,4 @@
-const { getAllKardexCuentas, createKardexCuentas, deleteKardexCuentas } = require("../../controllers/cajaybancos/kardexCuentasControllers");
+const { getAllKardexCuentas, createKardexCuentas, deleteKardexCuentas, regeneraKardexCuentas } = require("../../controllers/cajaybancos/kardexCuentasControllers");
 
 const getKardexCuentasHandler = async (req,res)=>{
     const results = await getAllKardexCuentas();
@@ -23,6 +23,16 @@ const deleteKardexCuentasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateKardexAlmacenHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await regeneraKardexCuentas(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getKardexCuentasHandler, createKardexCuentasHandler, deleteKardexCuentasHandler};
+module.exports ={getKardexCuentasHandler, createKardexCuentasHandler, deleteKardexCuentasHandler, updateKardexAlmacenHandler};

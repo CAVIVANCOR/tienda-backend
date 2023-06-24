@@ -90,5 +90,20 @@ const deletePersona = async (id)=>{
     };
 };
 
+const updatePersona = async (id,regPersona)=>{
+    let transactionActualizarPersona = await Personal.sequelize.transaction();
+    try {
+        let foundPersona = await Personal.findByPk(id);
+        if (!foundPersona) throw new Error('ID de Personal no encontrado');
+        let updatedPersona = await foundPersona.update(regPersona,{transaction:transactionActualizarPersona});
+        await transactionActualizarPersona.commit();
+        console.log('Registro actualizado OK Tabla Personal');
+        return updatedPersona;
+    } catch (error) {
+        await transactionActualizarPersona.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
 
-module.exports = {getAllPersonal,createPersona,deletePersona};
+module.exports = {getAllPersonal,createPersona,deletePersona, updatePersona};

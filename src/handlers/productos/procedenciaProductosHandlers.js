@@ -1,4 +1,4 @@
-const { getAllProcedenciaProducto, createProcedenciaProducto, deleteProcedenciaProducto } = require("../../controllers/productos/procedenciaProductosControllers");
+const { getAllProcedenciaProducto, createProcedenciaProducto, deleteProcedenciaProducto, updateProcedenciaProducto } = require("../../controllers/productos/procedenciaProductosControllers");
 
 const getProcedenciaProductoHandler = async (req,res)=>{
     const results = await getAllProcedenciaProducto();
@@ -23,6 +23,17 @@ const deleteProcedenciaProductoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getProcedenciaProductoHandler, createProcedenciaProductoHandler, deleteProcedenciaProductoHandler};
+const updateProcedenciaProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroProcedenciaProducto = req.body;
+    try {
+        const results = await updateProcedenciaProducto(id,registroProcedenciaProducto);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getProcedenciaProductoHandler, createProcedenciaProductoHandler, deleteProcedenciaProductoHandler, updateProcedenciaProductoHandler};

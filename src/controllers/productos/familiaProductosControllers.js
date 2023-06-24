@@ -76,6 +76,22 @@ const deleteFamiliaProducto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateFamiliaProducto = async (id,regFamiliaProducto)=>{
+    const transactionActualizarFamiliaProducto = await Familia.sequelize.transaction();
+    try {
+        let foundFamiliaProducto = await Familia.findByPk(id);
+        if (!foundFamiliaProducto) throw new Error('El ID de Familia Producto No existe');
+        let updatedFamiliaProducto = await foundFamiliaProducto.update(regFamiliaProducto,{transaction:transactionActualizarFamiliaProducto});
+        await transactionActualizarFamiliaProducto.commit();
+        console.log('Registro actualizado OK Tabla Familia')
+        return updatedFamiliaProducto;
+    } catch (error) {
+        await transactionActualizarFamiliaProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllFamiliaProducto,createFamiliaProducto, deleteFamiliaProducto};
+module.exports = {getAllFamiliaProducto,createFamiliaProducto, deleteFamiliaProducto, updateFamiliaProducto};

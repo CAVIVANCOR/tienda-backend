@@ -1,4 +1,4 @@
-const { getAllCabMovAlmacen, createCabMovAlmacen, deleteCabMovAlmacen } = require("../../controllers/almacen/cabMovAlmacenControllers");
+const { getAllCabMovAlmacen, createCabMovAlmacen, deleteCabMovAlmacen, updateCabMovAlmacen } = require("../../controllers/almacen/cabMovAlmacenControllers");
 
 const getCabMovAlmacenHandler = async (req,res)=>{
     const results = await getAllCabMovAlmacen();
@@ -23,6 +23,17 @@ const deleteCabMovAlmacenHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getCabMovAlmacenHandler, createCabMovAlmacenHandler, deleteCabMovAlmacenHandler};
+const updateCabMovAlmacenHandler = async (req,res)=>{
+    const {id} = req.params;
+    let registroCabMovAlmacen = req.body;
+    try {
+        const results = await updateCabMovAlmacen(id,registroCabMovAlmacen);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getCabMovAlmacenHandler, createCabMovAlmacenHandler, deleteCabMovAlmacenHandler, updateCabMovAlmacenHandler};

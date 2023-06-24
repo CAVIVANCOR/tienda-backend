@@ -1,4 +1,4 @@
-const { getAllColorProducto, createColorProducto, deleteColorProducto } = require("../../controllers/productos/colorProductosControllers");
+const { getAllColorProducto, createColorProducto, deleteColorProducto, updateColorProducto } = require("../../controllers/productos/colorProductosControllers");
 
 const getColorProductoHandler = async (req,res)=>{
     const results = await getAllColorProducto();
@@ -23,6 +23,17 @@ const deleteColorProductoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateColorProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroColorProducto = req.body;
+    try {
+        const results = await updateColorProducto(id,registroColorProducto);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getColorProductoHandler, createColorProductoHandler, deleteColorProductoHandler};
+module.exports ={getColorProductoHandler, createColorProductoHandler, deleteColorProductoHandler, updateColorProductoHandler};

@@ -76,6 +76,22 @@ const deleteMaterialProducto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllMaterialProducto,createMaterialProducto, deleteMaterialProducto};
+const updateMaterialProducto = async (id,regMaterialProducto)=>{
+    const transactionActualizarMaterialProducto = await Materiale.sequelize.transaction();
+    try {
+        let foundMaterialProducto = await Materiale.findByPk(id);
+        if (!foundMaterialProducto) throw new Error("ID de Material de Producto No existe");
+        let updatedMaterialProducto = await foundMaterialProducto.update(regMaterialProducto,{transaction:transactionActualizarMaterialProducto});
+        await transactionActualizarMaterialProducto.commit();
+        console.log('Registro actualizado OK Tabla Materiale Producto');
+        return updatedMaterialProducto;
+    } catch (error) {
+        await transactionActualizarMaterialProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllMaterialProducto,createMaterialProducto, deleteMaterialProducto, updateMaterialProducto};

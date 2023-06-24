@@ -83,6 +83,22 @@ const deleteteTiposCambio = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllTiposCambio,createTiposCambio,deleteteTiposCambio};
+const updateTiposCambio = async (id,regTiposCambio)=>{
+    let transactionActualizarTiposCambio = await TipoCambio.sequelize.transaction();
+    try {
+        let foundTipoCambio = await TipoCambio.findByPk(id);
+        if (!foundTipoCambio) throw new Error("No se encontró el ID tipo de cambio");
+        let updatedTiposCambio = await foundTipoCambio.update(regTiposCambio,{transaction:transactionActualizarTiposCambio});
+        await transactionActualizarTiposCambio.commit();
+        console.log('Registro actualizado OK Tabla TipoCambio');
+        return updatedTiposCambio;
+    } catch (error) {
+        await transactionActualizarTiposCambio.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTiposCambio,createTiposCambio,deleteteTiposCambio, updateTiposCambio};

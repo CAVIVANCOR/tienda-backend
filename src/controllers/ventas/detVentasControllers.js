@@ -144,4 +144,20 @@ const deleteDetVentas = async (id)=>{
     };
 };
 
-module.exports = {getAllDetVentas,createDetVentas,deleteDetVentas};   
+const updateDetVentas = async (id,regDetVentas)=>{
+    let transactionActualizarDetVentas = await DetVentas.sequelize.transaction();
+    try {
+        let foundDetVentas = await DetVentas.findByPk(id);
+        if (!foundDetVentas) throw new Error("No se encontro el ID del registro en Detalle Ventas");
+        let updatedDetVentas = await foundDetVentas.update(regDetVentas,{transaction:transactionActualizarDetVentas});
+        await transactionActualizarDetVentas.commit();
+        console.log('Registro actualizado OK Tabla DetVentas');
+        return updatedDetVentas;
+    } catch (error) {
+        await transactionActualizarDetVentas.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllDetVentas,createDetVentas,deleteDetVentas, updateDetVentas};   

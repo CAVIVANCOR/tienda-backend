@@ -141,6 +141,22 @@ const deleteProducto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllProducto, createProducto, deleteProducto};
+const updateProducto = async (id,regProducto)=>{
+    const transactionActualizarProducto = await Producto.sequelize.transaction();
+    try {
+        let foundProducto = await Producto.findByPk(id);
+        if (!foundProducto) throw new Error('ID de Producto no encontrado');
+        let updatedProducto = await foundProducto.update(regProducto,{transaction:transactionActualizarProducto});
+        await transactionActualizarProducto.commit();
+        console.log('Registro Actualizado OK Tabla Producto');
+        return updatedProducto;
+    } catch (error) {
+        await transactionActualizarProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllProducto, createProducto, deleteProducto, updateProducto};

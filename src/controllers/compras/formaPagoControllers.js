@@ -82,6 +82,22 @@ const deleteFormaPago = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllFormaPago,createFormaPago,deleteFormaPago};
+const updateFormaPago = async (id,regFormaPago)=>{
+    const transactionActualizarFormaPago = await FormaPago.sequelize.transaction();
+    try {
+        let foundFormaPago = await FormaPago.findByPk(id);
+        if (!foundFormaPago) throw new Error('ID de FormaPago no encontrado');
+        let updatedFormaPago = await foundFormaPago.update(regFormaPago,{transaction:transactionActualizarFormaPago});
+        await transactionActualizarFormaPago.commit();
+        console.log('Registro actualizado OK Tabla FormaPago');
+        return updatedFormaPago;
+    } catch (error) {
+        await transactionActualizarFormaPago.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllFormaPago,createFormaPago,deleteFormaPago, updateFormaPago};

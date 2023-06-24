@@ -82,6 +82,22 @@ const deleteSubFamiliaProducto = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllSubFamiliaProducto,createSubFamiliaProducto,deleteSubFamiliaProducto};
+const updateSubFamiliaProducto = async (id,regSubFamiliaProducto)=>{
+    const transactionActualizarSubFamiliaProducto = await SubFamilia.sequelize.transaction();
+    try {
+        let foundSubFamiliaProducto = await SubFamilia.findByPk(id);
+        if (!foundSubFamiliaProducto) throw new Error('ID de Registro SubFamilia de producto no encontrado');
+        let updatedSubFamiliaProducto = await foundSubFamiliaProducto.update(regSubFamiliaProducto,{transaction:transactionActualizarSubFamiliaProducto});
+        await transactionActualizarSubFamiliaProducto.commit();
+        console.log('Registro SubFamiliaProducto actualizado OK');
+        return updatedSubFamiliaProducto;
+    } catch (error) {
+        await transactionActualizarSubFamiliaProducto.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllSubFamiliaProducto,createSubFamiliaProducto,deleteSubFamiliaProducto, updateSubFamiliaProducto};

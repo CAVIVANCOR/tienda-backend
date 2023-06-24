@@ -190,6 +190,22 @@ const deleteClienteProveedor = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     }
-}
+};
 
-module.exports = {getAllClienteProveedor,createClienteProveedor,deleteClienteProveedor};
+const updateClienteProveedor = async (id,regClienteProveedor)=>{
+    let transactionActualizarClienteProveedor = await ClienteProveedor.sequelize.transaction();
+    try {
+        let foundClienteProveedor = await ClienteProveedor.findByPk(id);
+        if (!foundClienteProveedor) throw new Error('ID ClienteProveedor no encontrado');
+        let updatedClienteProveedor = await foundClienteProveedor.update(regClienteProveedor,{transaction:transactionActualizarClienteProveedor});
+        await transactionActualizarClienteProveedor.commit();
+        console.log('registro actualizado OK Tabla ClienteProveedor');
+        return updatedClienteProveedor;
+    } catch (error) {
+        await transactionActualizarClienteProveedor.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllClienteProveedor,createClienteProveedor,deleteClienteProveedor, updateClienteProveedor};

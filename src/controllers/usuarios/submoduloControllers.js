@@ -46,6 +46,22 @@ const deleteSubModulo = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllSubModulos,createSubModulo,deleteSubModulo};
+const updateSubModulo = async (id,regSubModulo)=>{
+    let transactionActualizarSubModulo = await SubModulo.sequelize.transaction();
+    try {
+        let foundSubModulo = await SubModulo.findByPk(id);
+        if (!foundSubModulo) throw new Error('ID de SubModulo no encontrado');
+        let updatedSubModulo = await foundSubModulo.update(regSubModulo,{transaction:transactionActualizarSubModulo});
+        await transactionActualizarSubModulo.commit();
+        console.log('Registro actualizado OK Tabla SubModulo');
+        return updatedSubModulo;
+    } catch (error) {
+        await transactionActualizarSubModulo.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllSubModulos,createSubModulo,deleteSubModulo, updateSubModulo};

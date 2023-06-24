@@ -1,4 +1,4 @@
-const { getAllUbicacionFisicaAlmacen, createUbicacionFisicaAlmacen, deleteUbicacionFisicaAlmacen } = require("../../controllers/almacen/ubicacionFisicaAlmacen");
+const { getAllUbicacionFisicaAlmacen, createUbicacionFisicaAlmacen, deleteUbicacionFisicaAlmacen, updateUbicacionFisicaAlmacen } = require("../../controllers/almacen/ubicacionFisicaAlmacen");
 
 const getUbicacionFisicaAlmacenHandler = async (req,res)=>{
     const results = await getAllUbicacionFisicaAlmacen();
@@ -23,6 +23,17 @@ const deleteUbicacionFisicaAlmacenHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const updateUbicacionFisicaAlmacenHandler = async (req,res)=>{
+    const {id} = req.params;
+    let registroUbicacionFisicaAlmacen = req.body;
+    try {
+        const results = await updateUbicacionFisicaAlmacen(id,registroUbicacionFisicaAlmacen);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getUbicacionFisicaAlmacenHandler, createUbicacionFisicaAlmacenHandler, deleteUbicacionFisicaAlmacenHandler};
+module.exports ={getUbicacionFisicaAlmacenHandler, createUbicacionFisicaAlmacenHandler, deleteUbicacionFisicaAlmacenHandler, updateUbicacionFisicaAlmacenHandler};

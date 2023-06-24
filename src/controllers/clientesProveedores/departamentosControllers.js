@@ -83,6 +83,21 @@ const deleteDepartamento = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateDepartamento = async (id,regDepartamento)=>{
+    const transactionActualizarDepartamento = await Departamento.sequelize.transaction();
+    try {
+        let foundDepartamento = await Departamento.findByPk(id);
+        if (!foundDepartamento) throw new Error('ID Departamento no encontrado');
+        let updatedDepartamento = await foundDepartamento.update(regDepartamento,{transaction:transactionActualizarDepartamento});
+        await transactionActualizarDepartamento.commit();
+        return updatedDepartamento;
+    } catch (error) {
+        await transactionActualizarDepartamento.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllDepartamento,createDepartamento, deleteDepartamento};
+module.exports = {getAllDepartamento,createDepartamento, deleteDepartamento, updateDepartamento};

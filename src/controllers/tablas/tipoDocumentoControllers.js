@@ -86,4 +86,20 @@ const deleteTipoDocumento = async (id)=>{
     };
 };
 
-module.exports = {getAllTiposDoc,createTipoDoc,deleteTipoDocumento};
+const updateTipoDocumento = async (id,regTipoDoc)=>{
+    let transactionActualizarTipoDoc = await TipoDocumento.sequelize.transaction();
+    try {
+        let foundTipoDocumento = await TipoDocumento.findByPk(id);
+        if (!foundTipoDocumento) throw new Error('No se encontró el ID TipoDocumento');
+        let updatedTipoDocumento = await foundTipoDocumento.update(regTipoDoc,{transaction:transactionActualizarTipoDoc});
+        await transactionActualizarTipoDoc.commit();
+        console.log('Registro actualizado OK Tabla TipoDocumento');
+        return updatedTipoDocumento;
+    } catch (error) {
+        await transactionActualizarTipoDoc.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTiposDoc,createTipoDoc,deleteTipoDocumento, updateTipoDocumento};

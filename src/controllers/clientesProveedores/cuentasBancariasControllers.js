@@ -45,6 +45,23 @@ const deleteCuentasBancariasCliProv = async (id)=>{
             await transactionEliminarCuentasBancariasCliProv.rollback();
             console.log(error.message);
             throw new Error(error.message);
-        }
+        };
+};
+
+const updateCuentasBancariasCliProv = async (id,regCuentasBancariasCliProv)=>{
+    let transactionActualizarCuentasBancariasCliProv = await CBancariasCliProv.sequelize.transaction();
+    try {
+        let foundCuentasBancariasCliProv = await CBancariasCliProv.findByPk(id);
+        if (!foundCuentasBancariasCliProv) throw new Error('ID CBancariasCliProv no encontrado');
+        let updatedCuentasBancariasCliProv = await foundCuentasBancariasCliProv.update(regCuentasBancariasCliProv,{transaction:transactionActualizarCuentasBancariasCliProv});
+        await transactionActualizarCuentasBancariasCliProv.commit();
+        console.log('Registro actualizado OK Tabla CBancariasCliProv')
+        return updatedCuentasBancariasCliProv;
+        } catch (error) {
+            await transactionActualizarCuentasBancariasCliProv.rollback();
+            console.log(error.message);
+            throw new Error(error.message);
+        };
 }
-module.exports = {getAllCuentasBancariasCliProv,createCuentasBancariasCliProv,deleteCuentasBancariasCliProv};
+
+module.exports = {getAllCuentasBancariasCliProv,createCuentasBancariasCliProv,deleteCuentasBancariasCliProv, updateCuentasBancariasCliProv};

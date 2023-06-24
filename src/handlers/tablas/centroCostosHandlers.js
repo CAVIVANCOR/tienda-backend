@@ -1,4 +1,4 @@
-const {getAllCentroCosto, createCentroCosto, deleteCentroCosto} = require("../../controllers/tablas/centroCostosControllers");
+const {getAllCentroCosto, createCentroCosto, deleteCentroCosto, updateCentroCosto} = require("../../controllers/tablas/centroCostosControllers");
 
 const getCentroCostosHandler = async (req,res)=>{
     const results = await getAllCentroCosto();
@@ -23,6 +23,17 @@ const deleteCentroCostoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports = {getCentroCostosHandler, createCentroCostosHandler, deleteCentroCostoHandler};
+const updateCentroCostoHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroCentroCosto = req.body;
+    try {
+        const results = await updateCentroCosto(id,registroCentroCosto);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports = {getCentroCostosHandler, createCentroCostosHandler, deleteCentroCostoHandler, updateCentroCostoHandler};

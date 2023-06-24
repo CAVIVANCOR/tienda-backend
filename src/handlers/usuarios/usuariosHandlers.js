@@ -1,4 +1,4 @@
-const { getAllUsuarios,createUsuario, deleteUsuario } = require("../../controllers/usuarios/usuarioControllers");
+const { getAllUsuarios,createUsuario, deleteUsuario, updateUsuario } = require("../../controllers/usuarios/usuarioControllers");
 
 const getUsuariosHandler = async (req,res)=>{
     const results = await getAllUsuarios();
@@ -24,4 +24,15 @@ const deleteUsuarioHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getUsuariosHandler,createUsuarioHandler,deleteUsuarioHandler}
+const updateUsuarioHandler = async (req,res)=>{
+    const id = req.params.id;
+    let registroUsuario = req.body;
+    try {
+        const results = await updateUsuario(id,registroUsuario);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getUsuariosHandler,createUsuarioHandler,deleteUsuarioHandler, updateUsuarioHandler}

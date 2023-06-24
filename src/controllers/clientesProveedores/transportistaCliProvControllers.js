@@ -42,6 +42,22 @@ const deleteTransportistaCliProv = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateTransportistaCliProv = async (id,regTransportistaCliProv)=>{
+    const transactionActualizarTransportistaCliProv = await TransportistaCliProv.sequelize.transaction();
+    try {
+        let foundtransportistaCliProv = await TransportistaCliProv.findByPk(id);
+        if (!foundtransportistaCliProv) throw new Error('ID de TransportistaCliProv no encontrado');
+        let updatedTransportistaCliProv = await foundtransportistaCliProv.update(regTransportistaCliProv,{transaction:transactionActualizarTransportistaCliProv});
+        await transactionActualizarTransportistaCliProv.commit();
+        console.log('Registro actualizado OK Tabla TransportistaCliProv');
+        return updatedTransportistaCliProv;
+    } catch (error) {
+        await transactionActualizarTransportistaCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllTransportistaCliProv,createTransportistaCliProv,deleteTransportistaCliProv};
+module.exports = {getAllTransportistaCliProv,createTransportistaCliProv,deleteTransportistaCliProv, updateTransportistaCliProv};

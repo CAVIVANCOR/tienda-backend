@@ -44,6 +44,22 @@ const deletePreciosCliProv = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updatePreciosCliProv = async (id,regPreciosCliProv)=>{
+    const transactionActualizarPreciosCliProv = await PreciosCliProv.sequelize.transaction();
+    try {
+        let foundPreciosCliProv = await PreciosCliProv.findByPk(id);
+        if (!foundPreciosCliProv) throw new Error('ID PreciosCliProv no encontrado');
+        let updatedPreciosCliProv = await foundPreciosCliProv.update(regPreciosCliProv,{transaction:transactionActualizarPreciosCliProv});
+        await transactionActualizarPreciosCliProv.commit();
+        console.log('Registro actualizado OK Tabla PreciosCliProv')
+        return updatedPreciosCliProv;
+    } catch (error) {
+        await transactionActualizarPreciosCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllPreciosCliProv, createPreciosCliProv, deletePreciosCliProv};
+module.exports = {getAllPreciosCliProv, createPreciosCliProv, deletePreciosCliProv, updatePreciosCliProv};

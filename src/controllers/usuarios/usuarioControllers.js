@@ -91,6 +91,22 @@ const deleteUsuario = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllUsuarios,createUsuario,deleteUsuario};
+const updateUsuario = async (id,regUsuario)=>{
+    let transactionActualizarUsuario = await Usuario.sequelize.transaction();
+    try {
+        let foundUsuario = await Usuario.findByPk(id);
+        if (!foundUsuario) throw new Error('ID de Usuario no encontrado');
+        let updatedUsuario = await foundUsuario.update(regUsuario,{transaction:transactionActualizarUsuario});
+        await transactionActualizarUsuario.commit();
+        console.log('Registro actualizado OK Tabla Usuario');
+        return updatedUsuario;
+    } catch (error) {
+        await transactionActualizarUsuario.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllUsuarios,createUsuario,deleteUsuario, updateUsuario};

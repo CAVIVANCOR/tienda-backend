@@ -82,6 +82,22 @@ const deleteTDI = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllTDI,createTDI,deleteTDI};
+const updateTDI = async (id,regTDI)=>{
+    const transactionActualizarTDI = await TipoDocIdentidad.sequelize.transaction();
+    try {
+        let foundTipoDocIdentidad = await TipoDocIdentidad.findByPk(id);
+        if (!foundTipoDocIdentidad) throw new Error('ID de TipoDocIdentidad no encontrada');
+        let updatedTipoDocIdentidad = await foundTipoDocIdentidad.update(regTDI,{transaction:transactionActualizarTDI});
+        await transactionActualizarTDI.commit();
+        console.log('Registro actualizado OK Tabla TipoDocIdentidad');
+        return updatedTipoDocIdentidad;
+    } catch (error) {
+        await transactionActualizarTDI.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTDI,createTDI,deleteTDI, updateTDI};

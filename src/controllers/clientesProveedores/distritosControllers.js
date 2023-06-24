@@ -93,5 +93,22 @@ const deleteDistrito = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateDistrito = async (id,regDistrito)=>{
+    const transactionActualizarDistrito = await Distrito.sequelize.transaction();
+    try {
+        let foundDistrito = await Distrito.findByPk(id);
+        if (!foundDistrito) throw new Error("ID Distrito no encontrado");
+        let updatedDistrito = await foundDistrito.update(regDistrito,{transaction:transactionActualizarDistrito});
+        await transactionActualizarDistrito.commit();
+        console.log("Registro actualizado OK Tabla Distrito");
+        return updatedDistrito;
+    } catch (error) {
+        await transactionActualizarDistrito.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
-module.exports = {getAllDistrito,createDistrito,deleteDistrito};
+
+module.exports = {getAllDistrito,createDistrito,deleteDistrito, updateDistrito};

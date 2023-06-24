@@ -42,4 +42,20 @@ const deleteDatosGlobales = async (id)=>{
     };
 };
 
-module.exports = {getAllDatosGlobales,createDatosGlobales, deleteDatosGlobales};
+const updateDatosGlobales = async (id,regDatosGlobales)=>{
+    let transactionActualizarDatosGlobales = await DatoGlobal.sequelize.transaction();
+    try {
+        let foundDatosGlobales = await DatoGlobal.findByPk(id);
+        if (!foundDatosGlobales) throw new Error('ID DatoGlobal no encontrado');
+        let updatedDatosGlobales = await foundDatosGlobales.update(regDatosGlobales,{transaction:transactionActualizarDatosGlobales});
+        await transactionActualizarDatosGlobales.commit();
+        console.log('Registro actualizado OK Tabla DatoGlobal')
+        return updatedDatosGlobales;
+    } catch (error) {
+        await transactionActualizarDatosGlobales.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllDatosGlobales,createDatosGlobales, deleteDatosGlobales, updateDatosGlobales};
