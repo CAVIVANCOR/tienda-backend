@@ -1,4 +1,4 @@
-const {getAllTiposCambio, createTiposCambio} = require("../../controllers/tablas/tipoCambioControllers");
+const {getAllTiposCambio, createTiposCambio, deleteteTiposCambio} = require("../../controllers/tablas/tipoCambioControllers");
 
 
 const getTiposCambioHandler = async (req,res)=>{
@@ -16,4 +16,14 @@ const createTipoCambioHandler = async (req,res)=>{
     };
 };
 
-module.exports = {getTiposCambioHandler, createTipoCambioHandler};
+const deleteteTipoCambioHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteteTiposCambio(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports = {getTiposCambioHandler, createTipoCambioHandler, deleteteTipoCambioHandler};

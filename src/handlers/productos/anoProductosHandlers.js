@@ -1,4 +1,4 @@
-const { getAllAnoProducto, createAnoProducto } = require("../../controllers/productos/anoProductosControllers");
+const { getAllAnoProducto, createAnoProducto, deleteAnoProducto } = require("../../controllers/productos/anoProductosControllers");
 
 const getAnoProductoHandler = async (req,res)=>{
     const results = await getAllAnoProducto();
@@ -15,4 +15,14 @@ const createAnoProductoHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getAnoProductoHandler, createAnoProductoHandler};
+const deleteAnoProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteAnoProducto(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getAnoProductoHandler, createAnoProductoHandler, deleteAnoProductoHandler};

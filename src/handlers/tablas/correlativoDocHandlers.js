@@ -1,4 +1,4 @@
-const {getAllCorrelativoDoc, createCorrelativoDoc} = require("../../controllers/tablas/correlativoDocControllers");
+const {getAllCorrelativoDoc, createCorrelativoDoc, deleteCorrelativoDoc} = require("../../controllers/tablas/correlativoDocControllers");
 
 const getCorrelativoDocHandler = async (req,res)=>{
     const results = await getAllCorrelativoDoc();
@@ -14,4 +14,14 @@ const createCorrelativoDocHandler = async (req,res)=>{
         res.status(400).json({error:error.message})
     };
 }
-module.exports = {getCorrelativoDocHandler, createCorrelativoDocHandler};
+
+const deleteCorrelativoDocHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteCorrelativoDoc(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+module.exports = {getCorrelativoDocHandler, createCorrelativoDocHandler, deleteCorrelativoDocHandler};

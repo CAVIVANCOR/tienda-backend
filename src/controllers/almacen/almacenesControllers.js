@@ -97,4 +97,22 @@ const deleteAlmacen = async (id) => {
     }
 };
 
-module.exports = {getAllAlmacen, createAlmacen, deleteAlmacen};
+const updateAlmacen = async (id,regAlmacen)=>{
+    let transactionActualizarAlmacen = await Almacen.sequelize.transaction();
+    try {
+        const foundAlmacen = await Almacen.findByPk(id);
+        if (!foundAlmacen) {
+            throw new Error('No se ha encontrado la entrada de Almacen');
+        }
+        let updatedAlmacen = await foundAlmacen.update(regAlmacen,{transaction:transactionActualizarAlmacen});
+        await transactionActualizarAlmacen.commit();
+        console.log("Registro actualizado OK Tabla Almacen");
+        return updatedAlmacen;
+    } catch (error) {
+        await transactionActualizarAlmacen.rollback();
+        console.error(error);
+        throw new Error(error.message);
+    }
+}
+
+module.exports = {getAllAlmacen, createAlmacen, deleteAlmacen, updateAlmacen};

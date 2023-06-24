@@ -3,32 +3,32 @@ const axios = require("axios");
 const regDetMovCuentasUsuario ={
     where: { borradoLogico: false },
     include:[{
-        model:ClienteProveedor,
-        attributes:["id","razonSocial","numDocIdentidad","TipoDocIdentidadId","TipoCliProvId"],
-        include:[{
-                    model:TipoDocIdentidad,
-                    attributes:["descripcion"]
-                },{
-                    model:TipoCliProv,
-                    attributes:["descripcion","clienteProveedor"]
+                model:ClienteProveedor,
+                attributes:["id","razonSocial","numDocIdentidad","TipoDocIdentidadId","TipoCliProvId"],
+                include:[{
+                            model:TipoDocIdentidad,
+                            attributes:["descripcion"]
+                        },{
+                            model:TipoCliProv,
+                            attributes:["descripcion","clienteProveedor"]
+                        }]
+            },{
+                model:EstadoDoc,
+                attributes:["descripcion"]
+            },{
+                model:Usuario,
+                attributes:["usuario"],
+                include:[{
+                    model:Personal,
+                    attributes:["nombres","email","telefonos","urlFoto","nroDocIdentidad","vendedor","TipoDocIdentidadId"]
                 }]
-    },{
-        model:EstadoDoc,
-        attributes:["descripcion"]
-    },{
-        model:Usuario,
-        attributes:["usuario"],
-        include:[{
-            model:Personal,
-            attributes:["nombres","email","telefonos","urlFoto","nroDocIdentidad","vendedor","TipoDocIdentidadId"]
-        }]
-    },{
-        model:ConceptoMovC,
-        attributes:["descripcion","idCuentaOrigen","idCuentaDestino","prioridad"],
-    },{
-        model:Bancos,
-        attributes:["descripcion"]
-    }]
+            },{
+                model:ConceptoMovC,
+                attributes:["descripcion","idCuentaOrigen","idCuentaDestino","prioridad"],
+            },{
+                model:Bancos,
+                attributes:["descripcion"]
+            }]
 };
 const {where,...regDetMovCuentasAdmin}=regDetMovCuentasUsuario;
 const cleanArray=(arr)=>{
@@ -116,4 +116,20 @@ const deleteDetMovCuenta = async (id)=>{
     };
 }
 
-module.exports = {getAllDetMovCuentas,createDetMovCuentas,deleteDetMovCuenta};
+const updateDetMovCuentas = async (id,regDetMovCuentas)=>{
+    const transactionActualizarDetMovCuentas = await DetMovCuentas.sequelize.transaction();
+    try {
+        let foundDetMovCuenta = await DetMovCuentas.findByPk(id);
+        if (!foundDetMovCuenta) throw new Error("ID detalle de movimiento de cuentas No encontrado");
+        let updatedDetMovCuenta = await foundDetMovCuenta.update(regDetMovCuentas,{transaction:transactionActualizarDetMovCuentas});
+        await transactionActualizarDetMovCuentas.commit();
+        console.log('Registro actualizado OK Tabla DetMovCuentas')
+        return updatedDetMovCuenta;
+    } catch (error) {
+        await transactionActualizarDetMovCuentas.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllDetMovCuentas,createDetMovCuentas,deleteDetMovCuenta, updateDetMovCuentas};

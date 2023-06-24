@@ -1,4 +1,4 @@
-const { getAllTipoCliProv, createTipoCliProv } = require("../../controllers/clientesProveedores/tiposCliProvControllers");
+const { getAllTipoCliProv, createTipoCliProv, deleteTipoCliProv } = require("../../controllers/clientesProveedores/tiposCliProvControllers");
 
 const getTipoCliProvHandler = async (req,res)=>{
     const results = await getAllTipoCliProv();
@@ -15,4 +15,14 @@ const createTipoCliProvHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getTipoCliProvHandler, createTipoCliProvHandler};
+const deleteTipoCliProvHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteTipoCliProv(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getTipoCliProvHandler, createTipoCliProvHandler, deleteTipoCliProvHandler};

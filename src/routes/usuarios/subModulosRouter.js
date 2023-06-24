@@ -1,8 +1,9 @@
 const {Router}=require("express");
-const {getSubModulosHandler,createSubModuloHandler} = require("../../handlers/usuarios/submodulosHandlers");
+const {getSubModulosHandler,createSubModuloHandler, deleteSubModuloHandler} = require("../../handlers/usuarios/submodulosHandlers");
 const subModulosRouter = Router();
 
 subModulosRouter.get("/",getSubModulosHandler);
 subModulosRouter.post("/",createSubModuloHandler);
+subModulosRouter.delete("/:id",deleteSubModuloHandler);
 
 module.exports = subModulosRouter;

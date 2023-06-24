@@ -82,4 +82,20 @@ const deleteTipoMovAlmacen = async (id) => {
     };
 }
 
-module.exports = {getAllTipoMovAlmacen,createTipoMovAlmacen, deleteTipoMovAlmacen};
+const updateTipoMovAlmacen = async (id, regTipoMovAlmacen)=>{
+    const transactionActualizarTipoMovAlmacen = await TipoMovAlmacen.sequelize.transaction();
+    try {
+        let foundTipoMovAlmacen = await TipoMovAlmacen.findByPk(id);
+        if (!foundTipoMovAlmacen) throw new Error('No se encontro el ID del Tipo de Movimiento Almacen');
+        let updatedTipoMovAlmacen = await foundTipoMovAlmacen.update(regTipoMovAlmacen,{transaction:transactionActualizarTipoMovAlmacen});
+        await transactionActualizarTipoMovAlmacen.commit();
+        console.log('Registro actualizado OK Tabla TipoMovAlmacen')
+        return updatedTipoMovAlmacen;
+    } catch (error) {
+        await transactionActualizarTipoMovAlmacen.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTipoMovAlmacen,createTipoMovAlmacen, deleteTipoMovAlmacen, updateTipoMovAlmacen};

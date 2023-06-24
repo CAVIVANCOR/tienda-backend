@@ -1,4 +1,4 @@
-const { getAllModulos, createModulo } = require("../../controllers/usuarios/moduloControllers");
+const { getAllModulos, createModulo, deleteModulo } = require("../../controllers/usuarios/moduloControllers");
 
 const getModulosHandler = async (req,res)=>{
     const results = await getAllModulos();
@@ -15,5 +15,14 @@ const createModuloHandler = async (req,res)=>{
     }
 }
 
+const deleteModuloHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteModulo(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
+}
 
-module.exports ={getModulosHandler, createModuloHandler}
+module.exports ={getModulosHandler, createModuloHandler, deleteModuloHandler}

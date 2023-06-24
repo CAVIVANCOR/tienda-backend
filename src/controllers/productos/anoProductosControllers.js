@@ -60,17 +60,17 @@ const createAnoProducto = async (regAno)=>{
     };
 };
 
-const deleteAno = async (id)=>{
+const deleteAnoProducto = async (id)=>{
     const transactionEliminarAno = await Ano.sequelize.transaction();
     try {
         let foundAno = await Ano.findByPk(id);
         if (!foundAno) throw new Error('ID Ano de producto No encontrado');
         let foundProductos = await Producto.findAll({where:{AnoId:id, borradoLogico:false}});
         if (foundProductos.length>0) throw new Error('Ano de producto tiene productos asociados');
-        let deletedAno = await foundAno.update({borradoLogico:!foundAno.borradoLogico},{transaction:transactionEliminarAno});
+        let deletedAnoProducto = await foundAno.update({borradoLogico:!foundAno.borradoLogico},{transaction:transactionEliminarAno});
         await transactionEliminarAno.commit();
         console.log('Registro eliminado OK Tabla Ano');
-        return deletedAno;
+        return deletedAnoProducto;
     } catch (error) {
         await transactionEliminarAno.rollback();
         console.log(error.message);
@@ -78,4 +78,4 @@ const deleteAno = async (id)=>{
     };
 };
 
-module.exports = {getAllAnoProducto,createAnoProducto,deleteAno};
+module.exports = {getAllAnoProducto,createAnoProducto,deleteAnoProducto};

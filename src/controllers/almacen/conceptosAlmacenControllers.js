@@ -90,4 +90,20 @@ const deleteConceptoAlmacen = async (id) => {
     };
 }
 
-module.exports = {getAllConceptoAlmacen,createConceptoAlmacen, deleteConceptoAlmacen};
+const updateConceptoAlmacen = async (id,regConceptoAlmacen)=>{
+    const transactionActualizarConceptoAlmacen = await ConceptoAlmacen.sequelize.transaction();
+    try {
+        const foundConceptoAlmacen = await ConceptoAlmacen.findByPk(id);
+        if (!foundConceptoAlmacen) throw new Error("No se a encontrado el ID en la tabla ConceptoAlmacen");
+        let updatedConceptoAlmacen = await foundConceptoAlmacen.update(regConceptoAlmacen,{transaction:transactionActualizarConceptoAlmacen});
+        await transactionActualizarConceptoAlmacen.commit();
+        console.log('Registro actualizado OK Tabla ConceptoAlmacen')
+        return updatedConceptoAlmacen;
+    } catch (error) {
+        await transactionActualizarConceptoAlmacen.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllConceptoAlmacen,createConceptoAlmacen, deleteConceptoAlmacen, updateConceptoAlmacen};

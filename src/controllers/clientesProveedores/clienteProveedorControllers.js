@@ -1,15 +1,15 @@
-const {ClienteProveedor,DirCliProv,Distrito,TipoDocIdentidad,TipoCliProv,CabMovAlmacen,CabCompras,CabVentas} = require("../../db");
+const {ClienteProveedor,Distrito,TipoDocIdentidad,TipoCliProv,CabMovAlmacen,CabCompras,CabVentas, DirCliProv} = require("../../db");
 const axios = require("axios");
 const {Op}=require("sequelize");
 const regClienteProveedorUsuario ={
     where: { borradoLogico: false },
     include:[{
-        Model:TipoDocIdentidad,
-        attributes:["descripcion","codSunat"]
+        model:TipoDocIdentidad,
+        attributes:["descripcion"]
     },{
-        Model:TipoCliProv,
+        model:TipoCliProv,
         attributes:["descripcion","clienteProveedor"]
-    }]
+}]
 };
 const {where,...regClienteProveedorAdmin}=regClienteProveedorUsuario;
 const cleanArray=(arr)=>{
@@ -18,110 +18,131 @@ const cleanArray=(arr)=>{
             id:elem.id,
             razonSocial:elem.razonSocial,
             nombreComercial:elem.nombreComercial,
-            TipoDocIdentidadId:elem.TipoDocIdentidadId,
             numDocIdentidad:elem.numDocIdentidad,
+            telefonos:elem.telefonos,
+            email:elem.email,
             monedaLineaCredito:elem.monedaLineaCredito,
-            monedaMontoAplicaDesc:elem.monedaMontoAplicaDesc,
             lineaCreditoMN:elem.lineaCreditoMN,
             lineaCreditoME:elem.lineaCreditoME,
             saldoAnticiposMN:elem.saldoAnticiposMN,
             saldoAnticiposME:elem.saldoAnticiposME,
+            monedaMontoAplicaDesc:elem.monedaMontoAplicaDesc,
             porcentajeDesc:elem.porcentajeDesc,
             montoAplicaDescMN:elem.montoAplicaDescMN,
             montoAplicaDescME:elem.montoAplicaDescME,
-            TipoCliProvId:elem.TipoCliProvId,
+            idHistorico:elem.id,
             codDirFiscal:elem.codDirFiscal,
             codDirGuia:elem.codDirGuia,
             dirFiscal:elem.dirFiscal,
             dirGuia:elem.dirGuia,
-            telefonos:elem.telefonos,
-            email:elem.email,
-            idHistorico:elem.id,
+            TipoDocIdentidadId:elem.TipoDocIdentidadId,
+            TipoCliProvId:elem.TipoCliProvId,
         };
     });
     return clean;
 };
 
-const cargaBDClienteProveedor = async (data)=>{
-    let transactionCargaBDClienteProveedor = await ClienteProveedor.sequelize.transaction();
+
+const generaDirCliProv = async (data) => {
+    const transactionGeneraDirCliProv = await DirCliProv.sequelize.transaction();
     try {
-        let distritosEncontrado = null;
-        let distritosEncontradosConvertidos = null;
-        let distritosEncontradosConvertidos2 = null;
-        let codDistritoEncontrado = 0;
         await Promise.all(
-            data.map(async(element)=>{
-                codDistritoEncontrado = 0;
-                await ClienteProveedor.create(element);
-                if (element.codDirFiscal === element.codDirGuia){
-                    if (element.codDirFiscal !== "")
-                    {
-                        distritosEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
-                        if (distritosEncontrado){
-                            distritosEncontradosConvertidos = JSON.stringify(distritosEncontrado);
-                            distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
+            data.map(async (element) => {
+                    let codDistritoEncontrado = 0;
+                    let distritoEncontrado = null;
+                    if (element.codDirFiscal === element.codDirGuia && element.codDirFiscal !== '') {
+                        distritoEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
+                        if (distritoEncontrado) {
+                            let distritosEncontradosConvertidos = JSON.stringify(distritoEncontrado);
+                            let distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
                             codDistritoEncontrado = distritosEncontradosConvertidos2.id;
+                            await DirCliProv.create({
+                                direccion: element.dirFiscal,
+                                telefonos: element.telefonos,
+                                email: element.email,
+                                principal: true,
+                                fiscal: true,
+                                ClienteProveedorId: element.id,
+                                DistritoId: Number(codDistritoEncontrado),
+                                idHistorico: 0
+                                }, { transaction: transactionGeneraDirCliProv });
                         }
-                        await DirCliProv.create({
-                            direccion:element.dirFiscal,
-                            telefonos:element.telefonos,
-                            email:element.email,
-                            principal:true,
-                            fiscal:true,
-                            ClienteProveedorId:element.id,
-                            DistritoId:Number(codDistritoEncontrado),
-                            idHistorico:0
-                            }, { transaction: transactionCargaBDClienteProveedor }
-                        );
+                    } 
+                    else if (element.codDirGuia !== '') {
+                            distritoEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
+                            if (distritoEncontrado) {
+                                let distritosEncontradosConvertidos = JSON.stringify(distritoEncontrado);
+                                let distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
+                                codDistritoEncontrado = distritosEncontradosConvertidos2.id;
+                                await DirCliProv.create({
+                                    direccion: element.dirFiscal,
+                                    telefonos: element.telefonos,
+                                    email: element.email,
+                                    principal: true,
+                                    fiscal: true,
+                                    ClienteProveedorId: element.id,
+                                    DistritoId: Number(codDistritoEncontrado),
+                                    idHistorico: 0
+                                }, { transaction: transactionGeneraDirCliProv });
+                            };
+                            distritoEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirGuia}}});
+                            if (distritoEncontrado) {
+                                let distritosEncontradosConvertidos = JSON.stringify(distritoEncontrado);
+                                let distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
+                                codDistritoEncontrado = distritosEncontradosConvertidos2.id;
+                                await DirCliProv.create({
+                                    direccion: element.dirGuia,
+                                    telefonos: element.telefonos,
+                                    email: element.email,
+                                    principal: true,
+                                    fiscal: false,
+                                    ClienteProveedorId: element.id,
+                                    DistritoId: Number(codDistritoEncontrado),
+                                    idHistorico: 0
+                                    }, { transaction: transactionGeneraDirCliProv });
+                            };
                     }
-                }else{
-                    if (element.codDirGuia !== ""){
-                        distritosEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirFiscal}}});
-                        if (distritosEncontrado){
-                            distritosEncontradosConvertidos = JSON.stringify(distritosEncontrado);
-                            distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
-                            codDistritoEncontrado = distritosEncontradosConvertidos2.id;
-                        }
-                        await DirCliProv.create({
-                            direccion:element.dirFiscal,
-                            telefonos:element.telefonos,
-                            email:element.email,
-                            principal:true,
-                            fiscal:true,
-                            ClienteProveedorId:element.id,
-                            DistritoId:Number(codDistritoEncontrado),
-                            idHistorico:0
-                            }, { transaction: transactionCargaBDClienteProveedor }
-                        );
-                        codDistritoEncontrado = 0;
-                        distritosEncontrado = await Distrito.findOne({where:{codSunat:{[Op.iLike]:element.codDirGuia}}});
-                        if (distritosEncontrado){
-                            distritosEncontradosConvertidos = JSON.stringify(distritosEncontrado);
-                            distritosEncontradosConvertidos2 = JSON.parse(distritosEncontradosConvertidos);
-                            codDistritoEncontrado = distritosEncontradosConvertidos2.id;
-                        }
-                        await DirCliProv.create({
-                            direccion:element.dirGuia,
-                            telefonos:element.telefonos,
-                            email:element.email,
-                            principal:true,
-                            fiscal:false,
-                            ClienteProveedorId:element.id,
-                            DistritoId:Number(codDistritoEncontrado),
-                            idHistorico:0
-                            }, { transaction: transactionCargaBDClienteProveedor }
-                        );
-                    }
-                };
             })
-        )
-        await transactionCargaBDClienteProveedor.commit();
-        return 
+        );
+        await transactionGeneraDirCliProv.commit();
     } catch (error) {
-        await transactionCargaBDClienteProveedor.rollback();
-        console.log(error.message)
-        throw new Error(error.message);
+    await transactionGeneraDirCliProv.rollback();
+    console.log(error.message);
+    throw new Error(error.message);
     }
+
+}
+
+const createClienteProveedor = async (regClienteProveedor)=>{
+    const transactionCrearCliProv = await ClienteProveedor.sequelize.transaction();
+    try {
+        let maxIdClienteProveedor = await ClienteProveedor.max('id');
+        let newClienteProveedor = await ClienteProveedor.create({id:maxIdClienteProveedor+1, ...regClienteProveedor}, { transaction: transactionCrearCliProv });
+        await transactionCrearCliProv.commit();
+        console.log('registro creado OK Tabla ClienteProveedor',newClienteProveedor);
+        return newClienteProveedor;
+    } catch (error) {
+        await transactionCrearCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+const cargaBDClienteProveedor = async (data) => {
+    const transactionLoteCrearCliProv = await ClienteProveedor.sequelize.transaction();
+    try {
+        await Promise.all(
+            data.map(async (element) => {
+                await ClienteProveedor.create(element, { transaction: transactionLoteCrearCliProv });   
+            })
+        );
+        await transactionLoteCrearCliProv.commit();
+    } catch (error) {
+        await transactionLoteCrearCliProv.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 };
 
 const getAllClienteProveedor= async (isAdministrator=false)=>{
@@ -134,8 +155,11 @@ const getAllClienteProveedor= async (isAdministrator=false)=>{
         databaseClienteProveedor = await ClienteProveedor.findAll(regClienteProveedor);
         if (databaseClienteProveedor.length===0){
             apiClienteProveedorRaw = (await axios.get('http://192.168.18.15:82/clientesProveedores')).data;
-            apiClienteProveedor = await cleanArray(apiClienteProveedorRaw);
+            apiClienteProveedor = await cleanArray(apiClienteProveedorRaw)
             await cargaBDClienteProveedor(apiClienteProveedor);
+            console.log('Concluyo cargaBDClienteProveedor');
+            await generaDirCliProv(apiClienteProveedor);
+            console.log('Concluyo generaDirCliProv');
             databaseClienteProveedor = await ClienteProveedor.findAll(regClienteProveedor);
         }
         return databaseClienteProveedor;
@@ -145,20 +169,6 @@ const getAllClienteProveedor= async (isAdministrator=false)=>{
     }
 };
 
-const createClienteProveedor = async (regClienteProveedor)=>{
-    const transactionCrearClienteProveedor = await ClienteProveedor.sequelize.transaction();
-    try {
-        let maxIdClienteProveedor = await ClienteProveedor.max('id');
-        let newClienteProveedor = await ClienteProveedor.create({id:maxIdClienteProveedor+1, ...regClienteProveedor}, { transaction: transactionCrearClienteProveedor });
-        await transactionCrearClienteProveedor.commit();
-        console.log('registro creado OK Tabla ClienteProveedor');
-        return newClienteProveedor;
-    } catch (error) {
-        await transactionCrearClienteProveedor.rollback();
-        console.log(error.message);
-        throw new Error(error.message);
-    };
-};
 
 const deleteClienteProveedor = async (id)=>{
     let transactionEliminarClienteProveedor = await ClienteProveedor.sequelize.transaction();

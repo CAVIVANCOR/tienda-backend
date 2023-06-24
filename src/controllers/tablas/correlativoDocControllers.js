@@ -36,7 +36,7 @@ const cargaBDCorrelativoDoc = async (data)=>{
     }
 };
 
-const getAllCorrelativoDoc= async ()=>{
+const getAllCorrelativoDoc= async (isAdministrator=false)=>{
     let databaseCorrelativoDoc = null;
     let apiCorrelativoDocRaw = null;
     let apiCorrelativoDoc = null;

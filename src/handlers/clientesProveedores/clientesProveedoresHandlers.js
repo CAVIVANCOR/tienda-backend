@@ -1,4 +1,4 @@
-const { getAllClienteProveedor, createClienteProveedor } = require("../../controllers/clientesProveedores/clienteProveedorControllers");
+const { getAllClienteProveedor, createClienteProveedor, deleteClienteProveedor } = require("../../controllers/clientesProveedores/clienteProveedorControllers");
 
 const getClienteProveedorHandler = async (req,res)=>{
     const results = await getAllClienteProveedor();
@@ -15,4 +15,14 @@ const createClienteProveedorHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getClienteProveedorHandler, createClienteProveedorHandler};
+const deleteClienteProveedorHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteClienteProveedor(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getClienteProveedorHandler, createClienteProveedorHandler, deleteClienteProveedorHandler};

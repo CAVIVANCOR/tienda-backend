@@ -1,4 +1,4 @@
-const { getAllLadoProducto, createLadoProducto } = require("../../controllers/productos/ladoProductosControllers");
+const { getAllLadoProducto, createLadoProducto, deleteLadoProducto } = require("../../controllers/productos/ladoProductosControllers");
 
 const getLadoProductoHandler = async (req,res)=>{
     const results = await getAllLadoProducto();
@@ -15,4 +15,14 @@ const createLadoProductoHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getLadoProductoHandler, createLadoProductoHandler};
+const deleteLadoProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteLadoProducto(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getLadoProductoHandler, createLadoProductoHandler, deleteLadoProductoHandler};

@@ -78,4 +78,4 @@ const deleteEstadoProducto = async (id)=>{
     };
 }
 
-module.exports = {getAllEstadoProducto,createEstadoProducto};
+module.exports = {getAllEstadoProducto,createEstadoProducto, deleteEstadoProducto};

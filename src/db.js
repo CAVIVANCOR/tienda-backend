@@ -2,7 +2,15 @@
 const {Sequelize} = require("sequelize");
 require("dotenv").config();
 const {DB_USER, DB_PASSWORD, DB_HOST, SERVER_PORT} = process.env;
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/tienda`,{logging:false});
+const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/tienda`,{
+        logging:false, 
+        dialectOptions:{
+                requestTimeout:30000,
+                decimalNumbers:true},
+        parse: {
+                timezone: 'America/Lima'
+        }
+});
 
 //**Definicion de modelos (con sequelize)*/
 //** CAJAYBANCOS */
@@ -203,8 +211,8 @@ ClienteProveedor.belongsTo(TipoCliProv);
 ClienteProveedor.hasMany(Chofer);
 Chofer.belongsTo(ClienteProveedor);
 
-TipoDocIdentidad.hasMany(Chofer);
-Chofer.belongsTo(TipoDocIdentidad);
+// TipoDocIdentidad.hasMany(Chofer);
+// Chofer.belongsTo(TipoDocIdentidad);
 
 
 ClienteProveedor.hasMany(ContactosCliProv);
@@ -313,8 +321,18 @@ UbicaAlmacen.belongsTo(Almacen);
 TipoMovAlmacen.hasMany(ConceptoAlmacen);
 ConceptoAlmacen.belongsTo(TipoMovAlmacen);
 
-DetMovAlmacen.hasMany(KardexAlmacen);
-KardexAlmacen.belongsTo(DetMovAlmacen);
+Producto.hasMany(KardexAlmacen);
+KardexAlmacen.belongsTo(Producto);
+
+ClienteProveedor.hasMany(KardexAlmacen);
+KardexAlmacen.belongsTo(ClienteProveedor);
+
+UbicaAlmacen.hasMany(KardexAlmacen);
+KardexAlmacen.belongsTo(UbicaAlmacen);
+
+EstadoProd.hasMany(KardexAlmacen);
+KardexAlmacen.belongsTo(EstadoProd);
+
 
 //**COMPRAS */
 CabCompras.hasMany(DetCompras);

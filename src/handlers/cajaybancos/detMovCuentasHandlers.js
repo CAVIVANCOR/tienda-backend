@@ -1,4 +1,4 @@
-const { getAllDetMovCuentas, createDetMovCuentas } = require("../../controllers/cajaybancos/detMovCuentasControllers");
+const { getAllDetMovCuentas, createDetMovCuentas, deleteDetMovCuenta } = require("../../controllers/cajaybancos/detMovCuentasControllers");
 
 const getDetMovCuentasHandler = async (req,res)=>{
     const results = await getAllDetMovCuentas();
@@ -15,4 +15,14 @@ const createDetMovCuentasHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getDetMovCuentasHandler, createDetMovCuentasHandler};
+const deleteDetMovCuentasHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteDetMovCuenta(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getDetMovCuentasHandler, createDetMovCuentasHandler, deleteDetMovCuentasHandler};

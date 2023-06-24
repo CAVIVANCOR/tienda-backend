@@ -78,4 +78,4 @@ const deleteMarcaProducto = async (id)=>{
     }
 }
 
-module.exports = {getAllMarcaProducto,createMarcaProducto};
+module.exports = {getAllMarcaProducto,createMarcaProducto, deleteMarcaProducto};

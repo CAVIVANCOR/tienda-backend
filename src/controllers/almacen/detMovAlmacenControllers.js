@@ -17,6 +17,7 @@ const {where,...regDetMovAlmacenAdmin}=regDetMovAlmacenUsuario;
 const cleanArray=(arr)=>{
     const clean = arr.map((elem)=>{
         return {
+            id:elem.id,
             nroLote:elem.nroLote,
             nroEnvase:elem.nroEnvase,
             nroSerie:elem.nroSerie,
@@ -98,8 +99,23 @@ const deleteDetMovAlmacen = async (id)=>{
         await transactionEliminarDetMovAlmacen.rollback();
         console.log(error.message)
         throw new Error(error.message);
-    }
+    };
+};
 
+const updateDetMovAlmacen = async (id,regDetMovAlmacen)=>{
+    let transactionActualizarDetMovAlmacen = await DetMovAlmacen.sequelize.transaction();
+    try {
+        let foundDetMovAlmacen = await DetMovAlmacen.findByPk(id);
+        if (!foundDetMovAlmacen) throw new Error("No se encontro el ID del registro en Detalle Movimientos de Almacen");
+        let updatedDetMovAlmacen = await foundDetMovAlmacen.update(regDetMovAlmacen,{transaction:transactionActualizarDetMovAlmacen});
+        await transactionActualizarDetMovAlmacen.commit();
+        console.log('Registro actualizado OK Tabla DetMovAlmacen')
+        return updatedDetMovAlmacen;
+    } catch (error) {
+        await transactionActualizarDetMovAlmacen.rollback();
+        console.log(error.message)
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllDetMovAlmacen,createDetMovAlmacen,deleteDetMovAlmacen};
+module.exports = {getAllDetMovAlmacen,createDetMovAlmacen,deleteDetMovAlmacen, updateDetMovAlmacen};

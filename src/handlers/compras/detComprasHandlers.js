@@ -1,4 +1,4 @@
-const { getAllDetCompras, createDetCompras } = require("../../controllers/compras/detComprasControllers");
+const { getAllDetCompras, createDetCompras, deleteDetCompras } = require("../../controllers/compras/detComprasControllers");
 
 const getDetComprasHandler = async (req,res)=>{
     const results = await getAllDetCompras();
@@ -15,4 +15,14 @@ const createDetComprasHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getDetComprasHandler, createDetComprasHandler};
+const deleteDetComprasHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteDetCompras(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getDetComprasHandler, createDetComprasHandler, deleteDetComprasHandler};

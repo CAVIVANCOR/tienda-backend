@@ -1,4 +1,4 @@
-const {getAllGrupoCentroCostos, createGrupoCentroCostos} = require("../../controllers/tablas/grupoCentroCostosControllers");
+const {getAllGrupoCentroCostos, createGrupoCentroCostos, deleteGrupoCentroCostos} = require("../../controllers/tablas/grupoCentroCostosControllers");
 
 
 const getGrupoCentroCostosHandler = async (req,res)=>{
@@ -16,4 +16,14 @@ const createGrupoCentroCostosHandler = async (req,res)=>{
     };
 };
 
-module.exports = {getGrupoCentroCostosHandler, createGrupoCentroCostosHandler};
+const deleteGrupoCentroCostosHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteGrupoCentroCostos(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports = {getGrupoCentroCostosHandler, createGrupoCentroCostosHandler, deleteGrupoCentroCostosHandler};

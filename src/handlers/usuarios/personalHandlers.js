@@ -1,4 +1,4 @@
-const { getAllPersonal, createPersona } = require("../../controllers/usuarios/personalControllers");
+const { getAllPersonal, createPersona, deletePersona } = require("../../controllers/usuarios/personalControllers");
 
 const getPersonalHandler = async (req,res)=>{
     const results = await getAllPersonal();
@@ -13,5 +13,16 @@ const createPersonalHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     }
+};
+
+const deletePersonalHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deletePersona(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
 }
-module.exports ={getPersonalHandler,createPersonalHandler}
+
+module.exports ={getPersonalHandler,createPersonalHandler, deletePersonalHandler}

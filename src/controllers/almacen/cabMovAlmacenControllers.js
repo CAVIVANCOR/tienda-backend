@@ -146,4 +146,18 @@ const deleteCabMovAlmacen = async (id) => {
     };
 };
 
-module.exports = {getAllCabMovAlmacen,createCabMovAlmacen, deleteCabMovAlmacen};
+const updateCabMovAlmacen = async (id, regCabMovAlmacen) => {
+    let transactionActualizarCabMovAlmacen = await CabMovAlmacen.sequelize.transaction();
+    try {
+        let foundCabMovAlmacen = await CabMovAlmacen.findByPk(id);
+        if (!foundCabMovAlmacen) throw new Error("No se encontró el ID del registro a actualizar en la tabla CabMovAlmacen");
+        let updatedCabMovAlmacen = await foundCabMovAlmacen.update(regCabMovAlmacen, {transaction:transactionActualizarCabMovAlmacen});
+        await transactionActualizarCabMovAlmacen.commit();
+        return updatedCabMovAlmacen;
+    } catch (error) {
+        await transactionActualizarCabMovAlmacen.rollback();
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllCabMovAlmacen,createCabMovAlmacen, deleteCabMovAlmacen, updateCabMovAlmacen};

@@ -56,6 +56,18 @@ module.exports = (sequelize)=>{
         montoAplicaDescME:{
             type:DataTypes.DECIMAL(12,2),
         },
+        codDirFiscal:{
+            type:DataTypes.STRING,
+        },
+        dirFiscal:{
+            type:DataTypes.STRING,
+        },
+        codDirGuia:{
+            type:DataTypes.STRING,
+        },
+        dirGuia:{
+            type:DataTypes.STRING,
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -70,18 +82,6 @@ module.exports = (sequelize)=>{
         },
         idHistorico:{
             type:DataTypes.INTEGER,
-        },
-        codDirFiscal:{
-            type:DataTypes.STRING,
-        },
-        dirFiscal:{
-            type:DataTypes.STRING,
-        },
-        codDirGuia:{
-            type:DataTypes.STRING,
-        },
-        dirGuia:{
-            type:DataTypes.STRING,
         },
     },
     {

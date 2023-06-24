@@ -1,4 +1,4 @@
-const { getAllAccesos, createAccesos } = require("../../controllers/usuarios/accesoControllers");
+const { getAllAccesos, createAccesos, deleteAcceso } = require("../../controllers/usuarios/accesoControllers");
 
 const getAccesosHandler = async (req,res)=>{
     const results = await getAllAccesos();
@@ -15,4 +15,14 @@ const createAccesosHandler = async (req,res)=>{
     }
 }
 
-module.exports ={getAccesosHandler,createAccesosHandler }
+const deleteAccesoHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteAcceso(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    }
+}
+
+module.exports ={getAccesosHandler,createAccesosHandler, deleteAccesoHandler }

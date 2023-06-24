@@ -1,4 +1,4 @@
-const { getAllEstadoProducto, createEstadoProducto } = require("../../controllers/productos/estadoProductosControllers");
+const { getAllEstadoProducto, createEstadoProducto, deleteEstadoProducto } = require("../../controllers/productos/estadoProductosControllers");
 
 const getEstadoProductoHandler = async (req,res)=>{
     const results = await getAllEstadoProducto();
@@ -15,4 +15,14 @@ const createEstadoProductoHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getEstadoProductoHandler, createEstadoProductoHandler};
+const deleteEstadoProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteEstadoProducto(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getEstadoProductoHandler, createEstadoProductoHandler, deleteEstadoProductoHandler};

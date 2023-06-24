@@ -1,8 +1,9 @@
 const {Router} = require("express");
-const {getTipoExistenciaContHandler,createTipoExistenciaContHandler}=require("../../handlers/productos/tipoExistenciasContHandlers");
+const {getTipoExistenciaContHandler,createTipoExistenciaContHandler, deleteTipoExistenciaContHandler}=require("../../handlers/productos/tipoExistenciasContHandlers");
 const tipoExistenciaContProductosRouter = Router();
 
 tipoExistenciaContProductosRouter.get("/",getTipoExistenciaContHandler);
 tipoExistenciaContProductosRouter.post("/",createTipoExistenciaContHandler);
+tipoExistenciaContProductosRouter.delete("/:id",deleteTipoExistenciaContHandler);
 
 module.exports = tipoExistenciaContProductosRouter;

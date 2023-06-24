@@ -1,6 +1,7 @@
-const { Op } = require("sequelize");
 const {ConceptoMovC, Cuentas,DetMovCuentas} = require("../../db");
 const axios = require("axios");
+const { Op } = require("sequelize");
+
 const regConceptoMovCUsuario ={
     where: { borradoLogico: false },
 };
@@ -33,7 +34,25 @@ const cargaBDConceptoMovC = async (data)=>{
     }
 };
 
-const getAllConceptoMovC= async (isAdministrator=false)=>{
+// const getAllConceptoMovC= async (isAdministrator=false)=>{
+//     let databaseConceptoMovC = null;
+//     let apiConceptoMovCRaw = null;
+//     let apiConceptoMovC = null;
+//     let regConceptoMovC = regConceptoMovCUsuario;
+//     if (isAdministrator) regConceptoMovC = regConceptoMovCAdmin;
+//     databaseConceptoMovC = await ConceptoMovC.findAll(regConceptoMovC);
+//     if (databaseConceptoMovC.length===0){
+//         apiConceptoMovCRaw = (await axios.get('http://192.168.18.15:82/conceptosMovsCuentas')).data;
+//         apiConceptoMovC = await cleanArray(apiConceptoMovCRaw);
+//         await cargaBDConceptoMovC(apiConceptoMovC);
+//         databaseConceptoMovC = await ConceptoMovC.findAll(regConceptoMovC);
+//     }
+
+//     return databaseConceptoMovC;
+// };
+
+const getAllConceptoMovC = async (isAdministrator=false) => {
+    try {
     let databaseConceptoMovC = null;
     let apiConceptoMovCRaw = null;
     let apiConceptoMovC = null;
@@ -46,28 +65,28 @@ const getAllConceptoMovC= async (isAdministrator=false)=>{
         await cargaBDConceptoMovC(apiConceptoMovC);
         databaseConceptoMovC = await ConceptoMovC.findAll(regConceptoMovC);
     }
-    if (databaseConceptoMovC.length > 0){
-        let cuentasOrigenDestino = await Cuentas.findAll({
-            where:{
-                [Op.or]:[{id: idCuentaOrigen}, {id: idCuentaDestino}]
-            }
-        });
-        let descripcionesOrigenDestino = cuentasOrigenDestino.reduce((acc,elem)=>{
-            acc[elem.id] = elem.descripcion;
-            return acc;
-        },{});
-        databaseConceptoMovC = databaseConceptoMovC.map((elem)=>{
-            let idCuentaOrigen = elem.idCuentaOrigen;
-            let idCuentaDestino = elem.idCuentaDestino;
-            return {
-                ...elem.get({plain:true}),
-                descripcionCuentaOrigen:descripcionesOrigenDestino[idCuentaOrigen],
-                descripcionCuentaDestino:descripcionesOrigenDestino[idCuentaDestino],
-            };
-        });
-    };
-    return databaseConceptoMovC;
-};
+      const result = await Promise.all(
+        databaseConceptoMovC.map(async (conceptoMovC) => {
+          const cuentaOrigen = await Cuentas.findByPk(conceptoMovC.idCuentaOrigen, {
+            attributes: ['descripcion'],
+          });
+          const cuentaDestino = await Cuentas.findByPk(conceptoMovC.idCuentaDestino, {
+            attributes: ['descripcion'],
+          });
+          return {
+            ...conceptoMovC.toJSON(),
+            cuentaOrigen: cuentaOrigen.descripcion,
+            cuentaDestino: cuentaDestino.descripcion,
+          };
+        })
+      );
+      return result;
+    } catch (error) {
+      console.log(error.message);
+      throw new Error(error.message);
+    }
+  };
+  
 
 const createConceptoMovC = async (regConceptoMovC)=>{
     const transactionCrearConceptoMovC = await ConceptoMovC.sequelize.transaction();
@@ -104,6 +123,22 @@ const deleteConceptoMovC = async (id)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const updateConceptoMovC = async (id,regConceptoMovC)=>{
+    const transactionActualizarConceptoMovC = await ConceptoMovC.sequelize.transaction();
+    try {
+        let foundConceptoMovC = await ConceptoMovC.findByPk(id);
+        if (!foundConceptoMovC) throw new Error('Registro de la Tabla ConceptoMovC No encontrado');
+        let updatedConceptoMovC = await foundConceptoMovC.update(regConceptoMovC,{transaction:transactionActualizarConceptoMovC});
+        await transactionActualizarConceptoMovC.commit();
+        console.log('Registro actualizado OK Tabla ConceptoMovC')
+        return updatedConceptoMovC;
+    } catch (error) {
+        await transactionActualizarConceptoMovC.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllConceptoMovC,createConceptoMovC, deleteConceptoMovC};
+module.exports = {getAllConceptoMovC,createConceptoMovC, deleteConceptoMovC, updateConceptoMovC};

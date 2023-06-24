@@ -1,10 +1,6 @@
 const {Chofer, TipoDocIdentidad,CabMovAlmacen} = require("../../db");
 const regChoferesUsuario ={
     where: { borradoLogico: false },
-    include:[{
-        model:TipoDocIdentidad,
-        attributes:["descripcion","codSunat"]
-    }]
 };
 const {where,...regChoferesAdmin}=regChoferesUsuario;
 const getAllChofer = async (isAdministrator=false)=>{

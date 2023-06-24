@@ -1,4 +1,4 @@
-const { getAllChofer, createChofer } = require("../../controllers/clientesProveedores/choferesControllers");
+const { getAllChofer, createChofer, deleteChofer } = require("../../controllers/clientesProveedores/choferesControllers");
 
 const getChoferHandler = async (req,res)=>{
     const results = await getAllChofer();
@@ -15,4 +15,14 @@ const createChoferHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getChoferHandler, createChoferHandler};
+const deleteChoferHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteChofer(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getChoferHandler, createChoferHandler, deleteChoferHandler};

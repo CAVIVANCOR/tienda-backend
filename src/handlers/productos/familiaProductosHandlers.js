@@ -1,4 +1,4 @@
-const { getAllFamiliaProducto, createFamiliaProducto } = require("../../controllers/productos/familiaProductosControllers");
+const { getAllFamiliaProducto, createFamiliaProducto, deleteFamiliaProducto } = require("../../controllers/productos/familiaProductosControllers");
 
 const getFamiliaProductoHandler = async (req,res)=>{
     const results = await getAllFamiliaProducto();
@@ -15,4 +15,14 @@ const createFamiliaProductoHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getFamiliaProductoHandler, createFamiliaProductoHandler};
+const deleteFamiliaProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteFamiliaProducto(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getFamiliaProductoHandler, createFamiliaProductoHandler, deleteFamiliaProductoHandler};

@@ -1,4 +1,4 @@
-const { getAllSubFamiliaProducto, createSubFamiliaProducto } = require("../../controllers/productos/subFamiliaProductosControllers");
+const { getAllSubFamiliaProducto, createSubFamiliaProducto, deleteSubFamiliaProducto } = require("../../controllers/productos/subFamiliaProductosControllers");
 
 const getSubFamiliaProductoHandler = async (req,res)=>{
     const results = await getAllSubFamiliaProducto();
@@ -15,4 +15,14 @@ const createSubFamiliaProductoHandler = async (req,res)=>{
     };
 }
 
-module.exports ={getSubFamiliaProductoHandler, createSubFamiliaProductoHandler};
+const deleteSubFamiliaProductoHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteSubFamiliaProducto(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getSubFamiliaProductoHandler, createSubFamiliaProductoHandler, deleteSubFamiliaProductoHandler};

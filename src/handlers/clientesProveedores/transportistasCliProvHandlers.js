@@ -1,4 +1,4 @@
-const { getAllTransportistaCliProv, createTransportistaCliProv } = require("../../controllers/clientesProveedores/transportistaCliProvControllers");
+const { getAllTransportistaCliProv, createTransportistaCliProv, deleteTransportistaCliProv } = require("../../controllers/clientesProveedores/transportistaCliProvControllers");
 
 const getTransportistaCliProvHandler = async (req,res)=>{
     const results = await getAllTransportistaCliProv();
@@ -15,4 +15,14 @@ const createTransportistaCliProvHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getTransportistaCliProvHandler, createTransportistaCliProvHandler};
+const deleteTransportistaCliProvHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteTransportistaCliProv(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getTransportistaCliProvHandler, createTransportistaCliProvHandler, deleteTransportistaCliProvHandler};

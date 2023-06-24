@@ -90,4 +90,20 @@ const deleteCuentas = async (id)=>{
     };
 }
 
-module.exports = {getAllCuentas,createCuentas, deleteCuentas};
+const updateCuentas = async (id,regCuentas)=>{
+    const transactionActualizarCuentas = await Cuentas.sequelize.transaction();
+    try {
+        let foundCuenta = await Cuentas.findByPk(id);
+        if (!foundCuenta) throw new Error('No se encontro ID del registro en la Tabla Cuentas');
+        let updatedCuenta = await foundCuenta.update(regCuentas,{transaction:transactionActualizarCuentas});
+        await transactionActualizarCuentas.commit();
+        console.log('Registro actualizado OK Tabla Cuentas')
+        return updatedCuenta;
+    } catch (error) {
+        await transactionActualizarCuentas.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllCuentas,createCuentas, deleteCuentas, updateCuentas};

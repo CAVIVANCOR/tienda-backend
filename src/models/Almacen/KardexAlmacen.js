@@ -18,23 +18,50 @@ module.exports = (sequelize)=>{
         saldoIniCant:{
             type:DataTypes.DECIMAL(12,2),
         },
-        costoUnitProm:{
-            type:DataTypes.DECIMAL(12,2),
-        },
-        saldoIniCTotMN:{
+        ingCUnit:{
             type:DataTypes.DECIMAL(12,2),
         },
         cantidad:{
             type:DataTypes.DECIMAL(12,2),
         },
-        valorUnitMN:{
+        saldoIniCUnit:{
+            type:DataTypes.DECIMAL(12,2),
+        },
+        saldoIniCTot:{
             type:DataTypes.DECIMAL(12,2),
         },
         saldoFinCant:{
             type:DataTypes.DECIMAL(12,2),
         },
-        saldoFinCTotMN:{
+        saldoFinCUnit:{
             type:DataTypes.DECIMAL(12,2),
+        },
+        saldoFinCTot:{
+            type:DataTypes.DECIMAL(12,2),
+        },
+        idAlmacen:{
+            type:DataTypes.INTEGER,
+        },
+        idCabMovAlmacen:{
+            type:DataTypes.BIGINT,
+        },
+        idDetMovAlmacen:{
+            type:DataTypes.BIGINT,
+        },
+        nroEnvase:{
+            type:DataTypes.STRING,
+        },
+        nroLote:{
+            type:DataTypes.STRING,
+        },
+        nroSerie:{
+            type:DataTypes.STRING,
+        },
+        fechaProduccion:{
+            type:DataTypes.DATEONLY,
+        },
+        fechaVencimiento:{
+            type:DataTypes.DATEONLY,
         },
     },
     {

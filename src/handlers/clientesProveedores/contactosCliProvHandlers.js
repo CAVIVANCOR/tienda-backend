@@ -1,4 +1,4 @@
-const { getAllContactosCliProv, createContactosCliProv } = require("../../controllers/clientesProveedores/contactosCliProvControllers");
+const { getAllContactosCliProv, createContactosCliProv, deleteContactosCliProv } = require("../../controllers/clientesProveedores/contactosCliProvControllers");
 
 const getContactosCliProvHandler = async (req,res)=>{
     const results = await getAllContactosCliProv();
@@ -15,4 +15,14 @@ const createContactosCliProvHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getContactosCliProvHandler, createContactosCliProvHandler};
+const deleteContactosCliProvHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteContactosCliProv(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getContactosCliProvHandler, createContactosCliProvHandler, deleteContactosCliProvHandler};

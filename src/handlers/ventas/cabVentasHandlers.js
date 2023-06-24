@@ -1,4 +1,4 @@
-const { getAllCabVentas, createCabVentas } = require("../../controllers/ventas/cabVentasControllers");
+const { getAllCabVentas, createCabVentas, deleteCabVentas } = require("../../controllers/ventas/cabVentasControllers");
 
 const getCabVentasHandler = async (req,res)=>{
     const results = await getAllCabVentas();
@@ -15,4 +15,14 @@ const createCabVentasHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getCabVentasHandler, createCabVentasHandler};
+const deleteCabVentasHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteCabVentas(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getCabVentasHandler, createCabVentasHandler, deleteCabVentasHandler};

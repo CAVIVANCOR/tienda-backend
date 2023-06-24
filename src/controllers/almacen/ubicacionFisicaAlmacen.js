@@ -98,4 +98,20 @@ const deleteUbicacionFisicaAlmacen = async (id)=>{
     }
 }
 
-module.exports = {getAllUbicacionFisicaAlmacen,createUbicacionFisicaAlmacen, deleteUbicacionFisicaAlmacen};
+const updateUbicacionFisicaAlmacen = async (id,regUbicacionFisicaAlmacen)=>{
+    const transactionActualizarUbicacionFisicaAlmacen = await UbicaAlmacen.sequelize.transaction();
+    try {
+        let foundUbicacionFisicaAlmacen = await UbicaAlmacen.findByPk(id);
+        if (!foundUbicacionFisicaAlmacen) throw new Error('No se ha encontrado el ID de Ubicacion Fisica Almacen');
+        let updatedUbicacionFisicaAlmacen = await foundUbicacionFisicaAlmacen.update(regUbicacionFisicaAlmacen,{transaction:transactionActualizarUbicacionFisicaAlmacen});
+        await transactionActualizarUbicacionFisicaAlmacen.commit();
+        console.log('Registro actualizado OK Tabla UbicacionFisicaAlmacen')
+        return updatedUbicacionFisicaAlmacen;
+    } catch (error) {
+        await transactionActualizarUbicacionFisicaAlmacen.rollback();
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+}
+
+module.exports = {getAllUbicacionFisicaAlmacen,createUbicacionFisicaAlmacen, deleteUbicacionFisicaAlmacen, updateUbicacionFisicaAlmacen};

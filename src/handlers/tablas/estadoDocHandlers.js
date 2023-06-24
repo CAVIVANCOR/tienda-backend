@@ -1,4 +1,4 @@
-const {getAllEstadoDoc, createEstadoDoc} = require("../../controllers/tablas/estadoDocControllers");
+const {getAllEstadoDoc, createEstadoDoc, deleteEstadoDoc} = require("../../controllers/tablas/estadoDocControllers");
 
 const getEstadoDocHandler = async (req,res)=>{
     const results = await getAllEstadoDoc();
@@ -15,4 +15,14 @@ const createEstadoDocHandler = async (req,res)=>{
     };
 };
 
-module.exports = {getEstadoDocHandler, createEstadoDocHandler};
+const deleteEstadoDocHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteEstadoDoc(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports = {getEstadoDocHandler, createEstadoDocHandler, deleteEstadoDocHandler};

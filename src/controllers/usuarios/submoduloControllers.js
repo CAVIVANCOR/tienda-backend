@@ -7,7 +7,7 @@ const regSubModuloUsuario ={
     }]
 };
 const {where,...regSubModuloAdmin}=regSubModuloUsuario;
-const getAllSubModulos= async ()=>{
+const getAllSubModulos= async (isAdministrator=false)=>{
     let regSubModulo = regSubModuloUsuario;
     if (isAdministrator) regSubModulo = regSubModuloAdmin;
     let databaseSubModulos = await SubModulo.findAll(regSubModulo);

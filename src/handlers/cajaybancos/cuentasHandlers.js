@@ -1,4 +1,4 @@
-const { getAllCuentas, createCuentas } = require("../../controllers/cajaybancos/cuentasControllers");
+const { getAllCuentas, createCuentas, deleteCuentas } = require("../../controllers/cajaybancos/cuentasControllers");
 
 const getCuentasHandler = async (req,res)=>{
     const results = await getAllCuentas();
@@ -15,4 +15,14 @@ const createCuentasHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getCuentasHandler, createCuentasHandler};
+const deleteCuentasHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deleteCuentas(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getCuentasHandler, createCuentasHandler, deleteCuentasHandler};

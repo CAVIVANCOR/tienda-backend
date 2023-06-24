@@ -1,4 +1,4 @@
-const { getAllPais, createPais } = require("../../controllers/clientesProveedores/paisesControllers");
+const { getAllPais, createPais, deletePais } = require("../../controllers/clientesProveedores/paisesControllers");
 
 const getPaisHandler = async (req,res)=>{
     const results = await getAllPais();
@@ -15,4 +15,14 @@ const createPaisHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getPaisHandler, createPaisHandler};
+const deletePaisHandler = async (req,res)=>{
+    const id = req.params.id;
+    try {
+        const results = await deletePais(id);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getPaisHandler, createPaisHandler, deletePaisHandler};
