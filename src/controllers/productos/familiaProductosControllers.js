@@ -92,6 +92,29 @@ const updateFamiliaProducto = async (id,regFamiliaProducto)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllFamiliaProducto,createFamiliaProducto, deleteFamiliaProducto, updateFamiliaProducto};
+const searchFamiliaProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundFamiliaProducto = await Familia.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchFamiliaProducto:Registros encontrados en Tabla Familia",foundFamiliaProducto, foundFamiliaProducto.length);
+        return foundFamiliaProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllFamiliaProducto,createFamiliaProducto, deleteFamiliaProducto, updateFamiliaProducto, searchFamiliaProducto};

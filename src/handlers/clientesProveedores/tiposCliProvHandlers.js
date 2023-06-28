@@ -1,4 +1,4 @@
-const { getAllTipoCliProv, createTipoCliProv, deleteTipoCliProv, updateTipoCliProv } = require("../../controllers/clientesProveedores/tiposCliProvControllers");
+const { getAllTipoCliProv, createTipoCliProv, deleteTipoCliProv, updateTipoCliProv, searchTiposCliProv } = require("../../controllers/clientesProveedores/tiposCliProvControllers");
 
 const getTipoCliProvHandler = async (req,res)=>{
     const results = await getAllTipoCliProv();
@@ -34,6 +34,16 @@ const updateTipoCliProvHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getTipoCliProvHandler, createTipoCliProvHandler, deleteTipoCliProvHandler, updateTipoCliProvHandler};
+const searchTiposCliProvHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchTiposCliProv(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getTipoCliProvHandler, createTipoCliProvHandler, deleteTipoCliProvHandler, updateTipoCliProvHandler, searchTiposCliProvHandler};

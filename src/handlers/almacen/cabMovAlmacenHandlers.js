@@ -1,4 +1,4 @@
-const { getAllCabMovAlmacen, createCabMovAlmacen, deleteCabMovAlmacen, updateCabMovAlmacen } = require("../../controllers/almacen/cabMovAlmacenControllers");
+const { getAllCabMovAlmacen, createCabMovAlmacen, deleteCabMovAlmacen, updateCabMovAlmacen, searchByCabMovAlmacen } = require("../../controllers/almacen/cabMovAlmacenControllers");
 
 const getCabMovAlmacenHandler = async (req,res)=>{
     const results = await getAllCabMovAlmacen();
@@ -36,4 +36,14 @@ const updateCabMovAlmacenHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getCabMovAlmacenHandler, createCabMovAlmacenHandler, deleteCabMovAlmacenHandler, updateCabMovAlmacenHandler};
+const searchByCabMovAlmacenHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchByCabMovAlmacen(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getCabMovAlmacenHandler, createCabMovAlmacenHandler, deleteCabMovAlmacenHandler, updateCabMovAlmacenHandler, searchByCabMovAlmacenHandler};

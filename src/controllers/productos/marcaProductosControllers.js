@@ -94,4 +94,27 @@ const updateMarcaProducto = async (id,regMarcaProducto)=>{
     };
 };
 
-module.exports = {getAllMarcaProducto,createMarcaProducto, deleteMarcaProducto, updateMarcaProducto};
+const searchMarcaProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundMarcaProducto = await Marca.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchMarcaProducto:Registros encontrados en Tabla MarcaProducto",foundMarcaProducto, foundMarcaProducto.length);
+        return foundMarcaProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllMarcaProducto,createMarcaProducto, deleteMarcaProducto, updateMarcaProducto, searchMarcaProducto};

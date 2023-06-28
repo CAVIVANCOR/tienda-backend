@@ -1,4 +1,4 @@
-const { getAllDetVentas, createDetVentas, deleteDetVentas, updateDetVentas } = require("../../controllers/ventas/detVentasControllers");
+const { getAllDetVentas, createDetVentas, deleteDetVentas, updateDetVentas, searchDetVentas } = require("../../controllers/ventas/detVentasControllers");
 
 const getDetVentasHandler = async (req,res)=>{
     const results = await getAllDetVentas();
@@ -34,6 +34,16 @@ const updateDetVentasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchDetVentasHandler = async (req,res)=>{
+    let registroDetVentas = req.body;
+    try {
+        const results = await searchDetVentas(registroDetVentas);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getDetVentasHandler, createDetVentasHandler, deleteDetVentasHandler, updateDetVentasHandler};
+module.exports ={getDetVentasHandler, createDetVentasHandler, deleteDetVentasHandler, updateDetVentasHandler, searchDetVentasHandler};

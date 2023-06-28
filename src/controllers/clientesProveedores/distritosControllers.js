@@ -109,6 +109,29 @@ const updateDistrito = async (id,regDistrito)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllDistrito,createDistrito,deleteDistrito, updateDistrito};
+const searchDistritos = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsDistrito = await Distrito.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchDistritos:Registros encontrados en Tabla Distrito",foundRegsDistrito, foundRegsDistrito.length);
+        return foundRegsDistrito;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllDistrito,createDistrito,deleteDistrito, updateDistrito, searchDistritos};

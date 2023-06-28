@@ -160,4 +160,68 @@ const updateDetVentas = async (id,regDetVentas)=>{
     };
 };
 
-module.exports = {getAllDetVentas,createDetVentas,deleteDetVentas, updateDetVentas};   
+const searchDetVentas = async (search)=>{
+    try {
+        let buscar = {};
+        if (search.fecha !== undefined) {
+            buscar['$CabVentas.fecha$'] = { [Op.eq]: search.fecha };
+            delete search.fecha;
+        };
+        if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
+            buscar['$CabVentas.fecha$'] = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
+            delete search.fechaInicial;
+            delete search.fechaFinal;
+        } else if (search.fechaInicial !== undefined) {
+            buscar['$CabVentas.fecha$'] = { [Op.gte]: search.fechaInicial };
+            delete search.fechaInicial;
+        } else if (search.fechaFinal !== undefined) {
+            buscar['$CabVentas.fecha$'] = { [Op.lte]: search.fechaFinal };
+            delete search.fechaFinal;
+        };
+        if (search.razonSocial !== undefined) {
+            buscar['$CabVentas.ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial}%` };
+            delete search.razonSocial;
+        };
+        if (search.descripcion !== undefined) {
+            buscar['$Producto.descripcion$'] = { [Op.like]: `%${search.descripcion}%` };
+            delete search.descripcion;
+        };
+        if (search.codigoProveedor !== undefined) {
+            buscar['$Producto.codigoProveedor$'] = { [Op.like]: `%${search.codigoProveedor}%` };
+            delete search.codigoProveedor;
+        };
+        if (search.cantidad !== undefined) {
+            buscar.cantidad = { [Op.gt]: search.cantidad };
+        };
+        for (let [key,value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        }
+        let foundDetVentas = await DetVentas.findAll({
+            where: buscar,
+            include: [{
+                        model: CabVentas,
+                        required:true,
+                        include:[{
+                                    model: ClienteProveedor,
+                                    required:true,
+                                }
+                        ]
+                    },{
+                        model:Producto,
+                        required:true
+                    }]
+            });
+            console.log("searchDetVentas:Registros encontrados en Tabla DetVentas",foundDetVentas, foundDetVentas.length);
+            return foundDetVentas;
+    } catch (error) {
+        console.log(error.message)
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllDetVentas,createDetVentas,deleteDetVentas, updateDetVentas, searchDetVentas};   

@@ -1,4 +1,4 @@
-const { getAllTipoMovAlmacen, createTipoMovAlmacen, deleteTipoMovAlmacen, updateTipoMovAlmacen } = require("../../controllers/almacen/tipoMovAlmacenControllers");
+const { getAllTipoMovAlmacen, createTipoMovAlmacen, deleteTipoMovAlmacen, updateTipoMovAlmacen, searchTipoMovAlmacen } = require("../../controllers/almacen/tipoMovAlmacenControllers");
 
 const getTipoMovAlmacenHandler = async (req,res)=>{
     const results = await getAllTipoMovAlmacen();
@@ -36,4 +36,14 @@ const updateTipoMovAlmacenHandler = async (req,res)=>{
     };
 }
 
-module.exports ={getTipoMovAlmacenHandler, createTipoMovAlmacenHandler, deleteTipoMovAlmacenHandler, updateTipoMovAlmacenHandler};
+const searchTipoMovAlmacenHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchTipoMovAlmacen(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getTipoMovAlmacenHandler, createTipoMovAlmacenHandler, deleteTipoMovAlmacenHandler, updateTipoMovAlmacenHandler, searchTipoMovAlmacenHandler};

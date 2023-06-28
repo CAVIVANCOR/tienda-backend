@@ -1,4 +1,4 @@
-const { getAllDetCompras, createDetCompras, deleteDetCompras, updateDetCompras } = require("../../controllers/compras/detComprasControllers");
+const { getAllDetCompras, createDetCompras, deleteDetCompras, updateDetCompras, searchDetCompras } = require("../../controllers/compras/detComprasControllers");
 
 const getDetComprasHandler = async (req,res)=>{
     const results = await getAllDetCompras();
@@ -34,6 +34,16 @@ const updateDetComprasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchDetComprasHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchDetCompras(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getDetComprasHandler, createDetComprasHandler, deleteDetComprasHandler, updateDetComprasHandler};
+module.exports ={getDetComprasHandler, createDetComprasHandler, deleteDetComprasHandler, updateDetComprasHandler, searchDetComprasHandler};

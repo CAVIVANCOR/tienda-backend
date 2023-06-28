@@ -60,4 +60,27 @@ const updateRol = async (id,regRol)=>{
     };
 };
 
-module.exports = {getAllRoles,createRol,deleteRol, updateRol};
+const searchRol = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRol = await Rol.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchRol:Registros encontrados en Tabla Rol",foundRol, foundRol.length);
+        return foundRol;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllRoles,createRol,deleteRol, updateRol, searchRol};

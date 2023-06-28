@@ -154,6 +154,70 @@ const updateDetCompras = async (id,regDetCompras)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllDetCompras,createDetCompras,deleteDetCompras, updateDetCompras};
+const searchDetCompras = async (search)=>{
+    try {
+        let buscar = {};
+        if (search.fecha !== undefined) {
+            buscar['$CabCompras.fecha$'] = { [Op.eq]: search.fecha };
+            delete search.fecha;
+        };
+        if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
+            buscar['$CabCompras.fecha$'] = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
+            delete search.fechaInicial;
+            delete search.fechaFinal;
+        } else if (search.fechaInicial !== undefined) {
+            buscar['$CabCompras.fecha$'] = { [Op.gte]: search.fechaInicial };
+            delete search.fechaInicial;
+        } else if (search.fechaFinal !== undefined) {
+            buscar['$CabCompras.fecha$'] = { [Op.lte]: search.fechaFinal };
+            delete search.fechaFinal;
+        };
+        if (search.razonSocial !== undefined) {
+            buscar['$CabCompras.ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial}%` };
+            delete search.razonSocial;
+        };
+        if (search.descripcion !== undefined) {
+            buscar['$Producto.descripcion$'] = { [Op.like]: `%${search.descripcion}%` };
+            delete search.descripcion;
+        };
+        if (search.codigoProveedor !== undefined) {
+            buscar['$Producto.codigoProveedor$'] = { [Op.like]: `%${search.codigoProveedor}%` };
+            delete search.codigoProveedor;
+        };
+        if (search.cantidad !== undefined) {
+            buscar.cantidad = { [Op.gt]: search.cantidad };
+        };
+        for (let [key,value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        }
+        let foundDetCompras = await DetCompras.findAll({
+            where: buscar,
+            include: [{
+                        model: CabCompras,
+                        required:true,
+                        include:[{
+                                    model: ClienteProveedor,
+                                    required:true,
+                                }
+                        ]
+                    },{
+                        model:Producto,
+                        required:true
+                    }]
+            });
+            console.log("searchDetCompras:Registros encontrados en Tabla DetCompras",foundDetCompras, foundDetCompras.length);
+            return foundDetCompras;
+    } catch (error) {
+        console.log(error.message)
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllDetCompras,createDetCompras,deleteDetCompras, updateDetCompras, searchDetCompras};

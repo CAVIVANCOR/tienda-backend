@@ -1,4 +1,4 @@
-const { getAllBancos, createBancos, deleteBanco, updateBanco } = require("../../controllers/clientesProveedores/bancosControllers");
+const { getAllBancos, createBancos, deleteBanco, updateBanco, searchBancos } = require("../../controllers/clientesProveedores/bancosControllers");
 
 const getBancosHandler = async (req,res)=>{
     const results = await getAllBancos();
@@ -34,6 +34,17 @@ const updateBancoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getBancosHandler, createBancosHandler, deleteBancoHandler, updateBancoHandler};
+const searchBancosHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchBancos(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getBancosHandler, createBancosHandler, deleteBancoHandler, updateBancoHandler, searchBancosHandler};
+

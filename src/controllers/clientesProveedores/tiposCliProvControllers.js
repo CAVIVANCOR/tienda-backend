@@ -95,6 +95,28 @@ const updateTipoCliProv = async (id,regTipoCliProv)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
+const searchTiposCliProv = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsTipoCliProv = await TipoCliProv.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchTiposCliProv:Registros encontrados en Tabla TipoCliProv",foundRegsTipoCliProv, foundRegsTipoCliProv.length);
+        return foundRegsTipoCliProv;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
 
-module.exports = {getAllTipoCliProv,createTipoCliProv,deleteTipoCliProv, updateTipoCliProv};
+module.exports = {getAllTipoCliProv,createTipoCliProv,deleteTipoCliProv, updateTipoCliProv, searchTiposCliProv};

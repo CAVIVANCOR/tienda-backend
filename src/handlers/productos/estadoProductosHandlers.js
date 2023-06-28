@@ -1,4 +1,4 @@
-const { getAllEstadoProducto, createEstadoProducto, deleteEstadoProducto, updateEstadoProducto } = require("../../controllers/productos/estadoProductosControllers");
+const { getAllEstadoProducto, createEstadoProducto, deleteEstadoProducto, updateEstadoProducto, searchEstadoProducto } = require("../../controllers/productos/estadoProductosControllers");
 
 const getEstadoProductoHandler = async (req,res)=>{
     const results = await getAllEstadoProducto();
@@ -34,6 +34,16 @@ const updateEstadoProductoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchEstadoProductoHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchEstadoProducto(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getEstadoProductoHandler, createEstadoProductoHandler, deleteEstadoProductoHandler, updateEstadoProductoHandler};
+module.exports ={getEstadoProductoHandler, createEstadoProductoHandler, deleteEstadoProductoHandler, updateEstadoProductoHandler, searchEstadoProductoHandler};

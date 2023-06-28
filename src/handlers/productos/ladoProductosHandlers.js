@@ -1,4 +1,4 @@
-const { getAllLadoProducto, createLadoProducto, deleteLadoProducto, updateLadoProducto } = require("../../controllers/productos/ladoProductosControllers");
+const { getAllLadoProducto, createLadoProducto, deleteLadoProducto, updateLadoProducto, searchLadoProducto } = require("../../controllers/productos/ladoProductosControllers");
 
 const getLadoProductoHandler = async (req,res)=>{
     const results = await getAllLadoProducto();
@@ -34,6 +34,16 @@ const updateLadoProductoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchLadoProductoHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchLadoProducto(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getLadoProductoHandler, createLadoProductoHandler, deleteLadoProductoHandler, updateLadoProductoHandler};
+module.exports ={getLadoProductoHandler, createLadoProductoHandler, deleteLadoProductoHandler, updateLadoProductoHandler, searchLadoProductoHandler};

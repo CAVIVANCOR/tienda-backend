@@ -85,8 +85,9 @@ const cargaBDKardexAlmacen = async (data)=>{
             data.map(async(element)=>{
                 await KardexAlmacen.create(element);
             })
-        )
-        return 
+        );
+        console.log("Concluyo con Exito cargaBDKardexAlmacen")
+        return true;
     } catch (error) {
         console.log(error.message)
     }
@@ -103,9 +104,19 @@ const getAllKardexAlmacen= async (isAdministrator=false)=>{
         apiKardexAlmacenRaw = (await axios.get('http://192.168.18.15:82/kardexAlmacen')).data;
         apiKardexAlmacen = await cleanArray(apiKardexAlmacenRaw);
         await cargaBDKardexAlmacen(apiKardexAlmacen);
-        // await regeneraKardexAlmacen(396582, 11, 7);
-        // await regeneraKardexAlmacen(723240, 4, 7718);
-        // await regeneraKardexAlmacen(811195, 8, 5233);
+        // let dataEncontrada = await searchKardexAlmacen({codigoProveedor:"CAVR130772"})
+        // console.log("dataEncontrada",dataEncontrada);
+        // let dataEncontrada2 = await searchKardexAlmacen({codigoProveedor:"CAVR130772lñdklñfasdk"})
+        // console.log("dataEncontrada2",dataEncontrada2);
+        // let dataEncontrada3 = await searchKardexAlmacen({codigoProveedor:"CAVR130772", fechaInicial:"2016-01-01", fechaFinal:"2019-12-19"});
+        // console.log("dataEncontrada3",dataEncontrada3);
+        // let dataEncontrada4 = await searchKardexAlmacen({codigoProveedor:"CAVR130772", fechaInicial:"2016-01-01"});
+        // console.log("dataEncontrada4",dataEncontrada4);
+        // let dataEncontrada5 = await searchKardexAlmacen({codigoProveedor:"CAVR130772",  fechaFinal:"2019-12-19"});
+        // console.log("dataEncontrada5",dataEncontrada5);
+      //  await regeneraKardexAlmacen(396582, 11, 7);
+      //  await regeneraKardexAlmacen(723240, 4, 7718);
+      //  await regeneraKardexAlmacen(811195, 8, 5233);
         //console.log("result regeneraKardexAlmacen",result.kardexGeneradoOrigen,result.kardexGeneradoDestino);
         databaseKardexAlmacen = await KardexAlmacen.findAll(regKardexAlmacen);
     };
@@ -155,41 +166,26 @@ const deleteKardexAlmacen = async (idDetMovAlmacen)=>{
 
 const busquedaKardexAlmacen = async (tipoConsulta, ProductoId, fechaInicio, fechaFin, idAlmacen, nroLote, nroEnvase, nroSerie, fechaProduccion, fechaVencimiento, idUbicacionFisica, idEstadoProducto) => {
     try {
+      //**  Para realizar el Kardex por Almacen y Producto */
       let where = {};
-      if (tipoConsulta) { // Para realizar el Kardex por Producto
-        where.ProductoId = ProductoId;
-        if (fechaInicio) {
-          where.fecha = {
-            [Op.gte]: fechaInicio
-          };
-          if (fechaFin) {
-            where.fecha[Op.lte] = fechaFin;
-          }
-        } else if (fechaFin) {
-          where.fecha = {
-            [Op.lt]: fechaFin
-          };
+      where.ProductoId = ProductoId;
+      if (fechaInicio) {
+        where.fecha = {
+          [Op.gte]: fechaInicio
+        };
+        if (fechaFin) {
+          where.fecha[Op.lte] = fechaFin;
         }
-        if (idAlmacen) {
-          where.idAlmacen = idAlmacen;
-        }
-      } else { // Para realizar el Kardex por Almacen y el resto de Variables
-        where.ProductoId = ProductoId;
-        if (fechaInicio) {
-          where.fecha = {
-            [Op.gte]: fechaInicio
-          };
-          if (fechaFin) {
-            where.fecha[Op.lte] = fechaFin;
-          }
-        } else if (fechaFin) {
-          where.fecha = {
-            [Op.lt]: fechaFin
-          };
-        }
-        if (idAlmacen) {
-          where.idAlmacen = idAlmacen;
-        }
+      } else if (fechaFin) {
+        where.fecha = {
+          [Op.lt]: fechaFin
+        };
+      }
+      if (idAlmacen) {
+        where.idAlmacen = idAlmacen;
+      }
+      //** Para realizar el Kardex por Nro Lote, Envase, Serie, Fecha Produccion, Fecha Vencimiento, Ubicacion Fisica, Estado Producto */
+      if (!tipoConsulta) { 
         if (nroLote) {
           where.nroLote = {
             [Op.like]: `%${nroLote}%`
@@ -246,68 +242,65 @@ const busquedaKardexAlmacen = async (tipoConsulta, ProductoId, fechaInicio, fech
 
 const generaSaldosKardexProducto = async (regKardexgenerado)=>{
     let transactionGeneraSaldosKardexProducto = await KardexAlmacen.sequelize.transaction();
+    let tipoBusquedaKardex = true;
     try {
-        let [
-            foundKardexaAlmacenSI,
-            foundKardexaAlmacenSF,
-            foundProducto,
-          ] = await Promise.all([
-            busquedaKardexAlmacen(true,
-                regKardexgenerado.ProductoId,
-                null,
-                regKardexgenerado.fecha,
-                regKardexgenerado.idAlmacen,
-                regKardexgenerado.nroLote,
-                regKardexgenerado.nroEnvase,
-                regKardexgenerado.nroSerie,
-                regKardexgenerado.fechaProduccion,
-                regKardexgenerado.fechaVencimiento,
-                regKardexgenerado.UbicaAlmacenId,
-                regKardexgenerado.EstadoProdId
+      foundProducto = await Producto.findByPk(regKardexgenerado.ProductoId);
+      for (let i = 0; i < 2; i++) {
+        if (i===1) tipoBusquedaKardex = false;
+        let [foundKardexaAlmacenSI, foundKardexaAlmacenSF,] = await Promise.all([
+          busquedaKardexAlmacen(
+            tipoBusquedaKardex,
+            regKardexgenerado.ProductoId,
+            null,
+            regKardexgenerado.fecha,
+            regKardexgenerado.idAlmacen,
+            regKardexgenerado.nroLote,
+            regKardexgenerado.nroEnvase,
+            regKardexgenerado.nroSerie,
+            regKardexgenerado.fechaProduccion,
+            regKardexgenerado.fechaVencimiento,
+            regKardexgenerado.UbicaAlmacenId,
+            regKardexgenerado.EstadoProdId
             ),
-            busquedaKardexAlmacen(true,
-                regKardexgenerado.ProductoId,
-                regKardexgenerado.fecha,
-                null,
-                regKardexgenerado.idAlmacen,
-                regKardexgenerado.nroLote,
-                regKardexgenerado.nroEnvase,
-                regKardexgenerado.nroSerie,
-                regKardexgenerado.fechaProduccion,
-                regKardexgenerado.fechaVencimiento,
-                regKardexgenerado.UbicaAlmacenId,
-                regKardexgenerado.EstadoProdId
-            ),
-            Producto.findByPk(regKardexgenerado.ProductoId),
+          busquedaKardexAlmacen(tipoBusquedaKardex,
+            regKardexgenerado.ProductoId,
+            regKardexgenerado.fecha,
+            null,
+            regKardexgenerado.idAlmacen,
+            regKardexgenerado.nroLote,
+            regKardexgenerado.nroEnvase,
+            regKardexgenerado.nroSerie,
+            regKardexgenerado.fechaProduccion,
+            regKardexgenerado.fechaVencimiento,
+            regKardexgenerado.UbicaAlmacenId,
+            regKardexgenerado.EstadoProdId
+            )
         ]);
         let lastIndex = 0;
         let saldoCantidad = 0;
         let costoPromUnitario = 0;
         let costoTotal = 0;
         let costoUnitUltCompra = 0;
-       //console.log('foundKardexaAlmacenSI', foundKardexaAlmacenSI.length);
-        //console.log('foundKardexaAlmacenSF', foundKardexaAlmacenSF.length);
         if (foundKardexaAlmacenSI.length>0){
           lastIndex = foundKardexaAlmacenSI.length - 1;
           saldoCantidad = foundKardexaAlmacenSI[lastIndex].saldoFinCant === null ? 0 : (+foundKardexaAlmacenSI[lastIndex].saldoFinCant);
           costoPromUnitario = foundKardexaAlmacenSI[lastIndex].saldoFinCUnit === null ? 0 : (+foundKardexaAlmacenSI[lastIndex].saldoFinCUnit);
           costoTotal = foundKardexaAlmacenSI[lastIndex].saldoFinCTot === null ? 0 : (+foundKardexaAlmacenSI[lastIndex].saldoFinCTot);  
-        }
+        };
         await Promise.all(foundKardexaAlmacenSF.map(async (kardex) => {
-          //console.log("Inicio: idDetMovAlmacen",kardex.idDetMovAlmacen,"kardex.ingCUnit",kardex.ingCUnit);
-            kardex.saldoIniCant = (+saldoCantidad).toFixed(2);
-            kardex.saldoIniCUnit = (+costoPromUnitario).toFixed(2);
-            kardex.saldoIniCTot = (+costoTotal).toFixed(2);
-            if (kardex.ingEgr) {
-                saldoCantidad = (+saldoCantidad) + (+kardex.cantidad);
-                if ((+kardex.ingCUnit) > 0){
-                    costoUnitUltCompra= (+kardex.ingCUnit).toFixed(2);
-                    costoPromUnitario = ((+kardex.saldoIniCTot) + ((+kardex.ingCUnit) * (+kardex.cantidad))) / (+saldoCantidad);
-                    costoTotal= (+costoPromUnitario) * (+saldoCantidad);
-                } else {
-                    costoPromUnitario = ((+kardex.saldoIniCTot) + ((+kardex.saldoIniCUnit) * (+kardex.cantidad))) / (+saldoCantidad);
-                    costoTotal= (+costoPromUnitario) * (+saldoCantidad);
-                }
+          kardex.saldoIniCant = (+saldoCantidad).toFixed(2);
+          kardex.saldoIniCUnit = (+costoPromUnitario).toFixed(2);
+          kardex.saldoIniCTot = (+costoTotal).toFixed(2);
+          if (kardex.ingEgr) {
+              saldoCantidad = (+saldoCantidad) + (+kardex.cantidad);
+              if ((+kardex.ingCUnit) > 0){
+                costoUnitUltCompra= (+kardex.ingCUnit).toFixed(2);
+                costoPromUnitario = ((+kardex.saldoIniCTot) + ((+kardex.ingCUnit) * (+kardex.cantidad))) / (+saldoCantidad);
+                costoTotal= (+costoPromUnitario) * (+saldoCantidad);
+              } else {
+                costoPromUnitario = ((+kardex.saldoIniCTot) + ((+kardex.saldoIniCUnit) * (+kardex.cantidad))) / (+saldoCantidad);
+                costoTotal= (+costoPromUnitario) * (+saldoCantidad);
+              }
             } else {
               kardex.ingCUnit = 0;
               saldoCantidad = (+saldoCantidad) - (+kardex.cantidad);
@@ -324,15 +317,15 @@ const generaSaldosKardexProducto = async (regKardexgenerado)=>{
             kardex.saldoFinCant = (+saldoCantidad).toFixed(2);
             kardex.saldoFinCUnit = (+costoPromUnitario).toFixed(2);
             kardex.saldoFinCTot = (+costoTotal).toFixed(2);
-            //console.log("kardex", kardex.toJSON());
             await kardex.save({ transaction: transactionGeneraSaldosKardexProducto });
-          }));
-            if ((+costoUnitUltCompra) > 0 && foundProducto) {
-                await foundProducto.update({ costoUnitarioMN: (+costoUnitUltCompra) },{ transaction: transactionGeneraSaldosKardexProducto });
-              }
-        await transactionGeneraSaldosKardexProducto.commit();
-        console.log("Concluyo Calculo Saldos Kardex");
-        return foundKardexaAlmacenSF;
+        }));
+        if (((+costoUnitUltCompra) > 0) && foundProducto && tipoBusquedaKardex===true) {
+          await foundProducto.update({ costoUnitarioMN: (+costoUnitUltCompra) },{ transaction: transactionGeneraSaldosKardexProducto });
+        };
+      };
+      await transactionGeneraSaldosKardexProducto.commit();
+      console.log("Concluyo Calculo Saldos Kardex Almacen");
+      return true;
     } catch (error) {
         await transactionGeneraSaldosKardexProducto.rollback();
         console.log(error.message);
@@ -435,4 +428,93 @@ const regeneraKardexAlmacen = async (idDetMovAlmacen, idConceptoAlmacen, idClien
     };
 };
 
-module.exports = {getAllKardexAlmacen,createKardexAlmacen, deleteKardexAlmacen, regeneraKardexAlmacen};
+
+const searchKardexAlmacen = async (search)=>{
+  try {
+    let buscar = {};
+    if (search.razonSocial !== undefined) {
+      buscar['$ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial}%` };
+      delete search.razonSocial;
+  };
+  if (search.descripcion !== undefined) {
+      buscar['$Producto.descripcion$'] = { [Op.like]: `%${search.descripcion}%` };
+      delete search.descripcion;
+  };
+  if (search.codigoProveedor !== undefined) {
+      buscar['$Producto.codigoProveedor$'] = { [Op.like]: `%${search.codigoProveedor}%` };
+      delete search.codigoProveedor;
+  };
+  if (search.fecha !== undefined) {
+    buscar.fecha = { [Op.eq]: search.fecha };
+    delete search.fecha;
+  };
+  if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
+      buscar.fecha = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
+      delete search.fechaInicial;
+      delete search.fechaFinal;
+  } else if (search.fechaInicial !== undefined) {
+      buscar.fecha = { [Op.gte]: search.fechaInicial };
+      delete search.fechaInicial;
+  } else if (search.fechaFinal !== undefined) {
+      buscar.fecha = { [Op.lte]: search.fechaFinal };
+      delete search.fechaFinal;
+  };
+  if (search.fechaProduccion !== undefined) {
+      buscar.fechaProduccion = { [Op.eq]: search.fechaProduccion };
+      delete search.fechaProduccion;
+  };
+  if (search.fechaProduccionInicial !== undefined && search.fechaProduccionFinal !== undefined) {
+      buscar.fechaProduccion = { [Op.between]: [search.fechaProduccionInicial, search.fechaProduccionFinal] };
+      delete search.fechaProduccionInicial;
+      delete search.fechaProduccionFinal;
+  } else if (search.fechaProduccionInicial !== undefined) {
+      buscar.fechaProduccion = { [Op.gte]: search.fechaProduccionInicial };
+      delete search.fechaProduccionInicial;
+  } else if (search.fechaProduccionFinal !== undefined) {
+      buscar.fechaProduccion = { [Op.lte]: search.fechaProduccionFinal };
+      delete search.fechaProduccionFinal;
+  };
+  if (search.fechaVencimiento !== undefined) {
+      buscar.fechaVencimiento = { [Op.eq]: search.fechaVencimiento };
+      delete search.fechaVencimiento;
+  };
+  if (search.fechaVencimientoInicial !== undefined && search.fechaVencimientoFinal !== undefined) {
+      buscar.fechaVencimiento = { [Op.between]: [search.fechaVencimientoInicial, search.fechaVencimientoFinal] };
+      delete search.fechaVencimientoInicial;
+      delete search.fechaVencimientoFinal;
+  } else if (search.fechaVencimientoInicial !== undefined) {
+      buscar.fechaVencimiento = { [Op.gte]: search.fechaVencimientoInicial };
+      delete search.fechaVencimientoInicial;
+  } else if (search.fechaVencimientoFinal !== undefined) {
+      buscar.fechaVencimiento = { [Op.lte]: search.fechaVencimientoFinal };
+      delete search.fechaVencimientoFinal;
+  };
+  if (search.cantidad !== undefined) {
+      buscar.cantidad = { [Op.gt]: search.cantidad };
+  };
+    for (let [key,value] of Object.entries(search)) {
+      if (typeof value === 'string') {
+          buscar[key] = { [Op.like]: `%${value}%` };
+      } else {
+          buscar[key] = value;
+      };
+    }
+    let foundKardexAlmacen = await KardexAlmacen.findAll({
+        where: buscar,
+        include: [{
+                    model: ClienteProveedor,
+                    required:true,
+                },{
+                    model:Producto,
+                    required:true
+                }]
+        });
+    return foundKardexAlmacen.length;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  };
+};
+
+
+module.exports = {getAllKardexAlmacen,createKardexAlmacen, deleteKardexAlmacen, regeneraKardexAlmacen, searchKardexAlmacen};

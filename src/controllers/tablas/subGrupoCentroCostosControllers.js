@@ -99,6 +99,33 @@ const updateSubGrupoCentroCosto = async (id,regSubGrupoCentroCosto)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllSubGrupoCentroCosto,createSubGrupoCentroCosto,deleteSubGrupoCentroCosto, updateSubGrupoCentroCosto};
+const searchSubGrupoCentroCosto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundSubGrupoCentroCosto = await SubGrupoCentroCosto.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include:[{
+                model:GrupoCentroCostos,
+                required:true,
+            }]
+        });
+        console.log("searchSubGrupoCentroCosto:Registros encontrados en Tabla SubGrupoCentroCosto",foundSubGrupoCentroCosto, foundSubGrupoCentroCosto.length);
+        return foundSubGrupoCentroCosto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllSubGrupoCentroCosto,createSubGrupoCentroCosto,deleteSubGrupoCentroCosto, updateSubGrupoCentroCosto, searchSubGrupoCentroCosto};

@@ -92,6 +92,29 @@ const updateAnoProducto = async (id,regAno)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllAnoProducto,createAnoProducto,deleteAnoProducto, updateAnoProducto};
+const searchAnoProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundAnoProducto = await Ano.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchAnoProducto:Registros encontrados en Tabla AnoProducto",foundAnoProducto, foundAnoProducto.length);
+        return foundAnoProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllAnoProducto,createAnoProducto,deleteAnoProducto, updateAnoProducto, searchAnoProducto};

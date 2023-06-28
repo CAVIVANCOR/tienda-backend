@@ -98,6 +98,30 @@ const updateDepartamento = async (id,regDepartamento)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
+};
+
+const searchDepartamento = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsDepartamento = await Departamento.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchDepartamento:Registros encontrados en Tabla Departamento",foundRegsDepartamento, foundRegsDepartamento.length);
+        return foundRegsDepartamento;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
 }
 
-module.exports = {getAllDepartamento,createDepartamento, deleteDepartamento, updateDepartamento};
+
+module.exports = {getAllDepartamento,createDepartamento, deleteDepartamento, updateDepartamento, searchDepartamento};

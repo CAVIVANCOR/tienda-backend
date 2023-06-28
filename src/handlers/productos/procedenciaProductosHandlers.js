@@ -1,4 +1,4 @@
-const { getAllProcedenciaProducto, createProcedenciaProducto, deleteProcedenciaProducto, updateProcedenciaProducto } = require("../../controllers/productos/procedenciaProductosControllers");
+const { getAllProcedenciaProducto, createProcedenciaProducto, deleteProcedenciaProducto, updateProcedenciaProducto, searchProcedenciaProducto } = require("../../controllers/productos/procedenciaProductosControllers");
 
 const getProcedenciaProductoHandler = async (req,res)=>{
     const results = await getAllProcedenciaProducto();
@@ -36,4 +36,14 @@ const updateProcedenciaProductoHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getProcedenciaProductoHandler, createProcedenciaProductoHandler, deleteProcedenciaProductoHandler, updateProcedenciaProductoHandler};
+const searchProcedenciaProductoHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchProcedenciaProducto(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getProcedenciaProductoHandler, createProcedenciaProductoHandler, deleteProcedenciaProductoHandler, updateProcedenciaProductoHandler, searchProcedenciaProductoHandler};

@@ -1,4 +1,4 @@
-const { getAllDepartamento, createDepartamento, deleteDepartamento, updateDepartamento } = require("../../controllers/clientesProveedores/departamentosControllers");
+const { getAllDepartamento, createDepartamento, deleteDepartamento, updateDepartamento, searchDepartamento } = require("../../controllers/clientesProveedores/departamentosControllers");
 
 const getDepartamentoHandler = async (req,res)=>{
     const results = await getAllDepartamento();
@@ -34,6 +34,16 @@ const updateDepartamentoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getDepartamentoHandler, createDepartamentoHandler, deleteDepartamentoHandler, updateDepartamentoHandler};
+const searchDepartamentoHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchDepartamento(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getDepartamentoHandler, createDepartamentoHandler, deleteDepartamentoHandler, updateDepartamentoHandler, searchDepartamentoHandler};

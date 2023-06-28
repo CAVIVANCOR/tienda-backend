@@ -1,4 +1,4 @@
-const { getAllAlmacen, createAlmacen, deleteAlmacen, updateAlmacen } = require("../../controllers/almacen/almacenesControllers");
+const { getAllAlmacen, createAlmacen, deleteAlmacen, updateAlmacen, searchByAlmacen } = require("../../controllers/almacen/almacenesControllers");
 
 const getAlmacenHandler = async (req,res)=>{
     const results = await getAllAlmacen();
@@ -36,4 +36,14 @@ const updateAlmacenHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getAlmacenHandler, createAlmacenHandler, deleteAlmacenHandler, updateAlmacenHandler};
+const searchByAlmacenHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchByAlmacen(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+}
+
+module.exports ={getAlmacenHandler, createAlmacenHandler, deleteAlmacenHandler, updateAlmacenHandler, searchByAlmacenHandler};

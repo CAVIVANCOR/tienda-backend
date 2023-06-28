@@ -1,6 +1,6 @@
-const { Op } = require("sequelize");
 const {Almacen,Distrito, ConceptoAlmacen} = require("../../db");
 const axios = require("axios");
+const { Op } = require("sequelize");
 const regAlmacenUsuario ={
     where: { borradoLogico: false },
     include:[{
@@ -115,4 +115,29 @@ const updateAlmacen = async (id,regAlmacen)=>{
     }
 }
 
-module.exports = {getAllAlmacen, createAlmacen, deleteAlmacen, updateAlmacen};
+const searchByAlmacen = async (search) => {
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsAlmacen = await Almacen.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchByAlmacen:Registros encontrados en Tabla Almacen",foundRegsAlmacen, foundRegsAlmacen.length);
+        return foundRegsAlmacen;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    }
+
+};
+
+
+module.exports = {getAllAlmacen, createAlmacen, deleteAlmacen, updateAlmacen, searchByAlmacen};

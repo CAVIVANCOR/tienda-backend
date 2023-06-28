@@ -1,4 +1,4 @@
-const { getAllConceptoMovC, createConceptoMovC, deleteConceptoMovC, updateConceptoMovC } = require("../../controllers/cajaybancos/conceptoMovCControllers");
+const { getAllConceptoMovC, createConceptoMovC, deleteConceptoMovC, updateConceptoMovC, searchConceptoMovC } = require("../../controllers/cajaybancos/conceptoMovCControllers");
 
 const getConceptoMovCHandler = async (req,res)=>{
     const results = await getAllConceptoMovC();
@@ -36,4 +36,14 @@ const updateConceptoMovCHandler = async (req,res)=>{
     };
 };
 
-module.exports ={getConceptoMovCHandler, createConceptoMovCHandler, deleteConceptoMovCHandler, updateConceptoMovCHandler};
+const searchConceptoMovCHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchConceptoMovC(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getConceptoMovCHandler, createConceptoMovCHandler, deleteConceptoMovCHandler, updateConceptoMovCHandler, searchConceptoMovCHandler};

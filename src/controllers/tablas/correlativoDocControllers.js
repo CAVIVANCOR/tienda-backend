@@ -106,6 +106,31 @@ const updateCorrelativoDoc = async (id,regCorrelativoDoc)=>{
     };
 };
 
+const searchCorrelativoDoc = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundCorrelativoDoc = await CorrelativoDoc.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include:[{
+                model: TipoDocumento,
+                required:true,
+            }]
+        });
+        console.log("searchCorrelativoDoc:Registros encontrados en Tabla CorrelativoDoc",foundCorrelativoDoc, foundCorrelativoDoc.length);
+        return foundCorrelativoDoc;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
 
-
-module.exports = {getAllCorrelativoDoc,createCorrelativoDoc,deleteCorrelativoDoc, updateCorrelativoDoc};
+module.exports = {getAllCorrelativoDoc,createCorrelativoDoc,deleteCorrelativoDoc, updateCorrelativoDoc, searchCorrelativoDoc};

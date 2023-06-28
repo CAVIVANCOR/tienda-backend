@@ -1,4 +1,4 @@
-const { getAllCuentasBancariasCliProv, createCuentasBancariasCliProv, deleteCuentasBancariasCliProv, updateCuentasBancariasCliProv } = require("../../controllers/clientesProveedores/cuentasBancariasControllers");
+const { getAllCuentasBancariasCliProv, createCuentasBancariasCliProv, deleteCuentasBancariasCliProv, updateCuentasBancariasCliProv, searchCuentasBancariasCliProv } = require("../../controllers/clientesProveedores/cuentasBancariasControllers");
 
 const getCuentasBancariasCliProvHandler = async (req,res)=>{
     const results = await getAllCuentasBancariasCliProv();
@@ -34,6 +34,16 @@ const updateCuentasBancariasCliProvHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getCuentasBancariasCliProvHandler, createCuentasBancariasCliProvHandler, deleteCuentasBancariasCliProvHandler, updateCuentasBancariasCliProvHandler};
+const searchCuentasBancariasCliProvHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchCuentasBancariasCliProv(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getCuentasBancariasCliProvHandler, createCuentasBancariasCliProvHandler, deleteCuentasBancariasCliProvHandler, updateCuentasBancariasCliProvHandler, searchCuentasBancariasCliProvHandler};

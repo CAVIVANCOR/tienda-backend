@@ -95,4 +95,27 @@ const updateTipoExistenciaCont = async (id,regTipoExistenciaCont)=>{
     };
 };
 
-module.exports = {getAllTipoExistenciaCont,createTipoExistenciaCont, deleteTipoExistenciaCont, updateTipoExistenciaCont};
+const searchTipoExistenciaCont = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundTipoExistenciaCont = await TipoExisCont.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchTipoExistenciaCont:Registros encontrados en Tabla TipoExisCont",foundTipoExistenciaCont, foundTipoExistenciaCont.length);
+        return foundTipoExistenciaCont;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTipoExistenciaCont,createTipoExistenciaCont, deleteTipoExistenciaCont, updateTipoExistenciaCont, searchTipoExistenciaCont};

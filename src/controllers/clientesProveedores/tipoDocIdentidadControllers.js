@@ -100,4 +100,27 @@ const updateTDI = async (id,regTDI)=>{
     };
 };
 
-module.exports = {getAllTDI,createTDI,deleteTDI, updateTDI};
+const searchTDI = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsTDI = await TipoDocIdentidad.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchTDI:Registros encontrados en Tabla TipoDocIdentidad",foundRegsTDI, foundRegsTDI.length);
+        return foundRegsTDI;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTDI,createTDI,deleteTDI, updateTDI, searchTDI};

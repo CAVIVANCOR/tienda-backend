@@ -93,6 +93,30 @@ const updateGrupoCentroCostos = async (id,regGrupoCentroCostos)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllGrupoCentroCostos,createGrupoCentroCostos,deleteGrupoCentroCostos, updateGrupoCentroCostos};
+const searchGrupoCentroCostos = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundGrupoCentroCostos = await GrupoCentroCostos.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchGrupoCentroCostos:Registros encontrados en Tabla GrupoCentroCostos",foundGrupoCentroCostos, foundGrupoCentroCostos.length);
+        return foundGrupoCentroCostos;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllGrupoCentroCostos,createGrupoCentroCostos,deleteGrupoCentroCostos, updateGrupoCentroCostos, searchGrupoCentroCostos};

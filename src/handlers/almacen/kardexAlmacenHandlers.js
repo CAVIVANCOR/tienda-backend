@@ -1,4 +1,4 @@
-const { getAllKardexAlmacen, createKardexAlmacen, deleteKardexAlmacen, regeneraKardexAlmacen } = require("../../controllers/almacen/kardexAlmacenControllers");
+const { getAllKardexAlmacen, createKardexAlmacen, deleteKardexAlmacen, regeneraKardexAlmacen, searchKardexAlmacen } = require("../../controllers/almacen/kardexAlmacenControllers");
 
 const getKardexAlmacenHandler = async (req,res)=>{
     const results = await getAllKardexAlmacen();
@@ -34,6 +34,16 @@ const updateKardexAlmacenHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchKardexAlmacenHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchKardexAlmacen(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getKardexAlmacenHandler, createKardexAlmacenHandler , deleteKardexAlmacenHandler, updateKardexAlmacenHandler};
+module.exports ={getKardexAlmacenHandler, createKardexAlmacenHandler , deleteKardexAlmacenHandler, updateKardexAlmacenHandler, searchKardexAlmacenHandler};

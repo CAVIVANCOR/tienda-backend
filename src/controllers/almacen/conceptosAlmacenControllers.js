@@ -106,4 +106,27 @@ const updateConceptoAlmacen = async (id,regConceptoAlmacen)=>{
     };
 }
 
-module.exports = {getAllConceptoAlmacen,createConceptoAlmacen, deleteConceptoAlmacen, updateConceptoAlmacen};
+const searchConceptoAlmacen = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsConceptoAlmacen = await ConceptoAlmacen.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchConceptoAlmacen:Registros encontrados en Tabla ConceptoAlmacen",foundRegsConceptoAlmacen, foundRegsConceptoAlmacen.length);
+        return foundRegsConceptoAlmacen;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    }
+};
+
+module.exports = {getAllConceptoAlmacen,createConceptoAlmacen, deleteConceptoAlmacen, updateConceptoAlmacen, searchConceptoAlmacen};

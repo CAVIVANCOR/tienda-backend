@@ -1,4 +1,4 @@
-const { getAllCabCompras, createCabCompras, deleteCabCompras, updateCabCompras} = require("../../controllers/compras/cabComprasControllers");
+const { getAllCabCompras, createCabCompras, deleteCabCompras, updateCabCompras, searchByCabCompras } = require("../../controllers/compras/cabComprasControllers");
 
 const getCabComprasHandler = async (req,res)=>{
     const results = await getAllCabCompras();
@@ -34,6 +34,16 @@ const updateCabComprasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getCabComprasHandler, createCabComprasHandler, deleteCabComprasHandler, updateCabComprasHandler};
+const searchByCabComprasHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchByCabCompras(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getCabComprasHandler, createCabComprasHandler, deleteCabComprasHandler, updateCabComprasHandler, searchByCabComprasHandler};

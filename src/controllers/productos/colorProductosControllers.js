@@ -92,6 +92,29 @@ const updateColorProducto = async (id,regColorProducto)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllColorProducto,createColorProducto,deleteColorProducto, updateColorProducto};
+const searchColorProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundColorProducto = await Colore.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchColorProducto:Registros encontrados en Tabla Colore",foundColorProducto, foundColorProducto.length);
+        return foundColorProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllColorProducto,createColorProducto,deleteColorProducto, updateColorProducto, searchColorProducto};

@@ -208,4 +208,27 @@ const updateClienteProveedor = async (id,regClienteProveedor)=>{
     };
 };
 
-module.exports = {getAllClienteProveedor,createClienteProveedor,deleteClienteProveedor, updateClienteProveedor};
+const searchClienteProveedor = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsClienteProveedor = await ClienteProveedor.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchClienteProveedor:Registros encontrados en Tabla ClienteProveedor",foundRegsClienteProveedor, foundRegsClienteProveedor.length);
+        return foundRegsClienteProveedor;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllClienteProveedor,createClienteProveedor,deleteClienteProveedor, updateClienteProveedor, searchClienteProveedor};

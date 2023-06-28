@@ -99,4 +99,31 @@ const updateModeloMarcaProducto = async (id,regModeloMarcaProducto)=>{
     };
 };
 
-module.exports = {getAllModeloMarcaProducto,createModeloMarcaProducto,deleteModeloMarcaProducto, updateModeloMarcaProducto};
+const searchModeloMarcaProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundModeloMarcaProducto = await ModeloMarca.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include:[{
+                model:Marca,
+                required:true,
+            }]
+        });
+        console.log("searchModeloMarcaProducto:Registros encontrados en Tabla ModeloMarcaProducto",foundModeloMarcaProducto, foundModeloMarcaProducto.length);
+        return foundModeloMarcaProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllModeloMarcaProducto,createModeloMarcaProducto,deleteModeloMarcaProducto, updateModeloMarcaProducto, searchModeloMarcaProducto};

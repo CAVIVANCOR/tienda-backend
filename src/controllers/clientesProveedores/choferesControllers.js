@@ -58,6 +58,29 @@ const updateChofer = async (id,regChofer)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllChofer, createChofer, deleteChofer, updateChofer};
+const searchChofer = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsChofer = await Chofer.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchChofer:Registros encontrados en Tabla Choferes",foundRegsChofer, foundRegsChofer.length);
+        return foundRegsChofer;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllChofer, createChofer, deleteChofer, updateChofer, searchChofer};

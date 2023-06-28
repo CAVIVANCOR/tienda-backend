@@ -1,4 +1,4 @@
-const {DetMovAlmacen,CabMovAlmacen,Producto,EstadoProd, KardexAlmacen} = require("../../db");
+const {DetMovAlmacen,CabMovAlmacen,Producto,EstadoProd, KardexAlmacen, ClienteProveedor} = require("../../db");
 const axios = require("axios");
 const regDetMovAlmacenUsuario ={
     where: { borradoLogico: false },
@@ -116,6 +116,99 @@ const updateDetMovAlmacen = async (id,regDetMovAlmacen)=>{
         console.log(error.message)
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllDetMovAlmacen,createDetMovAlmacen,deleteDetMovAlmacen, updateDetMovAlmacen};
+const searchDetMovAlmacen = async (search)=>{
+    try {
+        let buscar = {};
+        if (search.fecha !== undefined) {
+            buscar['$CabMovAlmacen.fecha$'] = { [Op.eq]: search.fecha };
+            delete search.fecha;
+        };
+        if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
+            buscar['$CabMovAlmacen.fecha$'] = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
+            delete search.fechaInicial;
+            delete search.fechaFinal;
+        } else if (search.fechaInicial !== undefined) {
+            buscar['$CabMovAlmacen.fecha$'] = { [Op.gte]: search.fechaInicial };
+            delete search.fechaInicial;
+        } else if (search.fechaFinal !== undefined) {
+            buscar['$CabMovAlmacen.fecha$'] = { [Op.lte]: search.fechaFinal };
+            delete search.fechaFinal;
+        };
+        if (search.razonSocial !== undefined) {
+            buscar['$CabMovAlmacen.ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial}%` };
+            delete search.razonSocial;
+        };
+        if (search.descripcion !== undefined) {
+            buscar['$Producto.descripcion$'] = { [Op.like]: `%${search.descripcion}%` };
+            delete search.descripcion;
+        };
+        if (search.codigoProveedor !== undefined) {
+            buscar['$Producto.codigoProveedor$'] = { [Op.like]: `%${search.codigoProveedor}%` };
+            delete search.codigoProveedor;
+        };
+        if (search.fechaProduccion !== undefined) {
+            buscar.fechaProduccion = { [Op.eq]: search.fechaProduccion };
+            delete search.fechaProduccion;
+        };
+        if (search.fechaProduccionInicial !== undefined && search.fechaProduccionFinal !== undefined) {
+            buscar.fechaProduccion = { [Op.between]: [search.fechaProduccionInicial, search.fechaProduccionFinal] };
+            delete search.fechaProduccionInicial;
+            delete search.fechaProduccionFinal;
+        } else if (search.fechaProduccionInicial !== undefined) {
+            buscar.fechaProduccion = { [Op.gte]: search.fechaProduccionInicial };
+            delete search.fechaProduccionInicial;
+        } else if (search.fechaProduccionFinal !== undefined) {
+            buscar.fechaProduccion = { [Op.lte]: search.fechaProduccionFinal };
+            delete search.fechaProduccionFinal;
+        };
+        if (search.fechaVencimiento !== undefined) {
+            buscar.fechaVencimiento = { [Op.eq]: search.fechaVencimiento };
+            delete search.fechaVencimiento;
+        };
+        if (search.fechaVencimientoInicial !== undefined && search.fechaVencimientoFinal !== undefined) {
+            buscar.fechaVencimiento = { [Op.between]: [search.fechaVencimientoInicial, search.fechaVencimientoFinal] };
+            delete search.fechaVencimientoInicial;
+            delete search.fechaVencimientoFinal;
+        } else if (search.fechaVencimientoInicial !== undefined) {
+            buscar.fechaVencimiento = { [Op.gte]: search.fechaVencimientoInicial };
+            delete search.fechaVencimientoInicial;
+        } else if (search.fechaVencimientoFinal !== undefined) {
+            buscar.fechaVencimiento = { [Op.lte]: search.fechaVencimientoFinal };
+            delete search.fechaVencimientoFinal;
+        };
+        if (search.cantidad !== undefined) {
+            buscar.cantidad = { [Op.gt]: search.cantidad };
+        };
+        for (let [key,value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        }
+        let foundDetMovAlmacen = await DetMovAlmacen.findAll({
+            where: buscar,
+            include: [{
+                        model: CabMovAlmacen,
+                        required:true,
+                        include:[{
+                                    model: ClienteProveedor,
+                                    required:true,
+                                }
+                        ]
+                    },{
+                        model:Producto,
+                        required:true
+                    }]
+            });
+            console.log("searchDetMovAlmacen:Registros encontrados en Tabla DetMovAlmacen",foundDetMovAlmacen, foundDetMovAlmacen.length);
+            return foundDetMovAlmacen;
+    } catch (error) {
+        console.log(error.message)
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllDetMovAlmacen,createDetMovAlmacen,deleteDetMovAlmacen, updateDetMovAlmacen , searchDetMovAlmacen };

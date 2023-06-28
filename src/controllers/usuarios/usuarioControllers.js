@@ -109,4 +109,34 @@ const updateUsuario = async (id,regUsuario)=>{
     };
 };
 
-module.exports = {getAllUsuarios,createUsuario,deleteUsuario, updateUsuario};
+const searchUsuario = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundUsuario = await Usuario.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include:[{
+                model:Personal,
+                required:true,
+            },{
+                model:Rol,
+                required:true,
+            }]
+        });
+        console.log("searchUsuario:Registros encontrados en Tabla Usuario",foundUsuario, foundUsuario.length);
+        return foundUsuario;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllUsuarios,createUsuario,deleteUsuario, updateUsuario, searchUsuario};

@@ -100,4 +100,35 @@ const updateSubFamiliaProducto = async (id,regSubFamiliaProducto)=>{
     };
 };
 
-module.exports = {getAllSubFamiliaProducto,createSubFamiliaProducto,deleteSubFamiliaProducto, updateSubFamiliaProducto};
+const searchSubFamiliaProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundSubFamiliaProducto = await SubFamilia.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include : [{
+                model:Familia,
+                required:true,
+            }
+            ]
+        });
+        console.log("searchSubFamiliaProducto:Registros encontrados en Tabla SubFamiliaProducto",foundSubFamiliaProducto, foundSubFamiliaProducto.length);
+        return foundSubFamiliaProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+
+
+module.exports = {getAllSubFamiliaProducto,createSubFamiliaProducto,deleteSubFamiliaProducto, updateSubFamiliaProducto, searchSubFamiliaProducto};

@@ -158,6 +158,84 @@ const updateCabMovAlmacen = async (id, regCabMovAlmacen) => {
         await transactionActualizarCabMovAlmacen.rollback();
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllCabMovAlmacen,createCabMovAlmacen, deleteCabMovAlmacen, updateCabMovAlmacen};
+const searchByCabMovAlmacen= async (search) => {
+    try {
+        let buscar = {};
+        if (search.razonSocial !== undefined) {
+            buscar['$ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial}%` };
+            delete search.razonSocial;
+        };
+        if (search.nombreComercial !== undefined) {
+            buscar['$ClienteProveedor.nombreComercial$'] = { [Op.like]: `%${search.nombreComercial}%` };
+            delete search.nombreComercial;
+        };
+        if (search.numDocIdentidad !== undefined) {
+            buscar['$ClienteProveedor.numDocIdentidad$'] = { [Op.eq]: search.numDocIdentidad };
+            delete search.numDocIdentidad;
+        };
+        if (search.lineaCreditoMN !== undefined) {
+            buscar['$ClienteProveedor.lineaCreditoMN$'] = { [Op.gt]: search.lineaCreditoMN };
+            delete search.lineaCreditoMN;
+        };
+        if (search.fecha !== undefined) {
+            buscar.fecha = { [Op.eq]: search.fecha };
+            delete search.fecha;
+        };
+        if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
+            buscar.fecha = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
+            delete search.fechaInicial;
+            delete search.fechaFinal;
+        } else if (search.fechaInicial !== undefined) {
+            buscar.fecha = { [Op.gte]: search.fechaInicial };
+            delete search.fechaInicial;
+        } else if (search.fechaFinal !== undefined) {
+            buscar.fecha = { [Op.lte]: search.fechaFinal };
+            delete search.fechaFinal;
+        };
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsCabMovAlmacen = await CabMovAlmacen.findAll({
+            where: buscar,
+            include: [{
+                model: ClienteProveedor,
+                required: true
+            },{
+                model: CentroCosto,
+                required: true
+            },{
+                model: EstadoDoc,
+                required: true
+            },{
+                model: TipoMovAlmacen,
+                required: true
+            },{
+                model: Usuario,
+                required: true
+            },{
+                model: ConceptoAlmacen,
+                required: true
+            },{
+                model: TipoCambio,
+                required: true
+            },{
+                model: CorrelativoDoc,
+                required: true
+            }]
+        });
+        console.log("searchByCabMovAlmacen:Registros encontrados en Tabla CabMovAlmacen",foundRegsCabMovAlmacen, foundRegsCabMovAlmacen.length);
+        return foundRegsCabMovAlmacen;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    }
+};
+
+
+module.exports = {getAllCabMovAlmacen,createCabMovAlmacen, deleteCabMovAlmacen, updateCabMovAlmacen, searchByCabMovAlmacen};

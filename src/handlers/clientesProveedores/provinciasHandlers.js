@@ -1,4 +1,4 @@
-const { getAllProvincia, createProvicias, deleteProvincias, updateProvincias } = require("../../controllers/clientesProveedores/provinciasControllers");
+const { getAllProvincia, createProvicias, deleteProvincias, updateProvincias, searchProvincias } = require("../../controllers/clientesProveedores/provinciasControllers");
 
 const getProvinciaHandler = async (req,res)=>{
     const results = await getAllProvincia();
@@ -34,6 +34,16 @@ const updateProvinciasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchProvinciasHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchProvincias(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getProvinciaHandler,  createProvinciaHandler, deleteProvinciasHandler, updateProvinciasHandler};
+module.exports ={getProvinciaHandler,  createProvinciaHandler, deleteProvinciasHandler, updateProvinciasHandler, searchProvinciasHandler};

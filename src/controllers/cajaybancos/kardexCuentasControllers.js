@@ -282,4 +282,58 @@ const regeneraKardexCuentas = async (idDetMovCuenta)=>{
     };
 };
 
-module.exports = {getAllKardexCuentas,createKardexCuentas, deleteKardexCuentas, regeneraKardexCuentas};
+const searchKardexCuentas = async (search)=>{
+    try {
+        let buscar = {};
+        if (search.nroTransaccion !== undefined) {
+            buscar['$DetMovCuentas.nroTransaccion$'] = { [Op.like]: `%${search.nroTransaccion}%` };
+            delete search.nroTransaccion;
+        };
+        if (search.razonSocial !== undefined) {
+            buscar['$DetMovCuentas.ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial}%` };
+            delete search.razonSocial;
+        };
+        if (search.numDocIdentidad !== undefined) {
+            buscar['$DetMovCuentas.ClienteProveedor.numDocIdentidad$'] = { [Op.eq]: search.numDocIdentidad };
+            delete search.numDocIdentidad;
+        };
+        if (search.fecha !== undefined) {
+            buscar.fecha = { [Op.eq]: search.fecha };
+            delete search.fecha;
+        };
+        if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
+            buscar.fecha = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
+            delete search.fechaInicial;
+            delete search.fechaFinal;
+        } else if (search.fechaInicial !== undefined) {
+            buscar.fecha = { [Op.gte]: search.fechaInicial };
+            delete search.fechaInicial;
+        } else if (search.fechaFinal !== undefined) {
+            buscar.fecha = { [Op.lte]: search.fechaFinal };
+            delete search.fechaFinal;
+        };
+        let foundRegsKardexCuentas = await KardexCuentas.findAll({
+            where: {
+                    [Op.and]: buscar,
+                    include: [{
+                                model: Cuentas,
+                                required: true
+                            },{
+                                model: DetMovCuentas,
+                                required: true,
+                                include:[{
+                                    model: ClienteProveedor,
+                                    required: true
+                                }]
+                            }]
+                    }
+            });
+            console.log("searchDetMovCuentas:Registros encontrados en Tabla DetMovCuentas",foundRegsKardexCuentas, foundRegsKardexCuentas.length);
+            return foundRegsKardexCuentas;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    }
+};
+
+module.exports = {getAllKardexCuentas,createKardexCuentas, deleteKardexCuentas, regeneraKardexCuentas, searchKardexCuentas};

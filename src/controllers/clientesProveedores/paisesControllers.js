@@ -96,4 +96,28 @@ const updatePais = async (id,regPais)=>{
     };
 };
 
-module.exports = {getAllPais,createPais,deletePais, updatePais};
+const searchPaises = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsPais = await Pais.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchPaises:Registros encontrados en Tabla Pais",foundRegsPais, foundRegsPais.length);
+        return foundRegsPais;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllPais,createPais,deletePais, updatePais, searchPaises};

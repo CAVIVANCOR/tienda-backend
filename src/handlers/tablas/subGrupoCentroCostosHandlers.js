@@ -1,4 +1,4 @@
-const {getAllSubGrupoCentroCosto, createSubGrupoCentroCosto, deleteSubGrupoCentroCosto, updateSubGrupoCentroCosto} = require("../../controllers/tablas/subGrupoCentroCostosControllers");
+const {getAllSubGrupoCentroCosto, createSubGrupoCentroCosto, deleteSubGrupoCentroCosto, updateSubGrupoCentroCosto, searchSubGrupoCentroCosto} = require("../../controllers/tablas/subGrupoCentroCostosControllers");
 
 
 const getSubGrupoCentroCostoHandler = async (req,res)=>{
@@ -35,6 +35,16 @@ const updateSubGrupoCentroCostoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchSubGrupoCentroCostoHandler = async (req,res)=>{
+    let registroSubGrupoCentroCosto = req.body;
+    try {
+        const results = await searchSubGrupoCentroCosto(registroSubGrupoCentroCosto);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports = {getSubGrupoCentroCostoHandler, createSubGrupoCentroCostoHandler, deleteSubGrupoCentroCostoHandler, updateSubGrupoCentroCostoHandler};
+module.exports = {getSubGrupoCentroCostoHandler, createSubGrupoCentroCostoHandler, deleteSubGrupoCentroCostoHandler, updateSubGrupoCentroCostoHandler, searchSubGrupoCentroCostoHandler};

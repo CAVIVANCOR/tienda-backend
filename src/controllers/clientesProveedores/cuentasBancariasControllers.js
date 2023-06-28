@@ -64,4 +64,27 @@ const updateCuentasBancariasCliProv = async (id,regCuentasBancariasCliProv)=>{
         };
 }
 
-module.exports = {getAllCuentasBancariasCliProv,createCuentasBancariasCliProv,deleteCuentasBancariasCliProv, updateCuentasBancariasCliProv};
+const searchCuentasBancariasCliProv = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsCuentasBancariasCliProv = await CBancariasCliProv.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchCuentasBancariasCliProv:Registros encontrados en Tabla CBancariasCliProv",foundRegsCuentasBancariasCliProv, foundRegsCuentasBancariasCliProv.length);
+        return foundRegsCuentasBancariasCliProv;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllCuentasBancariasCliProv,createCuentasBancariasCliProv,deleteCuentasBancariasCliProv, updateCuentasBancariasCliProv, searchCuentasBancariasCliProv};

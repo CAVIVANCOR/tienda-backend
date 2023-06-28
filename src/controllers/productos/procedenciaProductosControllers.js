@@ -94,4 +94,28 @@ const updateProcedenciaProducto = async (id,regProcedenciaProducto)=>{
     };
 };
 
-module.exports = {getAllProcedenciaProducto,createProcedenciaProducto, deleteProcedenciaProducto, updateProcedenciaProducto};
+const searchProcedenciaProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundProcedenciaProducto = await Procedencia.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchProcedenciaProducto:Registros encontrados en Tabla ProcedenciaProducto",foundProcedenciaProducto, foundProcedenciaProducto.length);
+        return foundProcedenciaProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllProcedenciaProducto,createProcedenciaProducto, deleteProcedenciaProducto, updateProcedenciaProducto, searchProcedenciaProducto};

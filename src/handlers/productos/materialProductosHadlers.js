@@ -1,4 +1,4 @@
-const { getAllMaterialProducto, createMaterialProducto, deleteMaterialProducto, updateMaterialProducto } = require("../../controllers/productos/materialProductosControllers");
+const { getAllMaterialProducto, createMaterialProducto, deleteMaterialProducto, updateMaterialProducto, searchMaterialProducto } = require("../../controllers/productos/materialProductosControllers");
 
 const getMaterialProductoHandler = async (req,res)=>{
     const results = await getAllMaterialProducto();
@@ -34,6 +34,16 @@ const updateMaterialProductoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getMaterialProductoHandler, createMaterialProductoHandler, deleteMaterialProductoHandler, updateMaterialProductoHandler};
+const searchMaterialProductoHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchMaterialProducto(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getMaterialProductoHandler, createMaterialProductoHandler, deleteMaterialProductoHandler, updateMaterialProductoHandler, searchMaterialProductoHandler};

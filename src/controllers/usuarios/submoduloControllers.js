@@ -64,4 +64,31 @@ const updateSubModulo = async (id,regSubModulo)=>{
     };
 };
 
-module.exports = {getAllSubModulos,createSubModulo,deleteSubModulo, updateSubModulo};
+const searchSubModulo = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundSubModulo = await SubModulo.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include:[{
+                model:Modulo,
+                required:true,
+            }]
+        });
+        console.log("searchSubModulo:Registros encontrados en Tabla SubModulo",foundSubModulo, foundSubModulo.length);
+        return foundSubModulo;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllSubModulos,createSubModulo,deleteSubModulo, updateSubModulo, searchSubModulo};

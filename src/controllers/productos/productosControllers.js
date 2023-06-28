@@ -159,4 +159,55 @@ const updateProducto = async (id,regProducto)=>{
     };
 };
 
-module.exports = {getAllProducto, createProducto, deleteProducto, updateProducto};
+const searchProductos = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundProducto = await Producto.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include: [{
+                model:SubFamilia,
+                required:true,
+            },{
+                model: Ano,
+                required:true,
+            },{
+                model:Materiale,
+                required:true,
+            },{
+                model:Colore,
+                required:true,
+            },{
+                model:Lado,
+                required:true,
+            },{
+                model:Procedencia,
+                required:true,
+            },{
+                model:TipoExisCont,
+                required:true,
+            },{
+                model:UMProd,
+                required:true,
+            },{
+                model:ModeloMarca,
+                required:true,
+            }]
+        });
+        console.log("searchProductos:Registros encontrados en Tabla Producto",foundProducto, foundProducto.length);
+        return foundProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllProducto, createProducto, deleteProducto, updateProducto, searchProductos};

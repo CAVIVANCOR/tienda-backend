@@ -110,4 +110,31 @@ const updateCentroCosto = async (id, regCentroCosto)=>{
     };
 };
 
-module.exports = {getAllCentroCosto,createCentroCosto, deleteCentroCosto, updateCentroCosto};
+const searchCentroCosto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundCentroCosto = await CentroCosto.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include : [{
+                model: SubGrupoCentroCosto,
+                required: true,
+            }]
+        });
+        console.log("searchCentroCosto:Registros encontrados en Tabla CentroCosto",foundCentroCosto, foundCentroCosto.length);
+        return foundCentroCosto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllCentroCosto,createCentroCosto, deleteCentroCosto, updateCentroCosto, searchCentroCosto};

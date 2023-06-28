@@ -92,6 +92,29 @@ const updateEstadoProducto = async (id,regEstadoProducto)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllEstadoProducto,createEstadoProducto, deleteEstadoProducto, updateEstadoProducto};
+const searchEstadoProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundEstadoProducto = await EstadoProd.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchEstadoProducto:Registros encontrados en Tabla EstadoProd",foundEstadoProducto, foundEstadoProducto.length);
+        return foundEstadoProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllEstadoProducto,createEstadoProducto, deleteEstadoProducto, updateEstadoProducto, searchEstadoProducto};

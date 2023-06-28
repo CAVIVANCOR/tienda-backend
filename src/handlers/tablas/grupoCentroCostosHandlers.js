@@ -1,4 +1,4 @@
-const {getAllGrupoCentroCostos, createGrupoCentroCostos, deleteGrupoCentroCostos, updateGrupoCentroCostos} = require("../../controllers/tablas/grupoCentroCostosControllers");
+const {getAllGrupoCentroCostos, createGrupoCentroCostos, deleteGrupoCentroCostos, updateGrupoCentroCostos, searchGrupoCentroCostos} = require("../../controllers/tablas/grupoCentroCostosControllers");
 
 
 const getGrupoCentroCostosHandler = async (req,res)=>{
@@ -35,6 +35,16 @@ const updateGrupoCentroCostosHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports = {getGrupoCentroCostosHandler, createGrupoCentroCostosHandler, deleteGrupoCentroCostosHandler, updateGrupoCentroCostosHandler};
+const searchGrupoCentroCostosHandler = async (req,res)=>{
+    let registroGrupoCentroCostos = req.body;
+    try {
+        const results = await searchGrupoCentroCostos(registroGrupoCentroCostos);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports = {getGrupoCentroCostosHandler, createGrupoCentroCostosHandler, deleteGrupoCentroCostosHandler, updateGrupoCentroCostosHandler, searchGrupoCentroCostosHandler};

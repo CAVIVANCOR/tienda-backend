@@ -60,6 +60,31 @@ const updatePreciosCliProv = async (id,regPreciosCliProv)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllPreciosCliProv, createPreciosCliProv, deletePreciosCliProv, updatePreciosCliProv};
+const searchPreciosCliProv = async (search)=>{
+    try {
+        let buscar={};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundPreciosCliProv = await PreciosCliProv.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchPreciosCliProv:Registros encontrados en Tabla PreciosCliProv",foundPreciosCliProv, foundPreciosCliProv.length);
+        return foundPreciosCliProv;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    }
+};
+
+
+
+module.exports = {getAllPreciosCliProv, createPreciosCliProv, deletePreciosCliProv, updatePreciosCliProv, searchPreciosCliProv};

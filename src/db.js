@@ -338,6 +338,9 @@ KardexAlmacen.belongsTo(EstadoProd);
 CabCompras.hasMany(DetCompras);
 DetCompras.belongsTo(CabCompras);
 
+CorrelativoDoc.hasMany(CabCompras);
+CabCompras.belongsTo(CorrelativoDoc);
+
 ClienteProveedor.hasMany(CabCompras);
 CabCompras.belongsTo(ClienteProveedor);
 
@@ -355,9 +358,6 @@ CabCompras.belongsTo(TipoCambio);
 
 CentroCosto.hasMany(CabCompras);
 CabCompras.belongsTo(CentroCosto);
-
-TipoDocumento.hasMany(CabCompras);
-CabCompras.belongsTo(TipoDocumento);
 
 Producto.hasMany(DetCompras);
 DetCompras.belongsTo(Producto);

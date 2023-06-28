@@ -58,6 +58,30 @@ const updateTransportistaCliProv = async (id,regTransportistaCliProv)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllTransportistaCliProv,createTransportistaCliProv,deleteTransportistaCliProv, updateTransportistaCliProv};
+const searchTransportistaCliProv = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsTransportistaCliProv = await TransportistaCliProv.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchTransportistaCliProv:Registros encontrados en Tabla TransportistaCliProv",foundRegsTransportistaCliProv, foundRegsTransportistaCliProv.length);
+        return foundRegsTransportistaCliProv;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllTransportistaCliProv,createTransportistaCliProv,deleteTransportistaCliProv, updateTransportistaCliProv, searchTransportistaCliProv};

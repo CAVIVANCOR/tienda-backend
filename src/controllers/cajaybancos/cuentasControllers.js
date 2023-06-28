@@ -104,6 +104,29 @@ const updateCuentas = async (id,regCuentas)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllCuentas,createCuentas, deleteCuentas, updateCuentas};
+const searchCuentas = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsCuentas = await Cuentas.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchCuentas:Registros encontrados en Tabla Cuentas",foundRegsCuentas, foundRegsCuentas.length);
+        return foundRegsCuentas;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllCuentas,createCuentas, deleteCuentas, updateCuentas, searchCuentas};

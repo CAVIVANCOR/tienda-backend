@@ -1,4 +1,4 @@
-const { getAllCuentas, createCuentas, deleteCuentas, updateCuentas } = require("../../controllers/cajaybancos/cuentasControllers");
+const { getAllCuentas, createCuentas, deleteCuentas, updateCuentas, searchCuentas } = require("../../controllers/cajaybancos/cuentasControllers");
 
 const getCuentasHandler = async (req,res)=>{
     const results = await getAllCuentas();
@@ -34,6 +34,17 @@ const updateCuentasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getCuentasHandler, createCuentasHandler, deleteCuentasHandler, updateCuentasHandler};
+const searchCuentasHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchCuentas(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getCuentasHandler, createCuentasHandler, deleteCuentasHandler, updateCuentasHandler, searchCuentasHandler};
+

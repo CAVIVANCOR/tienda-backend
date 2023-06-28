@@ -56,6 +56,29 @@ const updateDatosGlobales = async (id,regDatosGlobales)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllDatosGlobales,createDatosGlobales, deleteDatosGlobales, updateDatosGlobales};
+const searchDatoGlobal = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundDatoGlobal = await DatoGlobal.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchDatoGlobal:Registros encontrados en Tabla DatoGlobal",foundDatoGlobal, foundDatoGlobal.length);
+        return foundDatoGlobal;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllDatosGlobales,createDatosGlobales, deleteDatosGlobales, updateDatosGlobales, searchDatoGlobal};

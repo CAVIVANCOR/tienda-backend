@@ -101,6 +101,30 @@ const updateDirCliProv = async (id,regDirCliProv)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllDirCliProv,createDirCliProv,deleteDirCliProv, updateDirCliProv};
+const searchDirCliProv = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsDirCliProv = await DirCliProv.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchDirCliProv:Registros encontrados en Tabla DirCliProv",foundRegsDirCliProv, foundRegsDirCliProv.length);
+        return foundRegsDirCliProv;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllDirCliProv,createDirCliProv,deleteDirCliProv, updateDirCliProv, searchDirCliProv};

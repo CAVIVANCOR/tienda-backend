@@ -100,4 +100,27 @@ const updateFormaPago = async (id,regFormaPago)=>{
     };
 };
 
-module.exports = {getAllFormaPago,createFormaPago,deleteFormaPago, updateFormaPago};
+const searchFormaPago = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundFormaPago = await FormaPago.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchFormaPago:Registros encontrados en Tabla FormaPago",foundFormaPago, foundFormaPago.length);
+        return foundFormaPago;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllFormaPago,createFormaPago,deleteFormaPago, updateFormaPago, searchFormaPago};

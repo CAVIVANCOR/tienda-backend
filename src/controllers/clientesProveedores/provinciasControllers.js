@@ -104,6 +104,29 @@ const updateProvincias = async (regProvincias)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllProvincia, createProvicias, deleteProvincias, updateProvincias};
+const searchProvincias = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsProvincia = await Provincia.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchProvincias:Registros encontrados en Tabla Provincia",foundRegsProvincia, foundRegsProvincia.length);
+        return foundRegsProvincia;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllProvincia, createProvicias, deleteProvincias, updateProvincias, searchProvincias};

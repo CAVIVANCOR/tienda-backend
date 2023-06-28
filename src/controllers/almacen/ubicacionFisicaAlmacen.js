@@ -112,6 +112,30 @@ const updateUbicacionFisicaAlmacen = async (id,regUbicacionFisicaAlmacen)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllUbicacionFisicaAlmacen,createUbicacionFisicaAlmacen, deleteUbicacionFisicaAlmacen, updateUbicacionFisicaAlmacen};
+const searchUbicacionFisicaAlmacen = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsUbicacionFisicaAlmacen = await UbicaAlmacen.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchUbicacionFisicaAlmacen:Registros encontrados en Tabla UbicacionFisicaAlmacen",foundRegsUbicacionFisicaAlmacen, foundRegsUbicacionFisicaAlmacen.length);
+        return foundRegsUbicacionFisicaAlmacen;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllUbicacionFisicaAlmacen,createUbicacionFisicaAlmacen, deleteUbicacionFisicaAlmacen, updateUbicacionFisicaAlmacen, searchUbicacionFisicaAlmacen};

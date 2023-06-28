@@ -1,4 +1,4 @@
-const { getAllRoles,createRol, deleteRol, updateRol } = require("../../controllers/usuarios/rolControllers");
+const { getAllRoles,createRol, deleteRol, updateRol, searchRol } = require("../../controllers/usuarios/rolControllers");
 
 const getRolesHandler = async (req,res)=>{
     const results = await getAllRoles();
@@ -33,6 +33,16 @@ const updateRolHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     }
+};
+
+const searchRolHandler = async (req,res)=>{
+    let registroRol = req.body;
+    try {
+        const results = await searchRol(registroRol);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getRolesHandler,createRolHandler, deleteRolHandler, updateRolHandler}
+module.exports ={getRolesHandler,createRolHandler, deleteRolHandler, updateRolHandler, searchRolHandler}

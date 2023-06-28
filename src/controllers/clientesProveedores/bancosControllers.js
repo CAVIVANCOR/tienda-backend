@@ -94,6 +94,29 @@ const updateBanco = async (id,regBancos)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllBancos,createBancos,deleteBanco, updateBanco};
+const searchBancos = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsBancos = await Bancos.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchBancos:Registros encontrados en Tabla Bancos",foundRegsBancos, foundRegsBancos.length);
+        return foundRegsBancos;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllBancos,createBancos,deleteBanco, updateBanco, searchBancos};

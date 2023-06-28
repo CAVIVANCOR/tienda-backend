@@ -1,4 +1,4 @@
-const { getAllDetMovAlmacen, createDetMovAlmacen, deleteDetMovAlmacen, updateDetMovAlmacen } = require("../../controllers/almacen/detMovAlmacenControllers");
+const { getAllDetMovAlmacen, createDetMovAlmacen, deleteDetMovAlmacen, updateDetMovAlmacen, searchDetMovAlmacen } = require("../../controllers/almacen/detMovAlmacenControllers");
 
 const getDetMovAlmacenHandler = async (req,res)=>{
     const results = await getAllDetMovAlmacen();
@@ -34,6 +34,16 @@ const updateDetMovAlmacenHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchDetMovAlmacenHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchDetMovAlmacen(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getDetMovAlmacenHandler, createDetMovAlmacenHandler, deleteDetMovAlmacenHandler, updateDetMovAlmacenHandler};
+module.exports ={getDetMovAlmacenHandler, createDetMovAlmacenHandler, deleteDetMovAlmacenHandler, updateDetMovAlmacenHandler, searchDetMovAlmacenHandler};

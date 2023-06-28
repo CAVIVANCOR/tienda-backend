@@ -132,4 +132,68 @@ const updateDetMovCuentas = async (id,regDetMovCuentas)=>{
     };
 }
 
-module.exports = {getAllDetMovCuentas,createDetMovCuentas,deleteDetMovCuenta, updateDetMovCuentas};
+const searchDetMovCuentas = async (search)=>{
+    try {
+        let buscar = {};
+        if (search.razonSocial !== undefined) {
+            buscar['$ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial}%` };
+            delete search.razonSocial;
+        };
+        if (search.nombreComercial !== undefined) {
+            buscar['$ClienteProveedor.nombreComercial$'] = { [Op.like]: `%${search.nombreComercial}%` };
+            delete search.nombreComercial;
+        };
+        if (search.numDocIdentidad !== undefined) {
+            buscar['$ClienteProveedor.numDocIdentidad$'] = { [Op.eq]: search.numDocIdentidad };
+            delete search.numDocIdentidad;
+        };
+        if (search.fecha !== undefined) {
+            buscar.fecha = { [Op.eq]: search.fecha };
+            delete search.fecha;
+        };
+        if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
+            buscar.fecha = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
+            delete search.fechaInicial;
+            delete search.fechaFinal;
+        } else if (search.fechaInicial !== undefined) {
+            buscar.fecha = { [Op.gte]: search.fechaInicial };
+            delete search.fechaInicial;
+        } else if (search.fechaFinal !== undefined) {
+            buscar.fecha = { [Op.lte]: search.fechaFinal };
+            delete search.fechaFinal;
+        };
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsDetMovCuentas = await DetMovCuentas.findAll({
+            where: {
+                    [Op.and]: buscar,
+                    include: [{
+                                model: ClienteProveedor,
+                                required: true
+                            },{
+                                model: ConceptoMovC,
+                                required: true
+                            },{
+                                model: EstadoDoc,
+                                required: true
+                            },{
+                                model: Bancos,
+                                required: true
+                            }]
+                    }
+            });
+        console.log("searchDetMovCuentas:Registros encontrados en Tabla DetMovCuentas",foundRegsDetMovCuentas, foundRegsDetMovCuentas.length);
+        return foundRegsDetMovCuentas;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllDetMovCuentas,createDetMovCuentas,deleteDetMovCuenta, updateDetMovCuentas, searchDetMovCuentas};

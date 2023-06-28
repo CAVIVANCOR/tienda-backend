@@ -92,6 +92,29 @@ const updateLadoProducto = async (id,regLadoProducto)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllLadoProducto,createLadoProducto,deleteLadoProducto, updateLadoProducto};
+const searchLadoProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundLadoProducto = await Lado.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchLadoProducto:Registros encontrados en Tabla Lado",foundLadoProducto, foundLadoProducto.length);
+        return foundLadoProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllLadoProducto,createLadoProducto,deleteLadoProducto, updateLadoProducto, searchLadoProducto};

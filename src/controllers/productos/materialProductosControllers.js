@@ -94,4 +94,27 @@ const updateMaterialProducto = async (id,regMaterialProducto)=>{
     };
 };
 
-module.exports = {getAllMaterialProducto,createMaterialProducto, deleteMaterialProducto, updateMaterialProducto};
+const searchMaterialProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundMaterialProducto = await Materiale.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchMaterialProducto:Registros encontrados en Tabla Materiale",foundMaterialProducto, foundMaterialProducto.length);
+        return foundMaterialProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllMaterialProducto,createMaterialProducto, deleteMaterialProducto, updateMaterialProducto, searchMaterialProducto};

@@ -63,4 +63,27 @@ const updateContactosCliProv = async (id,regContactosCliProv)=>{
     };
 };
 
-module.exports = {getAllContactosCliProv,createContactosCliProv,deleteContactosCliProv, updateContactosCliProv};
+const searchContactosCliProv = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsContactosCliProv = await ContactosCliProv.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchContactosCliProv:Registros encontrados en Tabla ContactosCliProv",foundRegsContactosCliProv, foundRegsContactosCliProv.length);
+        return foundRegsContactosCliProv;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllContactosCliProv,createContactosCliProv,deleteContactosCliProv, updateContactosCliProv, searchContactosCliProv};

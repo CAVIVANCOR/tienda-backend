@@ -1,4 +1,4 @@
-const { getAllDirCliProv, createDirCliProv, deleteDirCliProv, updateDirCliProv } = require("../../controllers/clientesProveedores/dirCliProvControllers");
+const { getAllDirCliProv, createDirCliProv, deleteDirCliProv, updateDirCliProv, searchDirCliProv } = require("../../controllers/clientesProveedores/dirCliProvControllers");
 
 const getDirCliProvHandler = async (req,res)=>{
     const results = await getAllDirCliProv();
@@ -34,6 +34,16 @@ const updateDirCliProvHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchDirCliProvHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchDirCliProv(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getDirCliProvHandler, createDirCliProvHandler, deleteDirCliProvHandler, updateDirCliProvHandler};
+module.exports ={getDirCliProvHandler, createDirCliProvHandler, deleteDirCliProvHandler, updateDirCliProvHandler, searchDirCliProvHandler};

@@ -97,4 +97,27 @@ const updateUMProducto = async (id,regUMProducto)=>{
     };
 };
 
-module.exports = {getAllUMProducto,createUMProducto,deleteUMProducto, updateUMProducto};
+const searchUMProducto = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundUMProducto = await UMProd.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchUMProducto:Registros encontrados en Tabla UMProd",foundUMProducto, foundUMProducto.length);
+        return foundUMProducto;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllUMProducto,createUMProducto,deleteUMProducto, updateUMProducto, searchUMProducto};

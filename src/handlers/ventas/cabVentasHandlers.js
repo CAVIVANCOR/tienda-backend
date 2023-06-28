@@ -1,4 +1,4 @@
-const { getAllCabVentas, createCabVentas, deleteCabVentas, updateCabVentas } = require("../../controllers/ventas/cabVentasControllers");
+const { getAllCabVentas, createCabVentas, deleteCabVentas, updateCabVentas, searchByCabVentas } = require("../../controllers/ventas/cabVentasControllers");
 
 const getCabVentasHandler = async (req,res)=>{
     const results = await getAllCabVentas();
@@ -34,6 +34,16 @@ const updateCabVentasHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getCabVentasHandler, createCabVentasHandler, deleteCabVentasHandler, updateCabVentasHandler};
+const searchByCabVentasHandler = async (req,res)=>{
+    let registroCabVentas = req.body;
+    try {
+        const results = await searchByCabVentas(registroCabVentas);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getCabVentasHandler, createCabVentasHandler, deleteCabVentasHandler, updateCabVentasHandler, searchByCabVentasHandler};

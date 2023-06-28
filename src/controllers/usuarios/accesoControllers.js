@@ -1,4 +1,4 @@
-const {Acceso, Modulo, SubModulo} = require("../../db");
+const {Acceso, Modulo, SubModulo, Usuario} = require("../../db");
 const regAccesoUsuario ={
     where: { borradoLogico: false },
     include:[{
@@ -66,4 +66,34 @@ const updateAcceso = async (id,regAcceso)=>{
     };
 };
 
-module.exports = {getAllAccesos,createAccesos,deleteAcceso, updateAcceso};
+const searchAcceso = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundAcceso = await Acceso.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include:[{
+                model:SubModulo,
+                required:true,
+            },{
+                model:Usuario,
+                required:true
+            }]
+        });
+        console.log("searchAcceso:Registros encontrados en Tabla Acceso",foundAcceso, foundAcceso.length);
+        return foundAcceso;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllAccesos,createAccesos,deleteAcceso, updateAcceso, searchAcceso};

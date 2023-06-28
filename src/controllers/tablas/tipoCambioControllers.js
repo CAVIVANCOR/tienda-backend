@@ -101,4 +101,27 @@ const updateTiposCambio = async (id,regTiposCambio)=>{
     };
 };
 
-module.exports = {getAllTiposCambio,createTiposCambio,deleteteTiposCambio, updateTiposCambio};
+const searchTiposCambio = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundTiposCambio = await TipoCambio.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchTiposCambio:Registros encontrados en Tabla TipoCambio",foundTiposCambio, foundTiposCambio.length);
+        return foundTiposCambio;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTiposCambio,createTiposCambio,deleteteTiposCambio, updateTiposCambio, searchTiposCambio};

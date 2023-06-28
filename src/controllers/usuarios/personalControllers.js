@@ -106,4 +106,31 @@ const updatePersona = async (id,regPersona)=>{
     };
 };
 
-module.exports = {getAllPersonal,createPersona,deletePersona, updatePersona};
+const searchPersonal = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundPersonal = await Personal.findAll({
+            where: {
+                [Op.and]: buscar
+            },
+            include:[{
+                model:TipoDocIdentidad,
+                required:true,
+            }]
+        });
+        console.log("searchPersonal:Registros encontrados en Tabla Personal",foundPersonal, foundPersonal.length);
+        return foundPersonal;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllPersonal,createPersona,deletePersona, updatePersona, searchPersonal};

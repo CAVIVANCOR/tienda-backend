@@ -60,4 +60,27 @@ const updateModulo = async (id,regModulo)=>{
     };
 };
 
-module.exports = {getAllModulos,createModulo,deleteModulo, updateModulo};
+const searchModulo = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundModulo = await Modulo.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchModulo:Registros encontrados en Tabla Modulo",foundModulo, foundModulo.length);
+        return foundModulo;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllModulos,createModulo,deleteModulo, updateModulo, searchModulo};

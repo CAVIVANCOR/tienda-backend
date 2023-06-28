@@ -99,4 +99,29 @@ const updateEstadoDoc = async (id,regEstadoDoc)=>{
     };
 };
 
-module.exports = {getAllEstadoDoc,createEstadoDoc,deleteEstadoDoc, updateEstadoDoc};
+
+const searchEstadoDoc = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundEstadoDoc = await EstadoDoc.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchEstadoDoc:Registros encontrados en Tabla EstadoDoc",foundEstadoDoc, foundEstadoDoc.length);
+        return foundEstadoDoc;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllEstadoDoc,createEstadoDoc,deleteEstadoDoc, updateEstadoDoc, searchEstadoDoc};

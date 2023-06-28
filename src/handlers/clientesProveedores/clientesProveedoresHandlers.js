@@ -1,4 +1,4 @@
-const { getAllClienteProveedor, createClienteProveedor, deleteClienteProveedor, updateClienteProveedor } = require("../../controllers/clientesProveedores/clienteProveedorControllers");
+const { getAllClienteProveedor, createClienteProveedor, deleteClienteProveedor, updateClienteProveedor, searchClienteProveedor } = require("../../controllers/clientesProveedores/clienteProveedorControllers");
 
 const getClienteProveedorHandler = async (req,res)=>{
     const results = await getAllClienteProveedor();
@@ -34,6 +34,16 @@ const updateClienteProveedorHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
-}
+};
 
-module.exports ={getClienteProveedorHandler, createClienteProveedorHandler, deleteClienteProveedorHandler, updateClienteProveedorHandler};
+const searchClienteProveedorHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchClienteProveedor(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
+};
+
+module.exports ={getClienteProveedorHandler, createClienteProveedorHandler, deleteClienteProveedorHandler, updateClienteProveedorHandler, searchClienteProveedorHandler};

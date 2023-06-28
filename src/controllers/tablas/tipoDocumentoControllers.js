@@ -102,4 +102,27 @@ const updateTipoDocumento = async (id,regTipoDoc)=>{
     };
 };
 
-module.exports = {getAllTiposDoc,createTipoDoc,deleteTipoDocumento, updateTipoDocumento};
+const searchTipoDocumento = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundTipoDocumento = await TipoDocumento.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchTipoDocumento:Registros encontrados en Tabla TipoDocumento",foundTipoDocumento, foundTipoDocumento.length);
+        return foundTipoDocumento;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+module.exports = {getAllTiposDoc,createTipoDoc,deleteTipoDocumento, updateTipoDocumento, searchTipoDocumento};

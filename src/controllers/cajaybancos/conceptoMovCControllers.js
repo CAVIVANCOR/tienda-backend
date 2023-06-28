@@ -34,23 +34,6 @@ const cargaBDConceptoMovC = async (data)=>{
     }
 };
 
-// const getAllConceptoMovC= async (isAdministrator=false)=>{
-//     let databaseConceptoMovC = null;
-//     let apiConceptoMovCRaw = null;
-//     let apiConceptoMovC = null;
-//     let regConceptoMovC = regConceptoMovCUsuario;
-//     if (isAdministrator) regConceptoMovC = regConceptoMovCAdmin;
-//     databaseConceptoMovC = await ConceptoMovC.findAll(regConceptoMovC);
-//     if (databaseConceptoMovC.length===0){
-//         apiConceptoMovCRaw = (await axios.get('http://192.168.18.15:82/conceptosMovsCuentas')).data;
-//         apiConceptoMovC = await cleanArray(apiConceptoMovCRaw);
-//         await cargaBDConceptoMovC(apiConceptoMovC);
-//         databaseConceptoMovC = await ConceptoMovC.findAll(regConceptoMovC);
-//     }
-
-//     return databaseConceptoMovC;
-// };
-
 const getAllConceptoMovC = async (isAdministrator=false) => {
     try {
     let databaseConceptoMovC = null;
@@ -139,6 +122,54 @@ const updateConceptoMovC = async (id,regConceptoMovC)=>{
         console.log(error.message);
         throw new Error(error.message);
     };
-}
+};
 
-module.exports = {getAllConceptoMovC,createConceptoMovC, deleteConceptoMovC, updateConceptoMovC};
+const searchConceptoMovC = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsConceptoMovC = await ConceptoMovC.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchConceptoMovC:Registros encontrados en Tabla ConceptoMovC",foundRegsConceptoMovC, foundRegsConceptoMovC.length);
+        return foundRegsConceptoMovC;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    }
+};
+
+
+const searchUbicacionFisicaAlmacen = async (search)=>{
+    try {
+        let buscar = {};
+        for (let [key, value] of Object.entries(search)) {
+            if (typeof value === 'string') {
+                buscar[key] = { [Op.like]: `%${value}%` };
+            } else {
+                buscar[key] = value;
+            };
+        };
+        let foundRegsUbicacionFisicaAlmacen = await UbicaAlmacen.findAll({
+            where: {
+                [Op.and]: buscar
+            }
+        });
+        console.log("searchUbicacionFisicaAlmacen:Registros encontrados en Tabla UbicacionFisicaAlmacen",foundRegsUbicacionFisicaAlmacen, foundRegsUbicacionFisicaAlmacen.length);
+        return foundRegsUbicacionFisicaAlmacen;
+    } catch (error) {
+        console.log(error.message);
+        throw new Error(error.message);
+    };
+};
+
+
+module.exports = {getAllConceptoMovC,createConceptoMovC, deleteConceptoMovC, updateConceptoMovC, searchConceptoMovC, searchUbicacionFisicaAlmacen};

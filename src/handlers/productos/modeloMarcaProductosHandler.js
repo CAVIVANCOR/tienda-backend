@@ -1,4 +1,4 @@
-const { getAllModeloMarcaProducto, createModeloMarcaProducto, deleteModeloMarcaProducto, updateModeloMarcaProducto } = require("../../controllers/productos/modeloMarcaProductosControllers");
+const { getAllModeloMarcaProducto, createModeloMarcaProducto, deleteModeloMarcaProducto, updateModeloMarcaProducto, searchModeloMarcaProducto} = require("../../controllers/productos/modeloMarcaProductosControllers");
 
 const getModeloMarcaProductoHandler = async (req,res)=>{
     const results = await getAllModeloMarcaProducto();
@@ -34,6 +34,16 @@ const updateModeloMarcaProductoHandler = async (req,res)=>{
     } catch (error) {
         res.status(400).json({error:error.message})
     };
+};
+
+const searchModeloMarcaProductoHandler = async (req,res)=>{
+    let search = req.body;
+    try {
+        const results = await searchModeloMarcaProducto(search);
+        res.status(201).json(results);
+    } catch (error) {
+        res.status(400).json({error:error.message})
+    };
 }
 
-module.exports ={getModeloMarcaProductoHandler, createModeloMarcaProductoHandler, deleteModeloMarcaProductoHandler, updateModeloMarcaProductoHandler};
+module.exports ={getModeloMarcaProductoHandler, createModeloMarcaProductoHandler, deleteModeloMarcaProductoHandler, updateModeloMarcaProductoHandler, searchModeloMarcaProductoHandler};
