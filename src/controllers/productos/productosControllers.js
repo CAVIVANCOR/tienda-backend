@@ -1,4 +1,5 @@
-const {Producto, SubFamilia,Familia, Ano, Colore, Lado, Materiale, Procedencia, TipoExisCont, UMProd, ModeloMarca,DetCompras,DetVentas,DetMovAlmacen} = require("../../db");
+const { Op } = require("sequelize");
+const {Producto, SubFamilia,Familia, Marca,Ano, Colore, Lado, Materiale, Procedencia, TipoExisCont, UMProd, ModeloMarca,DetCompras,DetVentas,DetMovAlmacen} = require("../../db");
 const axios = require("axios");
 const regProductoUsuario ={
     where: { borradoLogico: false },
@@ -163,12 +164,19 @@ const searchProductos = async (search)=>{
     try {
         let buscar = {};
         for (let [key, value] of Object.entries(search)) {
-            if (typeof value === 'string') {
-                buscar[key] = { [Op.like]: `%${value}%` };
-            } else {
-                buscar[key] = value;
+          if (typeof value === 'string') {
+            const palabras = value.toUpperCase().split(' ');
+            buscar[key] = {
+              [Op.and]: palabras.map(palabra => {
+                return { [Op.like]: `%${palabra}%` };
+              })
             };
-        };
+          } else {
+            buscar[key] = value;
+          }
+        }
+        console.log("search", search);
+
         let foundProducto = await Producto.findAll({
             where: {
                 [Op.and]: buscar
@@ -176,6 +184,10 @@ const searchProductos = async (search)=>{
             include: [{
                 model:SubFamilia,
                 required:true,
+                include:[{
+                    model:Familia,
+                    required:true
+                }]
             },{
                 model: Ano,
                 required:true,
@@ -200,9 +212,15 @@ const searchProductos = async (search)=>{
             },{
                 model:ModeloMarca,
                 required:true,
+                include:[{
+                    model:Marca,
+                    required:true
+                }]
             }]
         });
-        console.log("searchProductos:Registros encontrados en Tabla Producto",foundProducto, foundProducto.length);
+        // console.log("searchProductos:Registros encontrados en Tabla Producto",foundProducto, foundProducto.length);
+        // const jsonResult = JSON.stringify(foundProducto, null, 2);
+        // console.log("Resultado en formato JSON:", jsonResult, foundProducto.length);
         return foundProducto;
     } catch (error) {
         console.log(error.message);

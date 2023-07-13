@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const {DatoGlobal,sequelize} = require("../../db");
 const regDatoGlobalUsuario ={
     where: { borradoLogico: false },
@@ -60,6 +61,7 @@ const updateDatosGlobales = async (id,regDatosGlobales)=>{
 
 const searchDatoGlobal = async (search)=>{
     try {
+        console.log("search",search);
         let buscar = {};
         for (let [key, value] of Object.entries(search)) {
             if (typeof value === 'string') {

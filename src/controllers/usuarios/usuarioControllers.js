@@ -1,5 +1,6 @@
-const {Usuario, Personal, Rol,CabCompras,CabVentas,CabMovAlmacen,DetMovCuentas} = require("../../db");
+const {Usuario, TipoDocIdentidad,Personal, Rol,CabCompras,CabVentas,CabMovAlmacen,DetMovCuentas} = require("../../db");
 const axios = require("axios");
+const { Op } = require("sequelize");
 const regUsuarioUsuario ={
     where: { borradoLogico: false },
     include:[{
@@ -111,7 +112,12 @@ const updateUsuario = async (id,regUsuario)=>{
 
 const searchUsuario = async (search)=>{
     try {
+        console.log("search", search);
         let buscar = {};
+        if (search.email !== undefined) {
+            buscar['$Personal.email$'] = { [Op.like]: `%${search.email}%` };
+            delete search.email;
+        };
         for (let [key, value] of Object.entries(search)) {
             if (typeof value === 'string') {
                 buscar[key] = { [Op.like]: `%${value}%` };
@@ -119,18 +125,25 @@ const searchUsuario = async (search)=>{
                 buscar[key] = value;
             };
         };
+        console.log("buscar", buscar);
         let foundUsuario = await Usuario.findAll({
-            where: {
-                [Op.and]: buscar
-            },
+            where: buscar,
             include:[{
                 model:Personal,
+                attributes:["nombres","email","telefonos","urlFoto","nroDocIdentidad","vendedor"],
                 required:true,
-            },{
+                include:[{
+                    model:TipoDocIdentidad,
+                    attributes:["descripcion","codSunat","iniciales"],
+                    required:true,
+                }]
+            },
+            {
                 model:Rol,
-                required:true,
-            }]
-        });
+                attributes:["descripcion","superUsuario"],
+                required:true
+            }],
+          });
         console.log("searchUsuario:Registros encontrados en Tabla Usuario",foundUsuario, foundUsuario.length);
         return foundUsuario;
     } catch (error) {

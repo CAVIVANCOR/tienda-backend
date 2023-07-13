@@ -6,6 +6,6 @@ productosRouter.get("/",getProductoHandler);
 productosRouter.post("/",createProductoHandler);
 productosRouter.delete("/:id",deleteProductoHandler);
 productosRouter.put("/:id",updateProductoHandler);
-productosRouter.get("/search/",searchProductosHandler);
+productosRouter.post("/search/",searchProductosHandler);
 
 module.exports = productosRouter;

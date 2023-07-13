@@ -6,6 +6,6 @@ usuariosRouter.get("/",getUsuariosHandler);
 usuariosRouter.post("/",createUsuarioHandler);
 usuariosRouter.delete("/:id",deleteUsuarioHandler);
 usuariosRouter.put("/:id",updateUsuarioHandler);
-usuariosRouter.get("/search/",searchUsuarioHandler);
+usuariosRouter.post("/search/",searchUsuarioHandler);
 
 module.exports = usuariosRouter;

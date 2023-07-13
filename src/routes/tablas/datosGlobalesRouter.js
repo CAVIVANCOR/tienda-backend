@@ -6,6 +6,6 @@ datosGlobalesRouter.get("/",getDatosGlobalesHandler);
 datosGlobalesRouter.post("/",createDatosGlobalesHandler);
 datosGlobalesRouter.delete("/:id",deleteDatosGlobalesHandler);
 datosGlobalesRouter.put("/:id",updateDatosGlobalesHandler);
-datosGlobalesRouter.get("/search/",searchDatoGlobalHandler);
+datosGlobalesRouter.post("/search/",searchDatoGlobalHandler);
 
 module.exports = datosGlobalesRouter;

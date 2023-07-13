@@ -14,6 +14,9 @@ module.exports = (sequelize)=>{
             type:DataTypes.STRING,
             allowNull: false,
         },
+        iniciales:{
+            type:DataTypes.STRING,
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
