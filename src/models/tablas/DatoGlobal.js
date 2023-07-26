@@ -79,6 +79,9 @@ module.exports = (sequelize)=>{
         porcentajeCalcVVentaServicioRentabilidad:{
             type:DataTypes.DECIMAL(12,2),
         },
+        idAlmacen:{
+            type:DataTypes.INTEGER,
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:true

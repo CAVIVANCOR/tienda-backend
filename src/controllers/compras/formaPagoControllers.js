@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const {FormaPago,CabCompras,CabVentas} = require("../../db");
 const axios = require("axios");
 const regFormaPagoUsuario ={

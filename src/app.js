@@ -16,6 +16,7 @@ app.use(function(req, res, next) {
   // Configurar carpeta estática
 app.use("/images/productos", express.static("images/productos"));
 app.use("/images/logo", express.static("images/logo"));
+app.use("/images/personal", express.static("images/personal"));
 
 
 app.use(mainRouter);

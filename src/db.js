@@ -221,15 +221,12 @@ ContactosCliProv.belongsTo(ClienteProveedor);
 ClienteProveedor.hasMany(DirCliProv);
 DirCliProv.belongsTo(ClienteProveedor);
 
-ClienteProveedor.hasMany(PreciosCliProv);
-PreciosCliProv.belongsTo(ClienteProveedor);
 
 ClienteProveedor.hasMany(TransportistaCliProv);
 TransportistaCliProv.belongsTo(ClienteProveedor);
 
 Distrito.hasMany(DirCliProv);
 DirCliProv.belongsTo(Distrito);
-
 
 Provincia.hasMany(Distrito);
 Distrito.belongsTo(Provincia);
@@ -259,6 +256,9 @@ Usuario.belongsTo(Rol);
 
 Usuario.hasMany(Acceso);
 Acceso.belongsTo(Usuario);
+
+Almacen.hasMany(Usuario);
+Usuario.belongsTo(Almacen);
 
 SubModulo.hasMany(Acceso);
 Acceso.belongsTo(SubModulo);
@@ -365,8 +365,6 @@ DetCompras.belongsTo(Producto);
 EstadoProd.hasMany(DetCompras);
 DetCompras.belongsTo(EstadoProd);
 
-PreciosCliProv.hasMany(DetCompras);
-DetCompras.belongsTo(PreciosCliProv);
 
 //**VENTAS */
 CabVentas.hasMany(DetVentas);
@@ -399,8 +397,6 @@ DetVentas.belongsTo(Producto);
 EstadoProd.hasMany(DetVentas);
 DetVentas.belongsTo(EstadoProd);
 
-PreciosCliProv.hasMany(DetVentas);
-DetVentas.belongsTo(PreciosCliProv);
 
 //**CAJA Y BANCOS */
 ClienteProveedor.hasMany(DetMovCuentas);

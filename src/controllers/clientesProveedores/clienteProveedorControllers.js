@@ -223,7 +223,7 @@ const searchClienteProveedor = async (search)=>{
                 [Op.and]: buscar
             }
         });
-        console.log("searchClienteProveedor:Registros encontrados en Tabla ClienteProveedor",foundRegsClienteProveedor, foundRegsClienteProveedor.length);
+        console.log("searchClienteProveedor:Registros encontrados en Tabla ClienteProveedor", foundRegsClienteProveedor.length);
         return foundRegsClienteProveedor;
     } catch (error) {
         console.log(error.message);

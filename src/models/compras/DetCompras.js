@@ -75,6 +75,9 @@ module.exports = (sequelize)=>{
         nroMesesGarantia:{
             type:DataTypes.INTEGER,
         },
+        idPreciosCliProv:{
+            type:DataTypes.BIGINT,
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false

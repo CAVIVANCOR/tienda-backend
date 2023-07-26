@@ -6,6 +6,6 @@ cabVentasRouter.get("/",getCabVentasHandler);
 cabVentasRouter.post("/",createCabVentasHandler);
 cabVentasRouter.delete("/:id",deleteCabVentasHandler);
 cabVentasRouter.put("/:id",updateCabVentasHandler);
-cabVentasRouter.get("/search/",searchByCabVentasHandler);
+cabVentasRouter.post("/search/",searchByCabVentasHandler);
 
 module.exports = cabVentasRouter;

@@ -1,6 +1,7 @@
 const { Op } = require("sequelize");
 const {Producto, SubFamilia,Familia, Marca,Ano, Colore, Lado, Materiale, Procedencia, TipoExisCont, UMProd, ModeloMarca,DetCompras,DetVentas,DetMovAlmacen} = require("../../db");
 const axios = require("axios");
+const { consultaStocks } = require('../almacen/kardexAlmacenControllers.js');
 const regProductoUsuario ={
     where: { borradoLogico: false },
     include:[{
@@ -160,8 +161,10 @@ const updateProducto = async (id,regProducto)=>{
     };
 };
 
+
 const searchProductos = async (search)=>{
     try {
+        console.log("search",search);
         let buscar = {};
         for (let [key, value] of Object.entries(search)) {
           if (typeof value === 'string') {
@@ -175,9 +178,7 @@ const searchProductos = async (search)=>{
             buscar[key] = value;
           }
         }
-        console.log("search", search);
-
-        let foundProducto = await Producto.findAll({
+        let foundProductos = await Producto.findAll({
             where: {
                 [Op.and]: buscar
             },
@@ -216,16 +217,17 @@ const searchProductos = async (search)=>{
                     model:Marca,
                     required:true
                 }]
-            }]
+            }],
+            order: [
+                ['descripcion', 'ASC'],
+              ]
         });
-        // console.log("searchProductos:Registros encontrados en Tabla Producto",foundProducto, foundProducto.length);
-        // const jsonResult = JSON.stringify(foundProducto, null, 2);
-        // console.log("Resultado en formato JSON:", jsonResult, foundProducto.length);
-        return foundProducto;
+        return foundProductos;
     } catch (error) {
         console.log(error.message);
         throw new Error(error.message);
     };
 };
+
 
 module.exports = {getAllProducto, createProducto, deleteProducto, updateProducto, searchProductos};

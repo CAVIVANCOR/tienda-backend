@@ -61,7 +61,7 @@ const updateDatosGlobales = async (id,regDatosGlobales)=>{
 
 const searchDatoGlobal = async (search)=>{
     try {
-        console.log("search",search);
+        //console.log("search",search);
         let buscar = {};
         for (let [key, value] of Object.entries(search)) {
             if (typeof value === 'string') {
@@ -75,7 +75,7 @@ const searchDatoGlobal = async (search)=>{
                 [Op.and]: buscar
             }
         });
-        console.log("searchDatoGlobal:Registros encontrados en Tabla DatoGlobal",foundDatoGlobal, foundDatoGlobal.length);
+        //console.log("searchDatoGlobal:Registros encontrados en Tabla DatoGlobal", foundDatoGlobal.length);
         return foundDatoGlobal;
     } catch (error) {
         console.log(error.message);

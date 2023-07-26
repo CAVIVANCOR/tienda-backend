@@ -1,7 +1,7 @@
 const moment = require("moment/moment");
 const {KardexAlmacen, CabMovAlmacen, Almacen,UbicaAlmacen,DetMovAlmacen,ConceptoAlmacen,Producto,EstadoProd,ClienteProveedor,TipoDocIdentidad,TipoCliProv, sequelize} = require("../../db");
 const axios = require("axios");
-const { Op } = require("sequelize");
+const { Op, Sequelize, QueryTypes } = require("sequelize");
 const regKardexAlmacenUsuario ={
     include:[{
                 model:Producto,
@@ -163,6 +163,85 @@ const deleteKardexAlmacen = async (idDetMovAlmacen)=>{
     };
 };
 
+const obtenerStockPorAlmacenes = async (kardexAlmacenResults) => {
+  const stockPorAlmacenesMap = new Map();
+  const idsAlmacen = [...new Set(kardexAlmacenResults.map(registro => registro.idAlmacen))];
+  const descripcionesAlmacen = await obtenerDescripcionesAlmacen(idsAlmacen);
+  kardexAlmacenResults.forEach((registro) => {
+    const { idAlmacen, saldoFinCant } = registro;
+    stockPorAlmacenesMap.set(idAlmacen, +saldoFinCant);
+  });
+  const stockPorAlmacenes = Array.from(stockPorAlmacenesMap.entries()).map(([almacen, stock]) => ({ almacen: +almacen, stock: +stock }));
+  stockPorAlmacenes.forEach((objeto) => {
+    const descripcionAlmacen = descripcionesAlmacen.get(objeto.almacen);
+    objeto.descripcion = descripcionAlmacen || ""; // Si no hay descripción, asignar una cadena vacía
+  });
+  return stockPorAlmacenes;
+};
+const obtenerDescripcionesAlmacen = async (idsAlmacen) => {
+  const descripcionesAlmacen = new Map();
+  for (const id of idsAlmacen) {
+    const almacen = await Almacen.findByPk(id);
+    if (almacen) {
+      descripcionesAlmacen.set(id, almacen.descripcion);
+    }
+  }
+  return descripcionesAlmacen;
+};
+
+const consultaStocks = async ({idAlmacen, ProductoId,fechaInicio,fechaFin}) => {
+  //console.log("consultaStocks",idAlmacen, ProductoId,fechaInicio,fechaFin);
+  try {
+    let where = {};
+    where.ProductoId = ProductoId;
+    if (fechaInicio) {
+      where.fecha = {
+        [Op.gte]: fechaInicio
+      };
+      if (fechaFin) {
+        where.fecha[Op.lte] = fechaFin;
+      }
+    } else if (fechaFin) {
+      where.fecha = {
+        [Op.lte]: fechaFin
+      };
+    }
+    if (idAlmacen) {
+      where.idAlmacen = idAlmacen;
+    }
+   // console.log("consultaStocks where",where);
+    let kardexAlmacenResults = await KardexAlmacen.findAll({
+      where,
+      include: [{
+                  model: UbicaAlmacen,
+                  required:true,
+                },{
+                  model:Producto,
+                  required:true
+                }],
+      order: [
+        ['idAlmacen', 'ASC'],
+        ['ProductoId', 'ASC'],
+        ['nroLote', 'ASC'],
+        ['nroEnvase', 'ASC'],
+        ['nroSerie', 'ASC'],
+        ['fechaProduccion', 'ASC'],
+        ['fechaVencimiento', 'ASC'],
+        ['UbicaAlmacenId', 'ASC'],
+        ['EstadoProdId', 'ASC'],
+        ['fecha', 'ASC'],
+        ['ingEgr', 'DESC'],
+        ['idDetMovAlmacen', 'ASC']
+      ]
+    });
+    let stockPorAlmacenes = await obtenerStockPorAlmacenes(kardexAlmacenResults);
+   // console.log("Concluyo con Exito la Consulta de Stocks", kardexAlmacenResults.length, stockPorAlmacenes);
+    return stockPorAlmacenes;
+  } catch (error) {
+    console.log(error.message);
+    throw new Error(error.message);
+  };
+};
 
 const busquedaKardexAlmacen = async (tipoConsulta, ProductoId, fechaInicio, fechaFin, idAlmacen, nroLote, nroEnvase, nroSerie, fechaProduccion, fechaVencimiento, idUbicacionFisica, idEstadoProducto) => {
     try {
@@ -516,5 +595,4 @@ const searchKardexAlmacen = async (search)=>{
   };
 };
 
-
-module.exports = {getAllKardexAlmacen,createKardexAlmacen, deleteKardexAlmacen, regeneraKardexAlmacen, searchKardexAlmacen};
+module.exports = {getAllKardexAlmacen,createKardexAlmacen, deleteKardexAlmacen, regeneraKardexAlmacen, searchKardexAlmacen, consultaStocks};

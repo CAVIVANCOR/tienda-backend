@@ -71,7 +71,7 @@ const cleanArray=(arr)=>{
             CabCompraId:elem.CabCompraId,
             ProductoId:elem.ProductoId,
             EstadoProdId:elem.EstadoProdId,
-            PreciosCliProvId:elem.PreciosCliProvId,
+            idPreciosCliProv:elem.idPreciosCliProv,
             idHistorico:elem.id,
         };
     });

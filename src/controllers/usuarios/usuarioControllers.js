@@ -1,4 +1,4 @@
-const {Usuario, TipoDocIdentidad,Personal, Rol,CabCompras,CabVentas,CabMovAlmacen,DetMovCuentas} = require("../../db");
+const {Usuario, Almacen,TipoDocIdentidad,Personal, Rol,CabCompras,CabVentas,CabMovAlmacen,DetMovCuentas} = require("../../db");
 const axios = require("axios");
 const { Op } = require("sequelize");
 const regUsuarioUsuario ={
@@ -112,7 +112,7 @@ const updateUsuario = async (id,regUsuario)=>{
 
 const searchUsuario = async (search)=>{
     try {
-        console.log("search", search);
+       // console.log("search", search);
         let buscar = {};
         if (search.email !== undefined) {
             buscar['$Personal.email$'] = { [Op.like]: `%${search.email}%` };
@@ -125,7 +125,7 @@ const searchUsuario = async (search)=>{
                 buscar[key] = value;
             };
         };
-        console.log("buscar", buscar);
+       // console.log("buscar", buscar);
         let foundUsuario = await Usuario.findAll({
             where: buscar,
             include:[{
@@ -142,9 +142,15 @@ const searchUsuario = async (search)=>{
                 model:Rol,
                 attributes:["descripcion","superUsuario"],
                 required:true
-            }],
+            },
+            {
+                model:Almacen,
+                attributes:["descripcion"],
+                required:true
+            }
+        ],
           });
-        console.log("searchUsuario:Registros encontrados en Tabla Usuario",foundUsuario, foundUsuario.length);
+        console.log("searchUsuario:Registros encontrados en Tabla Usuario", foundUsuario.length);
         return foundUsuario;
     } catch (error) {
         console.log(error.message);

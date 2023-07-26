@@ -22,6 +22,12 @@ module.exports = (sequelize)=>{
             type:DataTypes.DECIMAL(12,2),
             allowNull: false,
         },
+        idCodproducto:{
+            type:DataTypes.BIGINT,
+        },
+        idClienteProveedor:{
+            type:DataTypes.BIGINT,
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
