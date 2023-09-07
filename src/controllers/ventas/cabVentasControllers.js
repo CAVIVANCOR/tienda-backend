@@ -1,4 +1,4 @@
-const {CabVentas, DetVentas,CorrelativoDoc,Producto,FormaPago,CentroCosto, ClienteProveedor, EstadoDoc, TipoDocumento, TipoCambio, Usuario, Personal} = require("../../db");
+const {CabVentas, TipoDocIdentidad, DetVentas,CorrelativoDoc,Producto,FormaPago,CentroCosto, ClienteProveedor, EstadoDoc, TipoDocumento, TipoCambio, Usuario, Personal} = require("../../db");
 const axios = require("axios");
 const { deleteDetVentas } = require("./detVentasControllers");
 const { Op } = require("sequelize");
@@ -132,6 +132,7 @@ const deleteCabVentas = async (id)=>{
             )
         };
         let deletedCabVentas = await foundCabVentas.update({borradoLogico:!foundCabVentas.borradoLogico},{transaction:transactionEliminarCabVentas});
+        await transactionEliminarCabVentas.commit();
         console.log('Registro eliminado OK Tabla CabVentas');
         return deletedCabVentas;
     } catch (error) {
@@ -147,6 +148,7 @@ const updateCabVentas = async (id,regCabVentas)=>{
         let foundCabVentas = await CabVentas.findByPk(id);
         if (!foundCabVentas) throw new Error('ID de CabVentas no encontrado');
         let updatedCabVentas = await foundCabVentas.update(regCabVentas, {transaction:transactionActualizarCabVentas});
+        await transactionActualizarCabVentas.commit();
         console.log('Registro actualizado OK Tabla CabVentas');
         return updatedCabVentas;
     } catch (error) {
@@ -207,7 +209,12 @@ const searchByCabVentas= async (search)=>{
                         }]
                     },{
                         model: ClienteProveedor,
-                        required: true
+                        required: true,
+                        include:[{
+                            model:TipoDocIdentidad,
+                            required:true,
+                            attributes:["iniciales"]
+                        }]
                     },{
                         model: CentroCosto,
                         required: true
@@ -245,5 +252,6 @@ const searchByCabVentas= async (search)=>{
         
     }
 };
+
 
 module.exports = {getAllCabVentas,createCabVentas,deleteCabVentas, updateCabVentas, searchByCabVentas};

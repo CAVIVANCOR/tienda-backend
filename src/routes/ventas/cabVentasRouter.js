@@ -3,9 +3,9 @@ const {getCabVentasHandler,createCabVentasHandler, deleteCabVentasHandler, updat
 const cabVentasRouter = Router();
 
 cabVentasRouter.get("/",getCabVentasHandler);
-cabVentasRouter.post("/",createCabVentasHandler);
-cabVentasRouter.delete("/:id",deleteCabVentasHandler);
-cabVentasRouter.put("/:id",updateCabVentasHandler);
 cabVentasRouter.post("/search/",searchByCabVentasHandler);
+cabVentasRouter.post("/create/",createCabVentasHandler);
+cabVentasRouter.put("/update/:id",updateCabVentasHandler);
+cabVentasRouter.delete("/delete/:id",deleteCabVentasHandler);
 
 module.exports = cabVentasRouter;

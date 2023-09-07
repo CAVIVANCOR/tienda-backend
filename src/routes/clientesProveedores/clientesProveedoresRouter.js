@@ -6,6 +6,6 @@ clienteProveedorRouter.get("/",getClienteProveedorHandler);
 clienteProveedorRouter.post("/",createClienteProveedorHandler);
 clienteProveedorRouter.delete("/:id",deleteClienteProveedorHandler);
 clienteProveedorRouter.put("/:id",updateClienteProveedorHandler);
-clienteProveedorRouter.get("/search/",searchClienteProveedorHandler);
+clienteProveedorRouter.post("/search/",searchClienteProveedorHandler);
 
 module.exports = clienteProveedorRouter;

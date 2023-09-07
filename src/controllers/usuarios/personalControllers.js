@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const {Personal,TipoDocIdentidad,sequelize,Usuario } = require("../../db");
 const axios = require("axios");
 const regPersonalUsuario ={
@@ -111,7 +112,7 @@ const searchPersonal = async (search)=>{
         let buscar = {};
         for (let [key, value] of Object.entries(search)) {
             if (typeof value === 'string') {
-                buscar[key] = { [Op.like]: `%${value}%` };
+                buscar[key] = { [Op.like]: `%${value.toUpperCase()}%` };
             } else {
                 buscar[key] = value;
             };

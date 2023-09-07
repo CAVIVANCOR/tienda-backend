@@ -6,7 +6,7 @@ personalRouter.get("/",getPersonalHandler);
 personalRouter.post("/",createPersonalHandler);
 personalRouter.delete("/:id",deletePersonalHandler);
 personalRouter.put("/:id",updatePersonalHandler);
-personalRouter.get("/search/",searchPersonalHandler);
+personalRouter.post("/search/",searchPersonalHandler);
 
 
 module.exports = personalRouter;

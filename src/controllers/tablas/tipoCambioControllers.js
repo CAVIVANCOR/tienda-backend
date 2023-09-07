@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const {TipoCambio,CabCompras,CabMovAlmacen,CabVentas} = require("../../db");
 const axios = require("axios");
 const regTipoCambioUsuario ={
@@ -43,6 +44,17 @@ const getAllTiposCambio= async (isAdministrator=false)=>{
         apiTiposCambio = await cleanArray(apiTiposCambioRaw);
         await cargaBDTiposCambio(apiTiposCambio);
         databaseTiposCambio = await TipoCambio.findAll(regTipoCambio);
+    }
+    return databaseTiposCambio;
+};
+
+const getLastTiposCambio= async (isAdministrator=false)=>{
+    let databaseTiposCambio = null;
+    databaseTiposCambio = await TipoCambio.findOne({
+        order: [['fecha', 'DESC']],
+    });
+    if (!databaseTiposCambio) {
+    throw new Error('No se encontró ningún registro en la tabla TipoCambio');
     }
     return databaseTiposCambio;
 };
@@ -106,8 +118,6 @@ const searchTiposCambio = async (search)=>{
         let buscar = {};
         for (let [key, value] of Object.entries(search)) {
             if (typeof value === 'string') {
-                buscar[key] = { [Op.like]: `%${value}%` };
-            } else {
                 buscar[key] = value;
             };
         };
@@ -124,4 +134,4 @@ const searchTiposCambio = async (search)=>{
     };
 };
 
-module.exports = {getAllTiposCambio,createTiposCambio,deleteteTiposCambio, updateTiposCambio, searchTiposCambio};
+module.exports = {getAllTiposCambio,createTiposCambio,deleteteTiposCambio, updateTiposCambio, searchTiposCambio,getLastTiposCambio};

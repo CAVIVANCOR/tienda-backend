@@ -6,6 +6,6 @@ formaPagoRouter.get("/",getFormaPagoHandler);
 formaPagoRouter.post("/",createFormaPagoHandler);
 formaPagoRouter.delete("/:id",deleteFormaPagoHandler);
 formaPagoRouter.put("/:id",updateFormaPagoHandler);
-formaPagoRouter.get("/search/",searchFormaPagoHandler);
+formaPagoRouter.post("/search/",searchFormaPagoHandler);
 
 module.exports = formaPagoRouter;
