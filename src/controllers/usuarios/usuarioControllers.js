@@ -145,7 +145,6 @@ const searchUsuario = async (search)=>{
             },
             {
                 model:Almacen,
-                attributes:["descripcion"],
                 required:true
             }
         ],

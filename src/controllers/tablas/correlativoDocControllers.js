@@ -1,3 +1,4 @@
+const { Op } = require("sequelize");
 const {CorrelativoDoc,TipoDocumento,CabMovAlmacen,CabCompras,CabVentas} = require("../../db");
 const axios = require("axios");
 const regCorrelativoDocUsuario ={
@@ -109,6 +110,11 @@ const updateCorrelativoDoc = async (id,regCorrelativoDoc)=>{
 const searchCorrelativoDoc = async (search)=>{
     try {
         let buscar = {};
+        buscar.borradoLogico = false;
+        if (search.operacionesVenta !== undefined) {
+            buscar['$TipoDocumento.operacionesVenta$'] = { [Op.eq]: search.operacionesVenta };
+            delete search.operacionesVenta;
+        };
         for (let [key, value] of Object.entries(search)) {
             if (typeof value === 'string') {
                 buscar[key] = { [Op.like]: `%${value}%` };

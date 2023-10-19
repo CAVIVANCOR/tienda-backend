@@ -1,6 +1,6 @@
 const {DataTypes} = require("sequelize");
 module.exports = (sequelize)=>{
-    sequelize.define("Almacen",{
+    sequelize.define("MotivoNCND",{
         id:{
             type:DataTypes.INTEGER,
             autoIncrement:true,
@@ -10,23 +10,16 @@ module.exports = (sequelize)=>{
             type:DataTypes.STRING,
             allowNull: false,
         },
-        kardex:{
+        codSunat:{
+            type:DataTypes.STRING,
+        },
+        tipoNCND:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
-        },
-        direccion:{
-            type:DataTypes.STRING,
-        },
-        seriePuntoEmision:{
-            type:DataTypes.STRING,
         },
         created:{
             type:DataTypes.BOOLEAN,
-            defaultValue:false
-        },
-        cesado:{
-            type:DataTypes.BOOLEAN,
-            defaultValue:false
+            defaultValue:true
         },
         borradoLogico:{
             type:DataTypes.BOOLEAN,
@@ -38,7 +31,7 @@ module.exports = (sequelize)=>{
     },
     {
         timestamps:false,
-        tableName: "Almacen"
+        tableName: "MotivoNCND"
     }
     )
-};
+}

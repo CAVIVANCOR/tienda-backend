@@ -1,6 +1,7 @@
 const {Almacen,Distrito, ConceptoAlmacen} = require("../../db");
 const axios = require("axios");
 const { Op } = require("sequelize");
+const { managerCRUDError } = require("../../utils/errors");
 const regAlmacenUsuario ={
     where: { borradoLogico: false },
     include:[{
@@ -50,6 +51,7 @@ const getAllAlmacen= async (isAdministrator=false)=>{
         apiAlmacen = await cleanArray(apiAlmacenRaw);
         await cargaBDAlmacen(apiAlmacen);
         databaseAlmacen = await Almacen.findAll(regAlmacen);
+        await Almacen.sequelize.query('SELECT setval(\'"Almacen_id_seq"\', (SELECT MAX(id) FROM "Almacen"))');
     }
     return databaseAlmacen;
 };
@@ -57,43 +59,46 @@ const getAllAlmacen= async (isAdministrator=false)=>{
 const createAlmacen = async (regAlmacen)=>{
     const transactionCrearAlmacen = await Almacen.sequelize.transaction();
     try {
-        let maxIdAlmacen = await Almacen.max("id");
-        let newAlmacen = await Almacen.create({id:maxIdAlmacen+1, ...regAlmacen},{transaction:transactionCrearAlmacen});
+        await Almacen.sequelize.query('SELECT setval(\'"Almacen_id_seq"\', (SELECT MAX(id) FROM "Almacen"))');
+        let newAlmacen = await Almacen.create(regAlmacen,{transaction:transactionCrearAlmacen});
         await transactionCrearAlmacen.commit();
         console.log('Registro creado OK Tabla Almacen')
         return newAlmacen;
     } catch (error) {
         await transactionCrearAlmacen.rollback();
         console.log(error.message);
-        throw new Error(error.message);
+        throw new managerCRUDError(error.message,500,'Almacen');
     };
 };
 
-const deleteAlmacen = async (id) => {
+const deleteAlmacen = async (id, isAdministrator=false) => {
     let transactionEliminarAlmacen = await Almacen.sequelize.transaction();
     try {
-            const foundAlmacen = await Almacen.findByPk(id);
-            if (!foundAlmacen) {
-                throw new Error('No se ha encontrado la entrada de Almacen');
+        const foundAlmacen = await Almacen.findByPk(id);
+        if (!foundAlmacen) throw new Error('Delete: No se encontro ningun Registro');
+        let foundConceptoAlmacen = await ConceptoAlmacen.findAll({
+            where: {
+                [Op.or]: [
+                    { codAlmacenOrigen: id },
+                    { codAlmacenDestino: id }
+                ],
+                borradoLogico: false}
             }
-            let foundConceptoAlmacen = await ConceptoAlmacen.findAll({
-                where: {
-                    [Op.or]: [
-                        { codAlmacenOrigen: id },
-                        { codAlmacenDestino: id }
-                    ],
-                    borradoLogico: false}
-                }
-            );
-            if (foundConceptoAlmacen.length>0) throw new Error('No se puede marcar como borrado el Almacen porque hay ConceptoAlmacen que lo referencian');
-            let deletedAlmacen = await foundAlmacen.update({borradoLogico:!foundAlmacen.borradoLogico},{transaction:transactionEliminarAlmacen});
-            await transactionEliminarAlmacen.commit();
-            console.log("Registro eliminado OK Tabla Almacen");
-            return deletedAlmacen;
+        );
+        if (foundConceptoAlmacen.length>0) throw new Error('Delete: No se puede marcar como borrado porque en ConceptoAlmacen lo referencian');
+        let deletedAlmacen=null;
+        if (isAdministrator){
+            deletedAlmacen = await foundAlmacen.destroy({ where: { id }, transaction: transactionEliminarAlmacen });
+        }else{
+            deletedAlmacen = await foundAlmacen.update({borradoLogico:!foundAlmacen.borradoLogico},{transaction:transactionEliminarAlmacen});
+        }
+        console.log("Registro eliminado OK Tabla Almacen", foundAlmacen.dataValues);
+        await transactionEliminarAlmacen.commit();
+        return foundAlmacen;
     } catch (error) {
         await transactionEliminarAlmacen.rollback();
         console.error(error);
-        throw new Error(error.message);
+        throw new managerCRUDError(error.message,500,'Almacen');
     }
 };
 
@@ -101,19 +106,17 @@ const updateAlmacen = async (id,regAlmacen)=>{
     let transactionActualizarAlmacen = await Almacen.sequelize.transaction();
     try {
         const foundAlmacen = await Almacen.findByPk(id);
-        if (!foundAlmacen) {
-            throw new Error('No se ha encontrado la entrada de Almacen');
-        }
+        if (!foundAlmacen) throw new Error('Update: No se ha encontrado el registro');
         let updatedAlmacen = await foundAlmacen.update(regAlmacen,{transaction:transactionActualizarAlmacen});
         await transactionActualizarAlmacen.commit();
-        console.log("Registro actualizado OK Tabla Almacen");
+        console.log("Update:Registro actualizado OK Tabla Almacen",updatedAlmacen.dataValues );
         return updatedAlmacen;
     } catch (error) {
         await transactionActualizarAlmacen.rollback();
         console.error(error);
-        throw new Error(error.message);
+        throw new managerCRUDError(error.message,500,'Almacen');
     }
-}
+};
 
 const searchByAlmacen = async (search) => {
     try {
@@ -130,11 +133,12 @@ const searchByAlmacen = async (search) => {
                 [Op.and]: buscar
             }
         });
-        console.log("searchByAlmacen:Registros encontrados en Tabla Almacen",foundRegsAlmacen, foundRegsAlmacen.length);
+        console.log("Search: Registros encontrados en Tabla Almacen",foundRegsAlmacen, foundRegsAlmacen.length);
+        if (foundRegsAlmacen.length===0) throw new Error('Search: No se encontraron registros');
         return foundRegsAlmacen;
     } catch (error) {
         console.log(error.message);
-        throw new Error(error.message);
+        throw new managerCRUDError(error.message,500,'Almacen');
     }
 
 };

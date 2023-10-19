@@ -16,6 +16,22 @@ module.exports = (sequelize)=>{
         codSunat:{
             type:DataTypes.STRING,
         },
+        operacionesCompra:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        operacionesAlmacen:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        operacionesVenta:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
+        facturacionElectronica:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false

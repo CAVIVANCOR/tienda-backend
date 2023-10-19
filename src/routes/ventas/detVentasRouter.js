@@ -6,6 +6,6 @@ detVentasRouter.get("/",getDetVentasHandler);
 detVentasRouter.post("/",createDetVentasHandler);
 detVentasRouter.delete("/:id",deleteDetVentasHandler);
 detVentasRouter.put("/update/:id",updateDetVentasHandler);
-detVentasRouter.get("/search/",searchDetVentasHandler);
+detVentasRouter.post("/search/",searchDetVentasHandler);
 
 module.exports = detVentasRouter;

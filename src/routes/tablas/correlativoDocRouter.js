@@ -6,6 +6,6 @@ correlativoDocRouter.get("/",getCorrelativoDocHandler);
 correlativoDocRouter.post("/",createCorrelativoDocHandler);
 correlativoDocRouter.delete("/:id",deleteCorrelativoDocHandler);
 correlativoDocRouter.put("/:id",updateCorrelativoDocHandler);
-correlativoDocRouter.get("/search/",searchCorrelativoDocHandler);
+correlativoDocRouter.post("/search/",searchCorrelativoDocHandler);
 
 module.exports = correlativoDocRouter;

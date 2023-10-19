@@ -66,6 +66,7 @@ const formaPagoRouter = require("../routes/compras/formaPagoRouter");
 
 const cabVentasRouter = require("../routes/ventas/cabVentasRouter");
 const detVentasRouter = require("../routes/ventas/detVentasRouter");
+const motivoNCNDRouter = require("../routes/ventas/motivoNCNDRouter");
 
 mainRouter.use("/conceptosMovsCuentas", conceptoMovCRouter);
 mainRouter.use("/cuentas", cuentasRouter);
@@ -77,6 +78,7 @@ mainRouter.use("/detCompras", detComprasRouter);
 mainRouter.use("/formasPago", formaPagoRouter);
 mainRouter.use("/cabVentas", cabVentasRouter);
 mainRouter.use("/detVentas", detVentasRouter);
+mainRouter.use("/MotivoNCND", motivoNCNDRouter);
 
 
 mainRouter.use("/anosProductos", anoProductosRouter);
@@ -133,6 +135,5 @@ mainRouter.use("/detMovAlmacen", detMovAlmacenRouter);
 mainRouter.use("/tiposMovAlmacen", tipoMovAlmacenRouter);
 mainRouter.use("/ubicacionesFisicasAlmacen", ubicacionFisicaAlmacenRouter);
 mainRouter.use("/kardexAlmacen",kardexAlmacenRouter);
-
 
 module.exports = mainRouter;

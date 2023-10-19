@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const {DetVentas,CabVentas,Producto,EstadoProd, ClienteProveedor} = require("../../db");
+const {DetVentas,Producto,EstadoProd} = require("../../db");
 const axios = require("axios");
 const regDetVentasUsuario ={
     where: { borradoLogico: false },
@@ -78,11 +78,9 @@ const getAllDetVentas= async (isAdministrator=false)=>{
 };
 
 const createDetVentas = async (regDetVentas)=>{
-    const transactionCrearDetVentas = await DetVentas.create(regDetVentas);
+    const transactionCrearDetVentas = await DetVentas.sequelize.transaction();
     try {
-        await DetVentas.sequelize.query('Lock Table DetVentas',{transaction:transactionCrearDetVentas});
-        let maxIdDetVentas = await DetVentas.max("id");
-        let newDetVentas = await DetVentas.create({id:maxIdDetVentas+1},{transaction:transactionCrearDetVentas});
+        let newDetVentas = await DetVentas.create(regDetVentas,{transaction:transactionCrearDetVentas});
         await transactionCrearDetVentas.commit();
         console.log('Registro creado OK Tabla DetVentas');
         return newDetVentas;
@@ -120,7 +118,7 @@ const updateDetVentas = async (id,regDetVentas)=>{
         return updatedDetVentas;
     } catch (error) {
         await transactionActualizarDetVentas.rollback();
-        console.log(error.message);
+        console.log("BACKEND-CAVR:"+error.message);
         throw new Error(error.message);
     };
 };

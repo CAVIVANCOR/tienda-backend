@@ -28,7 +28,7 @@ const CabComprasModel = require("./models/compras/CabCompras");
 //**VENTAS */
 const DetVentasModel = require("./models/ventas/DetVentas");
 const CabVentasModel = require("./models/ventas/CabVentas");
-
+const MotivoNCNDModel = require("./models/ventas/MotivoNCND");
 
 //**PRODUCTOS */
 const ProductoModel = require("./models/productos/Producto");
@@ -104,6 +104,7 @@ DetComprasModel(sequelize);
 //**VENTAS */
 CabVentasModel(sequelize);
 DetVentasModel(sequelize);
+MotivoNCNDModel(sequelize);
 
 //**ALMACEN */
 AlmacenModel(sequelize);
@@ -172,7 +173,7 @@ const  {Producto, EstadoProd, Familia, SubFamilia, Ano, Colore, Lado,
         CorrelativoDoc, DatoGlobal, EstadoDoc, TipoCambio, TipoDocumento, CentroCosto, 
         GrupoCentroCostos, SubGrupoCentroCosto, TipoCliProv, Almacen, CabMovAlmacen, ConceptoAlmacen, KardexAlmacen, 
         DetMovAlmacen, TipoMovAlmacen, UbicaAlmacen, FormaPago, DetCompras, CabCompras, 
-        CabVentas, DetVentas, ConceptoMovC, Cuentas, DetMovCuentas, KardexCuentas} = sequelize.models;
+        CabVentas, DetVentas, MotivoNCND, ConceptoMovC, Cuentas, DetMovCuentas, KardexCuentas} = sequelize.models;
 
 
 //**PRODUCTOS */
@@ -359,6 +360,9 @@ CabCompras.belongsTo(TipoCambio);
 CentroCosto.hasMany(CabCompras);
 CabCompras.belongsTo(CentroCosto);
 
+MotivoNCND.hasMany(CabCompras);
+CabCompras.belongsTo(MotivoNCND);
+
 Producto.hasMany(DetCompras);
 DetCompras.belongsTo(Producto);
 
@@ -390,6 +394,9 @@ CabVentas.belongsTo(CentroCosto);
 
 CorrelativoDoc.hasMany(CabVentas);
 CabVentas.belongsTo(CorrelativoDoc);
+
+MotivoNCND.hasMany(CabVentas);
+CabVentas.belongsTo(MotivoNCND);
 
 Producto.hasMany(DetVentas);
 DetVentas.belongsTo(Producto);

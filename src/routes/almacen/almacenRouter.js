@@ -6,6 +6,6 @@ almacenRouter.get("/",getAlmacenHandler);
 almacenRouter.post("/",createAlmacenHandler);
 almacenRouter.delete("/:id",deleteAlmacenHandler);
 almacenRouter.put("/:id",updateAlmacenHandler);
-almacenRouter.get("/search/",searchByAlmacenHandler);
+almacenRouter.post("/search/",searchByAlmacenHandler);
 
 module.exports = almacenRouter;

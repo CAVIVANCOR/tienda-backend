@@ -1,4 +1,4 @@
-const {CabVentas, TipoDocIdentidad, DetVentas,CorrelativoDoc,Producto,FormaPago,CentroCosto, ClienteProveedor, EstadoDoc, TipoDocumento, TipoCambio, Usuario, Personal} = require("../../db");
+const {CabVentas, MotivoNCND, TipoDocIdentidad, DetVentas,CorrelativoDoc,Producto,FormaPago,CentroCosto, ClienteProveedor, EstadoDoc, TipoDocumento, TipoCambio, Usuario, Personal} = require("../../db");
 const axios = require("axios");
 const { deleteDetVentas } = require("./detVentasControllers");
 const { Op } = require("sequelize");
@@ -8,7 +8,6 @@ const regCabVentasUsuario ={
                 model:DetVentas,
                 include:[{
                     model:Producto,
-                    attributes:["descripcion","codigoProveedor","modeloFabricante","urlFotoProducto"],
                 }]
             },{
                 model:FormaPago,
@@ -102,6 +101,371 @@ const getAllCabVentas= async (isAdministrator=false)=>{
     return databaseCabVentas;
 };
 
+// const envioSunatCabVentas = async (regCabVentas)=>{
+//     const transactionEnvioSunatCabVentas = await CabVentas.sequelize.transaction();
+//     const data = {
+//         "personaId": "651c6cbee205ab00142d02c0",
+//         "personaToken": "DEV_1VJi15nAWxMLYR95tPCgSyVlyHLYQdy2CzZ5ZPzpaAsC4KHWFX2IJTclQivFdLLi",
+//         "fileName": "10100082697-03-B001-00000001",
+//         "documentBody": {
+//             "cbc:UBLVersionID": {
+//                 "_text": "2.1"
+//             },
+//             "cbc:CustomizationID": {
+//                 "_text": "2.0"
+//             },
+//             "cbc:ID": {
+//                 "_text": "B001-00000001"
+//             },
+//             "cbc:IssueDate": {
+//                 "_text": "2023-10-04"
+//             },
+//             "cbc:IssueTime": {
+//                 "_text": "13:02:12"
+//             },
+//             "cbc:InvoiceTypeCode": {
+//                 "_attributes": {
+//                     "listID": "0101"
+//                 },
+//                 "_text": "03"
+//             },
+//             "cbc:Note": [
+//                 {
+//                     "_text": "CIENTO CINCUENTA Y TRES CON 10/100 SOLES",
+//                     "_attributes": {
+//                         "languageLocaleID": "1000"
+//                     }
+//                 }
+//             ],
+
+//             "cbc:DocumentCurrencyCode": {
+//                 "_text": "PEN"
+//             },
+
+//             // datos proveedor
+//             "cac:AccountingSupplierParty": {
+//                 "cac:Party": {
+//                     "cac:PartyIdentification": {
+//                         "cbc:ID": {
+//                             "_attributes": {
+//                                 "schemeID": "6"
+//                             },
+//                             "_text": "10100082697"
+//                         }
+//                     },
+//                     "cac:PartyName": {
+//                         "cbc:Name": {
+//                             "_text": "13 EL FUTURO HOY"
+//                         }
+//                     },
+//                     "cac:PartyLegalEntity": {
+//                         "cbc:RegistrationName": {
+//                             "_text": "VIVANCO RODRIGUEZ CARLOS ALBERTO"
+//                         },
+//                         "cac:RegistrationAddress": {
+//                             "cbc:AddressTypeCode": {
+//                                 "_text": "0000"
+//                             },
+//                             "cac:AddressLine": {
+//                                 "cbc:Line": {
+//                                     "_text": "AV. PEDRO SILVA NRO. 1030 ZONA C SAN JUAN DE MIRAFLORES LIMA LIMA"
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             },
+
+//             // datos cliente
+//             "cac:AccountingCustomerParty": {
+//                 "cac:Party": {
+//                     "cac:PartyIdentification": {
+//                         "cbc:ID": {
+//                             "_attributes": {
+//                                 "schemeID": "6"
+//                             },
+//                             "_text": "10100082697"
+//                         }
+//                     },
+//                     "cac:PartyLegalEntity": {
+//                         "cbc:RegistrationName": {
+//                             "_text": "VIVANCO RODRIGUEZ CARLOS ALBERTO"
+//                         },
+//                         "cac:RegistrationAddress": {
+//                             "cac:AddressLine": {
+//                                 "cbc:Line": {
+//                                     "_text": "AV. PEDRO SILVA NRO. 1030 ZONA C SAN JUAN DE MIRAFLORES LIMA LIMA"
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 }
+//             },
+
+//             // impuestos totales
+//             "cac:TaxTotal": {
+//                 "cbc:TaxAmount": {
+//                     "_attributes": {
+//                         "currencyID": "PEN"
+//                     },
+//                     "_text": 23.35
+//                 },
+//                 "cac:TaxSubtotal": [
+//                     {
+//                         "cbc:TaxableAmount": {
+//                             "_attributes": {
+//                                 "currencyID": "PEN"
+//                             },
+//                             "_text": 129.75
+//                         },
+//                         "cbc:TaxAmount": {
+//                             "_attributes": {
+//                                 "currencyID": "PEN"
+//                             },
+//                             "_text": 23.35
+//                         },
+//                         "cac:TaxCategory": {
+//                             "cac:TaxScheme": {
+//                                 "cbc:ID": {
+//                                     "_text": "1000"
+//                                 },
+//                                 "cbc:Name": {
+//                                     "_text": "IGV"
+//                                 },
+//                                 "cbc:TaxTypeCode": {
+//                                     "_text": "VAT"
+//                                 }
+//                             }
+//                         }
+//                     }
+//                 ]
+//             },
+
+//             // totales TODO
+//             "cac:LegalMonetaryTotal": {
+//                 "cbc:LineExtensionAmount": {
+//                     "_attributes": {
+//                         "currencyID": "PEN"
+//                     },
+//                     "_text": 129.75
+//                 },
+//                 "cbc:TaxInclusiveAmount": {
+//                     "_attributes": {
+//                         "currencyID": "PEN"
+//                     },
+//                     "_text": 153.1
+//                 },
+//                 "cbc:PayableAmount": {
+//                     "_attributes": {
+//                         "currencyID": "PEN"
+//                     },
+//                     "_text": 153.1
+//                 }
+//             },
+
+//             // productos o items
+//             "cac:InvoiceLine": [
+//                 {
+//                     "cbc:ID": {
+//                         "_text": 1
+//                     },
+//                     "cbc:InvoicedQuantity": {
+//                         "_attributes": {
+//                             "unitCode": "NIU"
+//                         },
+//                         "_text": 1
+//                     },
+//                     "cbc:LineExtensionAmount": {
+//                         "_attributes": {
+//                             "currencyID": "PEN"
+//                         },
+//                         "_text": 84.75
+//                     },
+//                     "cac:PricingReference": {
+//                         "cac:AlternativeConditionPrice": {
+//                             "cbc:PriceAmount": {
+//                                 "_attributes": {
+//                                     "currencyID": "PEN"
+//                                 },
+//                                 "_text": 100
+//                             },
+//                             "cbc:PriceTypeCode": {
+//                                 "_text": "01"
+//                             }
+//                         }
+//                     },
+//                     "cac:TaxTotal": {
+//                         "cbc:TaxAmount": {
+//                             "_attributes": {
+//                                 "currencyID": "PEN"
+//                             },
+//                             "_text": 15.25
+//                         },
+//                         "cac:TaxSubtotal": [
+//                             {
+//                                 "cbc:TaxableAmount": {
+//                                     "_attributes": {
+//                                         "currencyID": "PEN"
+//                                     },
+//                                     "_text": 84.75
+//                                 },
+//                                 "cbc:TaxAmount": {
+//                                     "_attributes": {
+//                                         "currencyID": "PEN"
+//                                     },
+//                                     "_text": 15.25
+//                                 },
+//                                 "cac:TaxCategory": {
+//                                     "cbc:Percent": {
+//                                         "_text": 18
+//                                     },
+//                                     "cbc:TaxExemptionReasonCode": {
+//                                         "_text": "10"
+//                                     },
+//                                     "cac:TaxScheme": {
+//                                         "cbc:ID": {
+//                                             "_text": "1000"
+//                                         },
+//                                         "cbc:Name": {
+//                                             "_text": "IGV"
+//                                         },
+//                                         "cbc:TaxTypeCode": {
+//                                             "_text": "VAT"
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     "cac:Item": {
+//                         "cbc:Description": {
+//                             "_text": "pantalon jean"
+//                         },
+//                         "cac:SellersItemIdentification": {
+//                             "cbc:ID": {
+//                                 "_text": "4588"
+//                             }
+//                         }
+//                     },
+//                     "cac:Price": {
+//                         "cbc:PriceAmount": {
+//                             "_attributes": {
+//                                 "currencyID": "PEN"
+//                             },
+//                             "_text": 84.7457627119
+//                         }
+//                     }
+//                 },
+//                 {
+//                     "cbc:ID": {
+//                         "_text": 2
+//                     },
+//                     "cbc:InvoicedQuantity": {
+//                         "_attributes": {
+//                             "unitCode": "NIU"
+//                         },
+//                         "_text": 1
+//                     },
+//                     "cbc:LineExtensionAmount": {
+//                         "_attributes": {
+//                             "currencyID": "PEN"
+//                         },
+//                         "_text": 45
+//                     },
+//                     "cac:PricingReference": {
+//                         "cac:AlternativeConditionPrice": {
+//                             "cbc:PriceAmount": {
+//                                 "_attributes": {
+//                                     "currencyID": "PEN"
+//                                 },
+//                                 "_text": 53.1
+//                             },
+//                             "cbc:PriceTypeCode": {
+//                                 "_text": "01"
+//                             }
+//                         }
+//                     },
+//                     "cac:TaxTotal": {
+//                         "cbc:TaxAmount": {
+//                             "_attributes": {
+//                                 "currencyID": "PEN"
+//                             },
+//                             "_text": 8.1
+//                         },
+//                         "cac:TaxSubtotal": [
+//                             {
+//                                 "cbc:TaxableAmount": {
+//                                     "_attributes": {
+//                                         "currencyID": "PEN"
+//                                     },
+//                                     "_text": 45
+//                                 },
+//                                 "cbc:TaxAmount": {
+//                                     "_attributes": {
+//                                         "currencyID": "PEN"
+//                                     },
+//                                     "_text": 8.1
+//                                 },
+//                                 "cac:TaxCategory": {
+//                                     "cbc:Percent": {
+//                                         "_text": 18
+//                                     },
+//                                     "cbc:TaxExemptionReasonCode": {
+//                                         "_text": "10"
+//                                     },
+//                                     "cac:TaxScheme": {
+//                                         "cbc:ID": {
+//                                             "_text": "1000"
+//                                         },
+//                                         "cbc:Name": {
+//                                             "_text": "IGV"
+//                                         },
+//                                         "cbc:TaxTypeCode": {
+//                                             "_text": "VAT"
+//                                         }
+//                                     }
+//                                 }
+//                             }
+//                         ]
+//                     },
+//                     "cac:Item": {
+//                         "cbc:Description": {
+//                             "_text": "camiseta"
+//                         },
+//                         "cac:SellersItemIdentification": {
+//                             "cbc:ID": {
+//                                 "_text": "00015"
+//                             }
+//                         }
+//                     },
+//                     "cac:Price": {
+//                         "cbc:PriceAmount": {
+//                             "_attributes": {
+//                                 "currencyID": "PEN"
+//                             },
+//                             "_text": 45
+//                         }
+//                     }
+//                 }
+//             ]
+//         }
+//     }
+//     let regCabVentasJSON=JSON.stringify(data)
+//     let newCabVentas = JSON.parse(regCabVentasJSON);
+//     console.log("newCabVentas", newCabVentas);
+//     try {
+//         await CabVentas.sequelize.query('Lock Table CabVentas',{transaction:transactionEnvioSunatCabVentas});
+//         let apiCabVentas = (await axios.post('https://back.apisunat.com/personas/v1/sendBill',regCabVentasJSON)).data;
+//         console.log("envioSunatCabVentas:apiCabVentasRaw", apiCabVentas);
+//         await transactionEnvioSunatCabVentas.commit();
+//         return newCabVentas;
+//     } catch (error) {
+//         await transactionEnvioSunatCabVentas.rollback();
+//         console.log(error.message);
+//         throw new Error(error.message);
+//     };
+// }
+
 const createCabVentas = async (regCabVentas)=>{
     const transactionCrearCabVentas = await CabVentas.sequelize.transaction();
     try {
@@ -161,6 +525,7 @@ const updateCabVentas = async (id,regCabVentas)=>{
 const searchByCabVentas= async (search)=>{
     try {
         let buscar = {};
+        buscar.borradoLogico = false;
         if (search.razonSocial !== undefined) {
             buscar['$ClienteProveedor.razonSocial$'] = { [Op.like]: `%${search.razonSocial.toUpperCase()}%` };
             delete search.razonSocial;
@@ -180,6 +545,10 @@ const searchByCabVentas= async (search)=>{
         if (search.fecha !== undefined) {
             buscar.fecha = { [Op.eq]: search.fecha };
             delete search.fecha;
+        };
+        if (search.tipodocdiferente !== undefined) {
+            buscar.CorrelativoDocId = { [Op.not]: search.tipodocdiferente };
+            delete search.tipodocdiferente;
         };
         if (search.fechaInicial !== undefined && search.fechaFinal !== undefined) {
             buscar.fecha = { [Op.between]: [search.fechaInicial, search.fechaFinal] };
@@ -205,7 +574,6 @@ const searchByCabVentas= async (search)=>{
                         model:DetVentas,
                         include:[{
                             model:Producto,
-                            attributes:["descripcion","codigoProveedor","modeloFabricante","urlFotoProducto"],
                         }]
                     },{
                         model: ClienteProveedor,
@@ -242,6 +610,8 @@ const searchByCabVentas= async (search)=>{
                     },{
                         model: FormaPago,
                         required: true
+                    },{
+                        model: MotivoNCND,
                     }]
         });
         console.log("searchByCabVentas:Registros encontrados en Tabla CabVentas", foundRegsCabVentas.length);

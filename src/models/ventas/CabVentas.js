@@ -70,6 +70,16 @@ module.exports = (sequelize)=>{
             type:DataTypes.BOOLEAN,
             defaultValue:false
         },
+        idDocAfecto:{
+            type:DataTypes.BIGINT,
+            defaultValue:0,
+        },
+        numDocAfecto:{
+            type:DataTypes.STRING,
+        },
+        fechaDocAfecto:{
+            type:DataTypes.DATEONLY,
+        },
         created:{
             type:DataTypes.BOOLEAN,
             defaultValue:false
@@ -80,6 +90,10 @@ module.exports = (sequelize)=>{
         },
         idHistorico:{
             type:DataTypes.BIGINT,
+        },
+        cerrado:{
+            type:DataTypes.BOOLEAN,
+            defaultValue:false
         },
     },
     {

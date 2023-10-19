@@ -164,8 +164,8 @@ const updateProducto = async (id,regProducto)=>{
 
 const searchProductos = async (search)=>{
     try {
-        console.log("search",search);
         let buscar = {};
+        buscar.borradoLogico = false;
         for (let [key, value] of Object.entries(search)) {
           if (typeof value === 'string') {
             const palabras = value.toUpperCase().split(' ');
@@ -182,42 +182,42 @@ const searchProductos = async (search)=>{
             where: {
                 [Op.and]: buscar
             },
-            include: [{
-                model:SubFamilia,
-                required:true,
-                include:[{
-                    model:Familia,
-                    required:true
-                }]
-            },{
-                model: Ano,
-                required:true,
-            },{
-                model:Materiale,
-                required:true,
-            },{
-                model:Colore,
-                required:true,
-            },{
-                model:Lado,
-                required:true,
-            },{
-                model:Procedencia,
-                required:true,
-            },{
-                model:TipoExisCont,
-                required:true,
-            },{
-                model:UMProd,
-                required:true,
-            },{
-                model:ModeloMarca,
-                required:true,
-                include:[{
-                    model:Marca,
-                    required:true
-                }]
-            }],
+            include:[{
+                        model:SubFamilia,
+                        required:true,
+                        include:[{
+                            model:Familia,
+                            required:true
+                        }]
+                    },{
+                        model: Ano,
+                        required:true,
+                    },{
+                        model:Materiale,
+                        required:true,
+                    },{
+                        model:Colore,
+                        required:true,
+                    },{
+                        model:Lado,
+                        required:true,
+                    },{
+                        model:Procedencia,
+                        required:true,
+                    },{
+                        model:TipoExisCont,
+                        required:true,
+                    },{
+                        model:UMProd,
+                        required:true,
+                    },{
+                        model:ModeloMarca,
+                        required:true,
+                        include:[{
+                            model:Marca,
+                            required:true
+                        }]
+                    }],
             order: [
                 ['descripcion', 'ASC'],
               ]
